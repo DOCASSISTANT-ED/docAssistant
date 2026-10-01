@@ -1,0 +1,32 @@
+name: Bug
+description: Beklenmeyen bir davranış bildir
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Ne oldu?
+      description: Gördüğünüz davranış ve varsa hata mesajı / log.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ne olmasını bekliyordunuz?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Tekrar üretme adımları
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Ortam
+      placeholder: "Windows 11, .NET 10, branch: feature/..."
