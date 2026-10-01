@@ -1,0 +1,33 @@
+name: Görev
+description: Yapılacak bir iş tanımla
+title: "feat: "
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Amaç
+      description: Bu iş neden yapılıyor, ne elde edilecek?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Kabul kriterleri
+      value: |
+        - [ ]
+        - [ ] Test yazıldı
+        - [ ] CI yeşil
+        - [ ] Review edildi
+    validations:
+      required: true
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Faz
+      options: ["faz-0", "faz-1", "faz-2", "faz-3", "faz-4", "faz-5"]
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notlar / bağımlılıklar
