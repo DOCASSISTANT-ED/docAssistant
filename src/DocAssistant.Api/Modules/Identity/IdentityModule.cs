@@ -1,5 +1,6 @@
 using DocAssistant.Shared.Tenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -49,6 +50,10 @@ public static class IdentityModule
         // leak into another request.
         services.AddHttpContextAccessor();
         services.AddScoped<ITenantContext, JwtTenantContext>();
+
+        // TimeProvider instead of DateTime.UtcNow so tests can control the clock.
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddSingleton<JwtTokenIssuer>();
 
         return services;
     }
