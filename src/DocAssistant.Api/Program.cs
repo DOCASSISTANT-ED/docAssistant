@@ -1,4 +1,6 @@
+using DocAssistant.Api.Data;
 using DocAssistant.Api.Modules.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
+
+var connectionString = builder.Configuration.GetConnectionString("Default")
+    ?? throw new InvalidOperationException("Connection string 'Default' is not configured.");
+
+builder.Services.AddDbContext<AppDbContext>(options => options
+    .UseNpgsql(connectionString)
+    .UseSnakeCaseNamingConvention());
 
 builder.Services.AddIdentityModule();
 
