@@ -12,7 +12,7 @@ Başlangıç toplantısında alınan, sonradan değiştirmesi zor kararlar. Değ
 | 6 | Commit formatı | Conventional Commits (`feat:`, `fix:`, `test:` ...) | |
 | 7 | "Bitti" tanımı | Test yazılmış, CI yeşil, karşı taraf review etmiş | |
 | 8 | Embedding modeli | `bge-m3` (Ollama) | |
-| 9 | Dosya saklama (geliştirme) | SeaweedFS (`weed mini`), MinIO yerine. Uygulama S3 API'si üzerinden konuşur; canlıda herhangi bir S3 uyumlu depolama kullanılabilir. | 2026-10-05 |
+| 9 | Dosya saklama | SeaweedFS (geliştirme), S3 uyumlu depolama (canlı). MinIO'dan vazgeçildi, gerekçe Notlar'da. | 2026-10-05 |. | 2026-10-05 |
 
 ## Notlar
 

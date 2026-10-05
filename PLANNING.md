@@ -41,7 +41,7 @@ Bu bölüm başlangıç toplantısında doldurulacak. Değişen her karar tarihi
 | Embedding modeli | bge-m3 (Ollama) |
 | Sohbet modeli | Geliştirmede Ollama, canlıda API modeli (`IChatClient` ile değiştirilebilir) |
 | Branch stratejisi | `main` korumalı, `feature/*` branch'leri, en az 1 onaylı PR |
-| Merge yöntemi | _squash / rebase — seçilecek_ |
+| Merge yöntemi | Merge commit |
 | Commit formatı | Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`, `chore:`) |
 
 ### "Bitti" tanımı
