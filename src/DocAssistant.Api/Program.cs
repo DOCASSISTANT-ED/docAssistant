@@ -9,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
+// Errors as RFC 9457 ProblemDetails; request DTOs validated from their data annotations.
+builder.Services.AddProblemDetails();
+builder.Services.AddValidation();
+
 var connectionString = builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("Connection string 'Default' is not configured.");
 
