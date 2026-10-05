@@ -12,9 +12,12 @@ builder.Services.AddHealthChecks();
 var connectionString = builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("Connection string 'Default' is not configured.");
 
-builder.Services.AddDbContext<AppDbContext>(options => options
-    .UseNpgsql(connectionString)
-    .UseSnakeCaseNamingConvention());
+// Scoped like ITenantContext: each request gets an interceptor bound to its own tenant.
+builder.Services.AddScoped<TenantConnectionInterceptor>();
+
+builder.Services.AddDbContext<AppDbContext>((services, options) => options
+    .UseAppDatabase(connectionString)
+    .AddInterceptors(services.GetRequiredService<TenantConnectionInterceptor>()));
 
 builder.Services.AddIdentityModule();
 
