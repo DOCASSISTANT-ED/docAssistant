@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DocAssistant.Api.Modules.Identity;
 
@@ -19,4 +21,7 @@ public sealed class JwtOptions
 
     [Range(1, 1440)]
     public int AccessTokenMinutes { get; init; } = 60;
+
+    // Shared by token validation and token creation so both always use the same key.
+    public SymmetricSecurityKey CreateSigningKey() => new(Encoding.UTF8.GetBytes(SigningKey));
 }

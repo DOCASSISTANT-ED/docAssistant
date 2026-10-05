@@ -7,10 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
-builder.Services.AddOptions<JwtOptions>()
-    .BindConfiguration(JwtOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+builder.Services.AddIdentityModule();
 
 var app = builder.Build();
 
@@ -21,6 +18,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Order matters: identify the caller first, then check what they may access.
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapHealthChecks("/health");
 
