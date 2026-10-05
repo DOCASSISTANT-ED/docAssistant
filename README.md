@@ -77,7 +77,24 @@ dotnet build
 dotnet test
 ```
 
-### 6. Uygulamayı çalıştır
+### 6. Veritabanı şemasını oluştur
+
+Tablolar EF Core migration'larıyla oluşturulur. İlk komut `dotnet-ef` aracını `dotnet-tools.json`'daki sürümle kurar, ikincisi bekleyen migration'ları veritabanına uygular. PostgreSQL container'ı çalışıyor olmalı.
+
+```bash
+dotnet tool restore
+dotnet ef database update --project src/DocAssistant.Api
+```
+
+Doğrulamak için:
+
+```bash
+docker compose exec postgres psql -U docassistant -d docassistant -c "\dt"
+```
+
+Listede `tenants` ve `__EFMigrationsHistory` tabloları görünmelidir.
+
+### 7. Uygulamayı çalıştır
 
 API ve Web ayrı projelerdir; her biri kendi terminalinde çalıştırılır.
 
@@ -102,6 +119,8 @@ dotnet run --project src/DocAssistant.Web
 | Servisleri durdur (veri kalır) | `docker compose down` |
 | Servisleri sıfırla (veritabanı ve yüklenen dosyalar silinir) | `docker compose down -v` |
 | Testleri çalıştır | `dotnet test` |
+| Bekleyen migration'ları uygula (`git pull` sonrası) | `dotnet ef database update --project src/DocAssistant.Api` |
+| Yeni migration üret | `dotnet ef migrations add <Ad> --project src/DocAssistant.Api --output-dir Data/Migrations` |
 
 ## Sık karşılaşılan sorunlar
 
@@ -109,6 +128,8 @@ dotnet run --project src/DocAssistant.Web
 - **`docker compose up` bağlanamıyor:** Docker Desktop çalışmıyordur; açıp motorun başlamasını bekle.
 - **5432 portu kullanımda:** Bilgisayarında başka bir PostgreSQL çalışıyordur. `.env` dosyasında `POSTGRES_PORT` değerini değiştir. 8333 veya 23646 portları için aynı şekilde `S3_PORT` ve `SEAWEEDFS_ADMIN_PORT` kullanılır.
 - **`.env` dosyan bu değişiklikten önce oluşturulduysa:** `.env.example`'daki `S3_` ve `SEAWEEDFS_` satırlarını kendi `.env` dosyana ekle; yoksa SeaweedFS anahtarsız açılır.
+- **`dotnet ef` komutu tanınmıyor:** `dotnet tool restore` çalıştırılmamıştır.
+- **API açılışta "Connection string 'Default' is not configured" hatası veriyor:** Uygulama `Development` ortamında çalışmıyordur; bağlantı cümlesi `appsettings.Development.json` içindedir. `dotnet run` bunu kendiliğinden ayarlar.
 - **İlk embedding isteği yavaş:** Model belleğe yüklenirken ilk istek yarım dakika kadar sürebilir; sonrakiler hızlıdır.
 
 ## Katkı

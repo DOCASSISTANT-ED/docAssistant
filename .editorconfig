@@ -28,3 +28,7 @@ dotnet_naming_symbols.private_fields.applicable_kinds = field
 dotnet_naming_symbols.private_fields.applicable_accessibilities = private
 dotnet_naming_style.underscore_prefix.required_prefix = _
 dotnet_naming_style.underscore_prefix.capitalization = camel_case
+
+# EF Core'un ürettiği migration dosyaları elle düzenlenmez; kod stili denetiminden muaf.
+[**/Migrations/*.cs]
+generated_code = true
