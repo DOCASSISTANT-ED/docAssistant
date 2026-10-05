@@ -22,6 +22,44 @@ namespace DocAssistant.Api.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("DocAssistant.Api.Modules.Documents.Document", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("title");
+
+                    b.HasKey("Id")
+                        .HasName("pk_documents");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_documents_tenant_id");
+
+                    b.ToTable("documents", (string)null);
+                });
+
             modelBuilder.Entity("DocAssistant.Api.Modules.Identity.Membership", b =>
                 {
                     b.Property<Guid>("Id")
@@ -125,6 +163,16 @@ namespace DocAssistant.Api.Data.Migrations
                         .HasName("pk_tenants");
 
                     b.ToTable("tenants", (string)null);
+                });
+
+            modelBuilder.Entity("DocAssistant.Api.Modules.Documents.Document", b =>
+                {
+                    b.HasOne("DocAssistant.Api.Modules.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_documents_tenants_tenant_id");
                 });
 
             modelBuilder.Entity("DocAssistant.Api.Modules.Identity.Membership", b =>
