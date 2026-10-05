@@ -37,7 +37,7 @@ Bu bölüm başlangıç toplantısında doldurulacak. Değişen her karar tarihi
 | .NET sürümü | .NET 10 |
 | Arayüz | Blazor Web App |
 | Veritabanı | PostgreSQL 17 + pgvector |
-| Dosya saklama | MinIO (geliştirme), S3 uyumlu depolama (canlı) |
+| Dosya saklama | SeaweedFS (geliştirme), S3 uyumlu depolama (canlı). MinIO'dan vazgeçildi, bkz. `docs/decisions.md` #9 |
 | Embedding modeli | bge-m3 (Ollama) |
 | Sohbet modeli | Geliştirmede Ollama, canlıda API modeli (`IChatClient` ile değiştirilebilir) |
 | Branch stratejisi | `main` korumalı, `feature/*` branch'leri, en az 1 onaylı PR |
@@ -125,7 +125,7 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 |---|---|---|
 | Solution iskeleti, `Directory.*.props`, `.editorconfig` | Repo ayarları: branch protection, PR ve issue şablonları, etiketler, Project panosu | Başlangıç toplantısı, `docs/decisions.md` |
 | GitHub Actions: build pipeline | `docker-compose.yml` (pgvector), `.env.example`, Ollama + bge-m3 denemesi | `README.md`: sıfırdan kurulum adımları |
-| **Çapraz PR:** Compose'a MinIO ekler | **Çapraz PR:** CI'a test adımı ekler | |
+| **Çapraz PR:** Compose'a SeaweedFS (S3) ekler | **Çapraz PR:** CI'a test adımı ekler | |
 
 **Bitiş koşulu:**
 - [ ] İki bilgisayarda da `git clone` → `docker compose up` → `dotnet run` sorunsuz çalışıyor
@@ -152,7 +152,7 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 | Dide | Erva | Birlikte |
 |---|---|---|
 | DOCX parser (OpenXML) | PDF parser (PdfPig) | **Pair:** Chunking algoritması |
-| Arka plan işi (`BackgroundService` + `Channel`) ve belge durum takibi, açılışta yarım işleri kurtarma | Yükleme endpoint'i, MinIO'ya dosya saklama | **İlk değerlendirme seti:** 30–50 soru-cevap çifti |
+| Arka plan işi (`BackgroundService` + `Channel`) ve belge durum takibi, açılışta yarım işleri kurtarma | Yükleme endpoint'i, S3'e (SeaweedFS) dosya saklama | **İlk değerlendirme seti:** 30–50 soru-cevap çifti |
 | **Çapraz test:** PDF parser testleri | **Çapraz test:** DOCX parser ve arka plan işi testleri | |
 
 **Bitiş koşulu:**
@@ -207,7 +207,7 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 |---|---|---|
 | ASP.NET Core / Web API | Auth endpoint'leri | Yükleme ve sohbet endpoint'leri |
 | EF Core + migration | Auth tabloları | Tenant yapısı, query filter, RLS |
-| Docker | MinIO ekleme, canlı deploy | Compose kurulumu |
+| Docker | SeaweedFS ekleme, canlı deploy | Compose kurulumu |
 | CI (GitHub Actions) | İlk pipeline | Test adımı |
 | Belge parsing | DOCX | PDF |
 | Arka plan işleri | Ingestion işi, durum takibi | Testleri |

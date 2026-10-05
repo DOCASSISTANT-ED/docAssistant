@@ -19,6 +19,28 @@ services:
       timeout: 3s
       retries: 10
 
+  # S3 uyumlu dosya saklama (geliştirme). MinIO yerine SeaweedFS: docs/decisions.md #9
+  # "mini" modu master, volume, filer ve S3 gateway'i tek süreçte çalıştırır.
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.48
+    container_name: docassistant-seaweedfs
+    restart: unless-stopped
+    command: mini
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY}
+      S3_BUCKET: ${S3_BUCKET}
+    ports:
+      - "${S3_PORT:-8333}:8333"
+      - "${SEAWEEDFS_ADMIN_PORT:-23646}:23646"
+    volumes:
+      - seaweedfs-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8333/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   # Geliştirmede Ollama doğrudan Windows'a kurulur; bu servis sadece
   # Linux + NVIDIA sunucu için:  docker compose --profile linux-gpu up -d
   ollama:
@@ -40,4 +62,5 @@ services:
 
 volumes:
   postgres-data:
+  seaweedfs-data:
   ollama-data:
