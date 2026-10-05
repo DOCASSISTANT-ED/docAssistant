@@ -93,7 +93,7 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 |---|---|---|---|
 | xUnit | Birim ve entegrasyon testleri | 0 (boş test) | Planlı |
 | bUnit | Blazor bileşen testleri | 4 | Planlı |
-| Testcontainers | Testlerde gerçek PostgreSQL'i container olarak ayağa kaldırma | 5 | Planlı |
+| Testcontainers | Testlerde gerçek PostgreSQL'i container olarak ayağa kaldırma; RLS testleri için zorunlu | 1 | Planlı |
 | Değerlendirme seti | Arama ve cevap kalitesini ölçen soru-cevap çiftleri (30–50, sonra 100+) | 2'den itibaren | Planlı |
 
 Çapraz test kuralı her fazda geçerlidir: herkes karşı tarafın yazdığı kodun testini yazar.

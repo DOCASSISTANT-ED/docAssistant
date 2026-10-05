@@ -17,10 +17,12 @@ Başlangıç toplantısında alınan, sonradan değiştirmesi zor kararlar. Değ
 | 11 | Veritabanı erişimi | Tek `AppDbContext`; bütün tablolar ve migration'lar tek yerde. Modül başına ayrı `DbContext` kullanılmaz. | 2026-10-05 |
 | 12 | Kullanıcı–firma ilişkisi | Bir kullanıcı birden fazla firmaya üye olabilir (`users`, `tenants`, `memberships`). E-posta sistemde benzersizdir. Rol (`Admin`, `Member`) üyeliğe aittir; bir firmada birden fazla admin olabilir. | 2026-10-05 |
 | 13 | Çoklu üyeliğin kapsamı | Faz 1'de yalnızca veri modeli kurulur: her kullanıcının tek üyeliği olur ve giriş doğrudan o firmaya yapılır. Firma seçme ve değiştirme ekranları ihtiyaç doğunca eklenir. | 2026-10-05 |
-| 14 | Tenant sözleşmesi | `ITenantContext` (`DocAssistant.Shared`), `Guid? TenantId`. Değer bu istekte seçili firmayı gösterir; JWT'deki `tenant_id` claim'inden okunur. Boşken tenant'a ait sorgular hiçbir satır döndürmez, tenant'a ait kayıt eklemek hata verir. | 2026-10-05 |
-| 15 | RLS kapsamı | Row-Level Security yalnızca firma verisi tablolarında açıktır (belgeler, chunk'lar, sohbetler). Kimlik tablolarında (`users`, `memberships`, `tenants`) kapalıdır; bunları global query filter korur. Giriş sorgusu filtreyi bilerek atlar (`IgnoreQueryFilters`). | 2026-10-05 |
+| 14 | Tenant sözleşmesi | `ITenantContext` (`DocAssistant.Shared`), `Guid? TenantId`. Değer bu istekte seçili firmayı gösterir; JWT'deki `tenant_id` claim'inden okunur. Boşken filtreli sorgular hiçbir satır döndürmez. Yazma kontrolü yalnızca `ITenantOwned` ile işaretli firma verisi tablolarında geçerlidir: `TenantId` otomatik doldurulur, tenant boşken kayıt eklemek hata verir. Kimlik tabloları (`tenants`, `users`, `memberships`) bu işareti taşımaz; kayıt işlemi bu tablolara tenant bilinmeden yazar. | 2026-10-05 |
+| 15 | RLS kapsamı | Row-Level Security yalnızca firma verisi tablolarında açıktır (belgeler, chunk'lar, sohbetler). Kimlik tablolarında (`users`, `memberships`, `tenants`) kapalıdır; bunları global query filter korur: `tenants` → `Id` şu anki firma; `memberships` → `TenantId` şu anki firma; `users` → şu anki firmada üyeliği olanlar. Filtreler `AppDbContext`'te tanımlanır. Giriş ve kayıt, tenant bilinmeden arama yaptıkları yerlerde filtreyi bilerek atlar (`IgnoreQueryFilters`). | 2026-10-05 |
 | 16 | Klasör düzeni | Modüller ayrı proje değil, `DocAssistant.Api` içinde klasördür: `Data/` (`AppDbContext`, migration'lar), `Modules/Tenants/`, `Modules/Identity/` vb. | 2026-10-05 |
 | 17 | Faz 1'de RLS tablosu | `documents` tablosunun yalın hâli (kimlik, tenant, başlık, durum) Faz 1'e çekilir; RLS ve izolasyon testleri bu tablo üzerinde kurulur. | 2026-10-05 |
+| 18 | Entegrasyon testlerinde veritabanı | Testcontainers Faz 5'ten Faz 1'e çekilir. Testler `pgvector/pgvector:pg17` imajıyla açılan gerçek PostgreSQL'e bağlanır; bellek içi veritabanı ya da SQLite kullanılmaz. | 2026-10-05 |
+| 19 | Kısıtlı veritabanı kullanıcısı | Uygulama kullanıcısı (`docassistant_app`) `docker/postgres/init/` altındaki init betiğiyle oluşturulur; parolası `.env`'den gelir. Tablo yetkileri ve RLS politikaları migration'larla verilir. Testcontainers aynı init betiğini kullanır. | 2026-10-05 |
 
 ## Notlar
 
@@ -30,4 +32,7 @@ Başlangıç toplantısında alınan, sonradan değiştirmesi zor kararlar. Değ
 - #12–13 gerekçesi: veri modelini sonradan değiştirmek zor, ekran eklemek kolay. Üyelik tablosu baştan kurulur, çoklu firma ekranları ertelenir.
 - #15 gerekçesi: giriş anında firma bilinmediği için kullanıcı tablosunda RLS açık olsaydı kimse giriş yapamazdı.
 - #15 için kritik: PostgreSQL'de süper kullanıcılar ve tablo sahibi RLS'ten muaftır. Compose'daki `docassistant` kullanıcısı süper kullanıcıdır; uygulama onunla bağlanırsa politikalar hiç uygulanmaz. Migration'lar süper kullanıcıyla, uygulama yetkileri kısıtlı ayrı bir kullanıcıyla bağlanır.
+- #14 gerekçesi: kayıt isteğinde henüz giriş yapılmadığı için tenant boştur; yazma kontrolü kimlik tablolarına da uygulansaydı firma, kullanıcı ve üyelik eklenemezdi.
+- #18 gerekçesi: RLS bir PostgreSQL özelliğidir; başka bir veritabanında izolasyon testleri RLS'i hiç sınamadan geçer.
+- #19 gerekçesi: parola migration koduna yazılmaz, çünkü migration'lar repoda durur. Init betikleri yalnızca volume ilk oluşturulurken çalışır; betik eklendikten sonra mevcut volume bir kez `docker compose down -v` ile sıfırlanmalıdır.
 - #16 gerekçesi: tek `AppDbContext` hem modüllerin tablolarını bilmek hem de modüller tarafından kullanılmak zorunda; ayrı projelerde bu döngüsel başvuruya yol açar.
