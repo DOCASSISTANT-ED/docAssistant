@@ -11,6 +11,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <!-- Design paketi private olduğu için EF Core sürümünü bu projeye başvuran projelere
+         (testler) taşımaz; açık başvuru olmazsa onlar daha eski bir sürüm çözer ve derlenmez. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
