@@ -1,5 +1,6 @@
 using System.Reflection;
 using DocAssistant.Api.Modules.Documents;
+using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Tenants;
 using DocAssistant.Shared.Tenancy;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
     : DbContext(options)
 {
     public DbSet<Tenant> Tenants => Set<Tenant>();
+
+    public DbSet<User> Users => Set<User>();
+
+    public DbSet<Membership> Memberships => Set<Membership>();
 
     public DbSet<Document> Documents => Set<Document>();
 

@@ -1,5 +1,6 @@
 using DocAssistant.Shared.Tenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -54,6 +55,10 @@ public static class IdentityModule
         // TimeProvider instead of DateTime.UtcNow so tests can control the clock.
         services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<JwtTokenIssuer>();
+
+        // Only the hasher is taken from ASP.NET Core Identity; users and memberships are our
+        // own tables. Default: PBKDF2 with HMAC-SHA512, 100,000 iterations, random salt.
+        services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
         return services;
     }
