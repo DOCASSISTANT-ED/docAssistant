@@ -144,8 +144,9 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 | Dide | Erva | Birlikte |
 |---|---|---|
-| Identity + JWT (kayıt, giriş), `users` ve `memberships` tabloları | EF Core kurulumu, `AppDbContext`, Tenant entity, migration'lar, global query filter | Başlangıç kararları: `docs/decisions.md` #11–17 |
+| Identity + JWT (kayıt, giriş), `users` ve `memberships` tabloları | EF Core kurulumu, `AppDbContext`, Tenant entity, migration'lar, global query filter | Başlangıç kararları: `docs/decisions.md` #11–19 |
 | `ITenantContext`'in JWT'den okuyan uygulaması | `documents` tablosunun yalın hâli, PostgreSQL Row-Level Security politikaları, kısıtlı veritabanı kullanıcısı | |
+| Testcontainers ile entegrasyon test altyapısı (gerçek PostgreSQL) | Kimlik tablolarının query filter'ları (`users` ve `memberships` `main`'e girdikten sonra) | |
 | **Çapraz test:** Tenant izolasyon testleri (query filter + RLS) | **Çapraz test:** Auth testleri | |
 
 **Bitiş koşulu:**
@@ -194,7 +195,7 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 | Dide | Erva | Birlikte |
 |---|---|---|
-| Testcontainers ile entegrasyon testleri | Blazor belge yönetimi sayfası | `v0.1.0` release |
+| Entegrasyon testlerini genişletme (Testcontainers altyapısı Faz 1'de kuruldu) | Blazor belge yönetimi sayfası | `v0.1.0` release |
 | Docker ile canlı ortama deploy | Değerlendirme setini genişletme (100+ soru) | 2–3 pilot firma ile deneme |
 | | Tenant bazlı token kotası ve rate limiting | |
 | **Çapraz test:** Belge yönetimi ve kota testleri | **Çapraz test:** Deploy sonrası smoke testleri | |
