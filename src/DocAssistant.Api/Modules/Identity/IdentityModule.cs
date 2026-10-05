@@ -1,3 +1,4 @@
+using DocAssistant.Shared.Tenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -37,12 +38,17 @@ public static class IdentityModule
                     IssuerSigningKey = jwt.CreateSigningKey(),
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(1),
-                    NameClaimType = "sub",
-                    RoleClaimType = "role",
+                    NameClaimType = ClaimNames.UserId,
+                    RoleClaimType = ClaimNames.Role,
                 };
             });
 
         services.AddAuthorization();
+
+        // Scoped: one instance per HTTP request, so one request's tenant can never
+        // leak into another request.
+        services.AddHttpContextAccessor();
+        services.AddScoped<ITenantContext, JwtTenantContext>();
 
         return services;
     }
