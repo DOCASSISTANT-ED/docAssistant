@@ -6,6 +6,7 @@
 
   <!-- Paket sürümleri sadece burada tutulur; .csproj dosyalarında Version yazılmaz. -->
   <ItemGroup>
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
   </ItemGroup>
 

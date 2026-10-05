@@ -94,7 +94,29 @@ docker compose exec postgres psql -U docassistant -d docassistant -c "\dt"
 
 Listede `tenants` ve `__EFMigrationsHistory` tabloları görünmelidir.
 
-### 7. Uygulamayı çalıştır
+### 7. JWT imza anahtarını ayarla
+
+API, giriş token'larını imzalamak için gizli bir anahtar kullanır. Anahtar repoda tutulmaz; her geliştirici kendi bilgisayarında [user-secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) ile bir kez ayarlar. Anahtar yoksa API açılmaz ve `SigningKey` hatası verir.
+
+Rastgele bir anahtar üret (Git Bash):
+
+```bash
+openssl rand -base64 64
+```
+
+PowerShell'de:
+
+```powershell
+$b = New-Object byte[] 64; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); [Convert]::ToBase64String($b)
+```
+
+Çıkan değeri kaydet:
+
+```bash
+dotnet user-secrets set "Jwt:SigningKey" "<üretilen-anahtar>" --project src/DocAssistant.Api
+```
+
+### 8. Uygulamayı çalıştır
 
 API ve Web ayrı projelerdir; her biri kendi terminalinde çalıştırılır.
 

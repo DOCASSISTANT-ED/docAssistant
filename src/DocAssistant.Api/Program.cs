@@ -1,4 +1,5 @@
 using DocAssistant.Api.Data;
+using DocAssistant.Api.Modules.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,8 @@ builder.Services.AddDbContext<AppDbContext>(options => options
     .UseNpgsql(connectionString)
     .UseSnakeCaseNamingConvention());
 
+builder.Services.AddIdentityModule();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,6 +28,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Order matters: identify the caller first, then check what they may access.
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapHealthChecks("/health");
+app.MapAuthEndpoints();
 
 app.Run();
