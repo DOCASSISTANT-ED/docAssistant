@@ -14,7 +14,7 @@ Durum sütunu: **Kurulu** = repoda var, **Planlı** = kararı verilmiş ama hen�
 | Arayüz | Blazor Web App |
 | Veritabanı | PostgreSQL 17 + pgvector |
 | Veri erişimi | EF Core |
-| Dosya saklama | MinIO (geliştirme), S3 uyumlu depolama (canlı) |
+| Dosya saklama | SeaweedFS (geliştirme), S3 uyumlu depolama (canlı) |
 | Yapay zekâ | Ollama, bge-m3 (embedding), `IChatClient` / `IEmbeddingGenerator` |
 | Test | xUnit, bUnit, Testcontainers |
 | Altyapı | Docker Compose, GitHub Actions |
@@ -57,7 +57,7 @@ Paket sürümleri yalnızca `Directory.Packages.props` içinde tutulur (merkezi 
 | EF Core + migration | — | Veri erişimi, şema değişiklikleri, global query filter | 1 | Planlı |
 | Row-Level Security | PostgreSQL özelliği | Tenant izolasyonunun veritabanı katmanı | 1 | Planlı |
 | Full-text arama (`turkish`) | PostgreSQL özelliği | Anahtar kelime araması | 3 | Planlı |
-| MinIO | — | Yüklenen dosyaların saklanması (geliştirme) | 0 (compose), 2 (kullanım) | Planlı |
+| SeaweedFS | 4.48 (`chrislusf/seaweedfs`, `mini` modu) | Yüklenen dosyaların S3 API'si üzerinden saklanması (geliştirme). MinIO yerine, bkz. decisions.md #9 | 0 (compose), 2 (kullanım) | Kurulu |
 | S3 uyumlu depolama | — | Dosya saklama (canlı) | 5 | Planlı |
 
 Tenant izolasyonu iki katmanlıdır: uygulamada EF Core global query filter, veritabanında Row-Level Security.
@@ -102,7 +102,7 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 
 | Teknoloji | Ne için | Faz | Durum |
 |---|---|---|---|
-| Docker Compose | Geliştirme ortamı: PostgreSQL, MinIO, (Linux'ta) Ollama | 0 | Kurulu (PostgreSQL) |
+| Docker Compose | Geliştirme ortamı: PostgreSQL, SeaweedFS, (Linux'ta) Ollama | 0 | Kurulu (PostgreSQL, SeaweedFS) |
 | GitHub Actions | CI: build, ardından test adımı | 0 | Planlı |
 | Docker | Canlı ortama deploy | 5 | Planlı |
 | `.editorconfig` | Ortak kod stili | 0 | Kurulu |

@@ -10,7 +10,7 @@ KOBİ'ler için çok kiracılı (multi-tenant) Türkçe doküman asistanı. Firm
 | Araç | Sürüm | Not |
 |---|---|---|
 | [.NET SDK](https://dotnet.microsoft.com/download) | 10.0.100 veya üstü (10.0.x) | Sürüm `global.json` ile sabitlenir |
-| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Güncel | PostgreSQL bunun içinde çalışır |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Güncel | PostgreSQL ve SeaweedFS bunun içinde çalışır |
 | [Ollama](https://ollama.com/download) | Güncel | Windows'a doğrudan kurulur, Docker içinde değil |
 | Git | Güncel | |
 
@@ -35,7 +35,7 @@ cp .env.example .env
 
 PowerShell'de: `Copy-Item .env.example .env`
 
-### 3. Veritabanını başlat
+### 3. Servisleri başlat
 
 Docker Desktop açık olmalı.
 
@@ -43,14 +43,21 @@ Docker Desktop açık olmalı.
 docker compose up -d
 ```
 
-Bu komut PostgreSQL 17'yi pgvector eklentisiyle birlikte başlatır. Doğrulamak için:
+Bu komut iki servis başlatır:
+
+| Servis | Ne için | Adres |
+|---|---|---|
+| PostgreSQL 17 + pgvector | Veritabanı | `localhost:5432` |
+| SeaweedFS | S3 uyumlu dosya saklama; `documents` bucket'ı açılışta otomatik oluşur | S3 API: http://localhost:8333, yönetim paneli: http://localhost:23646 |
+
+Doğrulamak için:
 
 ```bash
 docker compose ps
 docker compose exec postgres psql -U docassistant -d docassistant -c "SELECT '[1,2,3]'::vector <-> '[1,2,4]'::vector AS distance;"
 ```
 
-İlk komutta `docassistant-postgres` satırında `healthy` görünmeli, ikincisi `1` döndürmelidir.
+İlk komutta `docassistant-postgres` ve `docassistant-seaweedfs` satırlarında `healthy` görünmeli, ikincisi `1` döndürmelidir.
 
 ### 4. Embedding modelini indir
 
@@ -91,16 +98,17 @@ dotnet run --project src/DocAssistant.Web
 
 | İş | Komut |
 |---|---|
-| Veritabanını başlat | `docker compose up -d` |
-| Veritabanını durdur (veri kalır) | `docker compose down` |
-| Veritabanını sıfırla (veri silinir) | `docker compose down -v` |
+| Servisleri başlat | `docker compose up -d` |
+| Servisleri durdur (veri kalır) | `docker compose down` |
+| Servisleri sıfırla (veritabanı ve yüklenen dosyalar silinir) | `docker compose down -v` |
 | Testleri çalıştır | `dotnet test` |
 
 ## Sık karşılaşılan sorunlar
 
 - **`ollama` komutu tanınmıyor:** Terminal Ollama kurulmadan önce açılmıştır. Terminali, VS Code kullanıyorsan VS Code'u tamamen kapatıp yeniden aç.
 - **`docker compose up` bağlanamıyor:** Docker Desktop çalışmıyordur; açıp motorun başlamasını bekle.
-- **5432 portu kullanımda:** Bilgisayarında başka bir PostgreSQL çalışıyordur. `.env` dosyasında `POSTGRES_PORT` değerini değiştir.
+- **5432 portu kullanımda:** Bilgisayarında başka bir PostgreSQL çalışıyordur. `.env` dosyasında `POSTGRES_PORT` değerini değiştir. 8333 veya 23646 portları için aynı şekilde `S3_PORT` ve `SEAWEEDFS_ADMIN_PORT` kullanılır.
+- **`.env` dosyan bu değişiklikten önce oluşturulduysa:** `.env.example`'daki `S3_` ve `SEAWEEDFS_` satırlarını kendi `.env` dosyana ekle; yoksa SeaweedFS anahtarsız açılır.
 - **İlk embedding isteği yavaş:** Model belleğe yüklenirken ilk istek yarım dakika kadar sürebilir; sonrakiler hızlıdır.
 
 ## Katkı
