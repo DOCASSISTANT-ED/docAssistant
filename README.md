@@ -1,1 +1,112 @@
-# docAssistant
+# DocAssistant
+
+KOBİ'ler için çok kiracılı (multi-tenant) Türkçe doküman asistanı. Firmalar kendi belgelerini yükler, çalışanlar bu belgelere soru sorar, cevaplar kaynak gösterilerek gelir.
+
+- Proje planı ve mimari: [PLANNING.md](PLANNING.md)
+- Kararlar: [docs/decisions.md](docs/decisions.md)
+
+## Gereksinimler
+
+| Araç | Sürüm | Not |
+|---|---|---|
+| [.NET SDK](https://dotnet.microsoft.com/download) | 10.0.100 veya üstü (10.0.x) | Sürüm `global.json` ile sabitlenir |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Güncel | PostgreSQL bunun içinde çalışır |
+| [Ollama](https://ollama.com/download) | Güncel | Windows'a doğrudan kurulur, Docker içinde değil |
+| Git | Güncel | |
+
+## Kurulum
+
+Komutlar proje klasöründe çalıştırılır.
+
+### 1. Repoyu klonla
+
+```bash
+git clone https://github.com/DOCASSISTANT-ED/docAssistant.git
+cd docAssistant
+```
+
+### 2. Ortam dosyasını oluştur
+
+`.env.example` dosyasını `.env` adıyla kopyala. `.env` commit edilmez; içindeki değerler yalnızca kendi bilgisayarın içindir.
+
+```bash
+cp .env.example .env
+```
+
+PowerShell'de: `Copy-Item .env.example .env`
+
+### 3. Veritabanını başlat
+
+Docker Desktop açık olmalı.
+
+```bash
+docker compose up -d
+```
+
+Bu komut PostgreSQL 17'yi pgvector eklentisiyle birlikte başlatır. Doğrulamak için:
+
+```bash
+docker compose ps
+docker compose exec postgres psql -U docassistant -d docassistant -c "SELECT '[1,2,3]'::vector <-> '[1,2,4]'::vector AS distance;"
+```
+
+İlk komutta `docassistant-postgres` satırında `healthy` görünmeli, ikincisi `1` döndürmelidir.
+
+### 4. Embedding modelini indir
+
+Ollama kurulduktan sonra yeni bir terminal aç (eski terminaller `ollama` komutunu tanımaz) ve modeli indir. Yaklaşık 1,2 GB.
+
+```bash
+ollama pull bge-m3
+ollama list
+```
+
+Listede `bge-m3:latest` görünmelidir.
+
+### 5. Derle ve test et
+
+```bash
+dotnet build
+dotnet test
+```
+
+### 6. Uygulamayı çalıştır
+
+API ve Web ayrı projelerdir; her biri kendi terminalinde çalıştırılır.
+
+```bash
+dotnet run --project src/DocAssistant.Api
+```
+
+```bash
+dotnet run --project src/DocAssistant.Web
+```
+
+| Uygulama | Adres | Kontrol |
+|---|---|---|
+| API | http://localhost:5174 | http://localhost:5174/health `Healthy` döndürür |
+| Web | http://localhost:5078 | Ana sayfa açılır |
+
+## Günlük kullanım
+
+| İş | Komut |
+|---|---|
+| Veritabanını başlat | `docker compose up -d` |
+| Veritabanını durdur (veri kalır) | `docker compose down` |
+| Veritabanını sıfırla (veri silinir) | `docker compose down -v` |
+| Testleri çalıştır | `dotnet test` |
+
+## Sık karşılaşılan sorunlar
+
+- **`ollama` komutu tanınmıyor:** Terminal Ollama kurulmadan önce açılmıştır. Terminali, VS Code kullanıyorsan VS Code'u tamamen kapatıp yeniden aç.
+- **`docker compose up` bağlanamıyor:** Docker Desktop çalışmıyordur; açıp motorun başlamasını bekle.
+- **5432 portu kullanımda:** Bilgisayarında başka bir PostgreSQL çalışıyordur. `.env` dosyasında `POSTGRES_PORT` değerini değiştir.
+- **İlk embedding isteği yavaş:** Model belleğe yüklenirken ilk istek yarım dakika kadar sürebilir; sonrakiler hızlıdır.
+
+## Katkı
+
+- `main` korumalıdır; her iş kendi branch'inde yapılır ve PR ile, merge commit yöntemiyle birleştirilir.
+- Commit mesajları [Conventional Commits](https://www.conventionalcommits.org/) formatındadır (`feat:`, `fix:`, `test:`, `docs:`, `chore:`).
+- Çapraz test kuralı geçerlidir: herkes karşı tarafın yazdığı kodun testini yazar.
+
+Ayrıntılar için [PLANNING.md](PLANNING.md) dosyasına bakın.
