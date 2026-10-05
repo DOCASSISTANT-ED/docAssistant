@@ -12,7 +12,9 @@ Başlangıç toplantısında alınan, sonradan değiştirmesi zor kararlar. Değ
 | 6 | Commit formatı | Conventional Commits (`feat:`, `fix:`, `test:` ...) | |
 | 7 | "Bitti" tanımı | Test yazılmış, CI yeşil, karşı taraf review etmiş | |
 | 8 | Embedding modeli | `bge-m3` (Ollama) | |
+| 9 | Dosya saklama (geliştirme) | SeaweedFS (`weed mini`), MinIO yerine. Uygulama S3 API'si üzerinden konuşur; canlıda herhangi bir S3 uyumlu depolama kullanılabilir. | 2026-10-05 |
 
 ## Notlar
 
 - Geliştirmede Ollama doğrudan Windows'a kurulur; compose'daki `ollama` servisi yalnızca `linux-gpu` profilinde çalışır.
+- #9 gerekçesi: MinIO Community Edition Aralık 2025'te bakım moduna alındı, Nisan 2026'da arşivlendi; resmi Docker imajları artık yayınlanmıyor ve Docker Hub'dan çekilemeyebiliyor.
