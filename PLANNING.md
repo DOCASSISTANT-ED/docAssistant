@@ -61,21 +61,24 @@ Modüler monolit. Mikroservis yok.
 ```
 src/
   DocAssistant.Api            ASP.NET Core Web API
+    Data/                     AppDbContext (tek), migration'lar
+    Modules/
+      Tenants                 Firma yönetimi, tenant çözümleme
+      Identity                Kayıt, giriş, JWT, üyelikler
+      Documents               Yükleme, saklama, belge durumu
+      Ingestion               Parse → chunk → embed hattı
+      Retrieval               Hibrit arama, reranking
+      Chat                    LLM, prompt, sohbet geçmişi
   DocAssistant.Web            Blazor Web App
-  DocAssistant.Shared         Ortak tipler, sonuç nesneleri
-  Modules/
-    Tenants                   Firma yönetimi, tenant çözümleme
-    Identity                  Kayıt, giriş, JWT
-    Documents                 Yükleme, saklama, belge durumu
-    Ingestion                 Parse → chunk → embed hattı
-    Retrieval                 Hibrit arama, reranking
-    Chat                      LLM, prompt, sohbet geçmişi
+  DocAssistant.Shared         Ortak tipler, sonuç nesneleri, ITenantContext
 tests/
   DocAssistant.UnitTests
   DocAssistant.IntegrationTests
 docs/
   decisions.md
 ```
+
+Modüller ayrı proje değil, API projesi içinde klasördür (bkz. `docs/decisions.md` #16).
 
 Kök dizinde `Directory.Build.props`, `Directory.Packages.props` (merkezi paket sürümü) ve `.editorconfig` bulunur.
 
@@ -102,6 +105,8 @@ Belge yeniden yüklendiğinde eski sürümün chunk'ları silinir.
 ### Tenant izolasyonu (iki katman)
 1. **Uygulama:** EF Core global query filter ile her sorguya otomatik `TenantId` filtresi.
 2. **Veritabanı:** PostgreSQL Row-Level Security. Kodda filtre unutulsa bile başka firmanın verisi dönmez.
+
+RLS yalnızca firma verisi tablolarında açıktır; kimlik tablolarını (`users`, `memberships`, `tenants`) yalnızca query filter korur. Şu anki firma `ITenantContext` üzerinden okunur. Uygulama veritabanına yetkileri kısıtlı ayrı bir kullanıcıyla bağlanır; süper kullanıcı RLS'ten muaf olduğu için yalnızca migration'larda kullanılır. Ayrıntılar: `docs/decisions.md` #12–15.
 
 Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 0.8+ kullanılır.
 
@@ -139,8 +144,8 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 | Dide | Erva | Birlikte |
 |---|---|---|
-| Identity + JWT (kayıt, giriş) | Tenant entity, EF Core migration'ları, global query filter | |
-| | PostgreSQL Row-Level Security politikaları | |
+| Identity + JWT (kayıt, giriş), `users` ve `memberships` tabloları | EF Core kurulumu, `AppDbContext`, Tenant entity, migration'lar, global query filter | Başlangıç kararları: `docs/decisions.md` #11–17 |
+| `ITenantContext`'in JWT'den okuyan uygulaması | `documents` tablosunun yalın hâli, PostgreSQL Row-Level Security politikaları, kısıtlı veritabanı kullanıcısı | |
 | **Çapraz test:** Tenant izolasyon testleri (query filter + RLS) | **Çapraz test:** Auth testleri | |
 
 **Bitiş koşulu:**
