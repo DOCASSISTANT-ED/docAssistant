@@ -88,8 +88,59 @@ public static class AuthEndpoints
         return TypedResults.Created("/auth/me", token);
     }
 
-    private static IResult Login(LoginRequest request) =>
-        Results.Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Not implemented yet.");
+    private static async Task<Results<Ok<AccessToken>, ProblemHttpResult>> Login(
+        LoginRequest request,
+        AppDbContext db,
+        IPasswordHasher<User> passwordHasher,
+        JwtTokenIssuer tokenIssuer,
+        CancellationToken cancellationToken)
+    {
+        var normalizedEmail = User.NormalizeEmail(request.Email);
+
+        // No tenant is selected before login (decisions #15).
+        var user = await db.Users
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
+
+        if (user is null)
+        {
+            // Verify against a dummy hash so an unknown email takes as long as a wrong
+            // password; otherwise response time would reveal which emails are registered.
+            passwordHasher.VerifyHashedPassword(TimingDummy.User, TimingDummy.PasswordHash, request.Password);
+            return InvalidCredentials();
+        }
+
+        var verification = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+
+        if (verification == PasswordVerificationResult.Failed)
+        {
+            return InvalidCredentials();
+        }
+
+        // Phase 1: every user has exactly one membership and signs in to it (decisions #13).
+        var membership = await db.Memberships
+            .IgnoreQueryFilters()
+            .Where(m => m.UserId == user.Id)
+            .OrderBy(m => m.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (membership is null)
+        {
+            return TypedResults.Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "This account is not a member of any organization.");
+        }
+
+        // The stored hash uses an older format; upgrade it while we have the plain password.
+        if (verification == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            user.PasswordHash = passwordHasher.HashPassword(user, request.Password);
+            await db.SaveChangesAsync(cancellationToken);
+        }
+
+        var token = tokenIssuer.Issue(user.Id, user.Email, membership.TenantId, membership.Role.ToString());
+        return TypedResults.Ok(token);
+    }
 
     private static CurrentUserResponse GetCurrentUser(ClaimsPrincipal user, ITenantContext tenantContext) =>
         new(
@@ -102,6 +153,28 @@ public static class AuthEndpoints
         TypedResults.Problem(
             statusCode: StatusCodes.Status409Conflict,
             title: "This email address is already registered.");
+
+    // Same response for unknown email and wrong password, so callers cannot tell which
+    // emails are registered.
+    private static ProblemHttpResult InvalidCredentials() =>
+        TypedResults.Problem(
+            statusCode: StatusCodes.Status401Unauthorized,
+            title: "Invalid email or password.");
+
+    private static class TimingDummy
+    {
+        public static readonly User User = new()
+        {
+            Email = string.Empty,
+            NormalizedEmail = string.Empty,
+            PasswordHash = string.Empty,
+        };
+
+        // Created with the same default hasher settings as the registered IPasswordHasher,
+        // so verifying against it costs the same as verifying a real user's hash.
+        public static readonly string PasswordHash =
+            new PasswordHasher<User>().HashPassword(User, Guid.NewGuid().ToString());
+    }
 }
 
 public sealed record CurrentUserResponse(string? UserId, string? Email, Guid? TenantId, string? Role);
