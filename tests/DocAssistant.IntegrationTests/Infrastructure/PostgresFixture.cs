@@ -59,7 +59,21 @@ public sealed class PostgresFixture : IAsyncLifetime
         var options = new DbContextOptionsBuilder<AppDbContext>();
         options.UseAppDatabase(SuperuserConnectionString);
 
-        return new AppDbContext(options.Options, new NoTenantContext());
+        return new AppDbContext(options.Options, new FixedTenantContext(null));
+    }
+
+    // Wired like the running app (Program.cs): restricted user, query filters, write rules
+    // and the interceptor that hands the tenant to Row-Level Security. Null = no tenant
+    // selected, as before login.
+    public AppDbContext CreateAppDbContext(Guid? tenantId)
+    {
+        var tenantContext = new FixedTenantContext(tenantId);
+
+        var options = new DbContextOptionsBuilder<AppDbContext>();
+        options.UseAppDatabase(AppConnectionString)
+            .AddInterceptors(new TenantConnectionInterceptor(tenantContext));
+
+        return new AppDbContext(options.Options, tenantContext);
     }
 
     public async Task DisposeAsync()
@@ -83,9 +97,9 @@ public sealed class PostgresFixture : IAsyncLifetime
         throw new DirectoryNotFoundException("docker/postgres/init was not found above the test output folder.");
     }
 
-    private sealed class NoTenantContext : ITenantContext
+    private sealed class FixedTenantContext(Guid? tenantId) : ITenantContext
     {
-        public Guid? TenantId => null;
+        public Guid? TenantId => tenantId;
     }
 }
 
