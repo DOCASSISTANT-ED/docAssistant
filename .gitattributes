@@ -1,0 +1,4 @@
+# Container içinde (Linux) çalışan betikler her bilgisayarda LF satır sonuyla kalmalı;
+# CRLF ile bash betikleri çalışmaz.
+*.sh text eol=lf
+docker/postgres/init/* text eol=lf

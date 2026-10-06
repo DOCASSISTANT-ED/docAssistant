@@ -89,10 +89,19 @@ dotnet ef database update --project src/DocAssistant.Api
 Doğrulamak için:
 
 ```bash
-docker compose exec postgres psql -U docassistant -d docassistant -c "\dt"
+docker compose exec postgres psql -U docassistant -d docassistant -c "\dt" -c "\du"
 ```
 
-Listede `tenants` ve `__EFMigrationsHistory` tabloları görünmelidir.
+Tablo listesinde `tenants`, `documents` ve `__EFMigrationsHistory`, kullanıcı listesinde `docassistant` ve `docassistant_app` görünmelidir.
+
+Veritabanında iki kullanıcı vardır:
+
+| Kullanıcı | Kim kullanır | Bağlantı cümlesi | Neden |
+|---|---|---|---|
+| `docassistant` (süper kullanıcı) | Yalnızca `dotnet ef` komutları | `Migrations` | Tablo, yetki ve RLS politikası oluşturabilmek için |
+| `docassistant_app` (kısıtlı) | Çalışan API | `Default` | Süper kullanıcı Row-Level Security'den muaftır; API onunla bağlansaydı tenant izolasyonunun veritabanı katmanı hiç çalışmazdı |
+
+`docassistant_app`, veritabanı ilk oluşturulurken `docker/postgres/init/02-app-user.sh` ile kendiliğinden oluşur. Geliştirmede iki bağlantı cümlesi de `appsettings.Development.json` içindedir.
 
 ### 7. JWT imza anahtarını ayarla
 
@@ -150,6 +159,15 @@ dotnet run --project src/DocAssistant.Web
 - **`docker compose up` bağlanamıyor:** Docker Desktop çalışmıyordur; açıp motorun başlamasını bekle.
 - **5432 portu kullanımda:** Bilgisayarında başka bir PostgreSQL çalışıyordur. `.env` dosyasında `POSTGRES_PORT` değerini değiştir. 8333 veya 23646 portları için aynı şekilde `S3_PORT` ve `SEAWEEDFS_ADMIN_PORT` kullanılır.
 - **`.env` dosyan bu değişiklikten önce oluşturulduysa:** `.env.example`'daki `S3_` ve `SEAWEEDFS_` satırlarını kendi `.env` dosyana ekle; yoksa SeaweedFS anahtarsız açılır.
+- **Migration `role "docassistant_app" does not exist` hatası veriyor:** Veritabanın bu kullanıcı eklenmeden önce oluşturulmuştur; init betikleri yalnızca veritabanı ilk oluşurken çalışır. `.env` dosyana `.env.example`'daki `APP_DB_PASSWORD` satırını ekle, sonra veriyi silmeden kullanıcıyı oluştur:
+
+  ```bash
+  docker compose up -d
+  docker compose exec postgres bash /docker-entrypoint-initdb.d/02-app-user.sh
+  ```
+
+  Ardından `dotnet ef database update --project src/DocAssistant.Api` komutunu yeniden çalıştır.
+- **API bir sorguda `permission denied for table ...` hatası veriyor:** Migration'lar uygulanmamıştır; tablo yetkilerini migration'lar verir. `dotnet ef database update --project src/DocAssistant.Api` çalıştır.
 - **`dotnet ef` komutu tanınmıyor:** `dotnet tool restore` çalıştırılmamıştır.
 - **API açılışta "Connection string 'Default' is not configured" hatası veriyor:** Uygulama `Development` ortamında çalışmıyordur; bağlantı cümlesi `appsettings.Development.json` içindedir. `dotnet run` bunu kendiliğinden ayarlar.
 - **İlk embedding isteği yavaş:** Model belleğe yüklenirken ilk istek yarım dakika kadar sürebilir; sonrakiler hızlıdır.
