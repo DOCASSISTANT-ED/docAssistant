@@ -77,6 +77,8 @@ dotnet build
 dotnet test
 ```
 
+Docker Desktop açık olmalı: entegrasyon testleri ([Testcontainers](https://dotnet.testcontainers.org/) ile) kendi geçici PostgreSQL container'larını açar, migration'ları uygular ve bitince siler. Geliştirme veritabanına (`docker compose`) dokunmazlar. Test yazma rehberi: [docs/testing.md](docs/testing.md).
+
 ### 6. Veritabanı şemasını oluştur
 
 Tablolar EF Core migration'larıyla oluşturulur. İlk komut `dotnet-ef` aracını `dotnet-tools.json`'daki sürümle kurar, ikincisi bekleyen migration'ları veritabanına uygular. PostgreSQL container'ı çalışıyor olmalı.
@@ -158,6 +160,8 @@ dotnet run --project src/DocAssistant.Web
 
 - **`ollama` komutu tanınmıyor:** Terminal Ollama kurulmadan önce açılmıştır. Terminali, VS Code kullanıyorsan VS Code'u tamamen kapatıp yeniden aç.
 - **`docker compose up` bağlanamıyor:** Docker Desktop çalışmıyordur; açıp motorun başlamasını bekle.
+- **Entegrasyon testleri "Docker is either not running or misconfigured" hatasıyla başarısız oluyor:** Aynı sebep; Docker Desktop'ı açıp `dotnet test`'i yeniden çalıştır. Birim testleri Docker'a ihtiyaç duymaz.
+- **API açılışta `The SigningKey field is required` hatası veriyor:** Bu bilgisayarda JWT anahtarı ayarlanmamıştır; 7. adımı uygula.
 - **5432 portu kullanımda:** Bilgisayarında başka bir PostgreSQL çalışıyordur. `.env` dosyasında `POSTGRES_PORT` değerini değiştir. 8333 veya 23646 portları için aynı şekilde `S3_PORT` ve `SEAWEEDFS_ADMIN_PORT` kullanılır.
 - **`.env` dosyan bu değişiklikten önce oluşturulduysa:** `.env.example`'daki `S3_` ve `SEAWEEDFS_` satırlarını kendi `.env` dosyana ekle; yoksa SeaweedFS anahtarsız açılır.
 - **Migration `role "docassistant_app" does not exist` hatası veriyor:** Veritabanın bu kullanıcı eklenmeden önce oluşturulmuştur; init betikleri yalnızca veritabanı ilk oluşurken çalışır. `.env` dosyana `.env.example`'daki `APP_DB_PASSWORD` satırını ekle, sonra veriyi silmeden kullanıcıyı oluştur:
