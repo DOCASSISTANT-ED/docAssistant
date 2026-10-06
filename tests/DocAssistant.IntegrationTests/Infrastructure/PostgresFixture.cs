@@ -52,14 +52,15 @@ public sealed class PostgresFixture : IAsyncLifetime
         Api = new DocAssistantApiFactory(AppConnectionString);
     }
 
-    // Bypasses Row-Level Security (superuser). For setup and checks only, never for
-    // asserting tenant isolation.
-    public AppDbContext CreateOwnerDbContext()
+    // Bypasses Row-Level Security (superuser). For setup and checks, and for testing the
+    // query filters on their own (with a tenantId, the filters are the only active layer).
+    // Never use it to assert that RLS isolates tenants.
+    public AppDbContext CreateOwnerDbContext(Guid? tenantId = null)
     {
         var options = new DbContextOptionsBuilder<AppDbContext>();
         options.UseAppDatabase(SuperuserConnectionString);
 
-        return new AppDbContext(options.Options, new FixedTenantContext(null));
+        return new AppDbContext(options.Options, new FixedTenantContext(tenantId));
     }
 
     // Wired like the running app (Program.cs): restricted user, query filters, write rules
