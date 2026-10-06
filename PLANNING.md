@@ -83,18 +83,22 @@ Modüller ayrı proje değil, API projesi içinde klasördür (bkz. `docs/decisi
 Kök dizinde `Directory.Build.props`, `Directory.Packages.props` (merkezi paket sürümü) ve `.editorconfig` bulunur.
 
 ### Ingestion hattı
-1. **Parse:** PDF için PdfPig, DOCX için OpenXML SDK, XLSX için ClosedXML. Metinle birlikte sayfa numarası, başlık hiyerarşisi ve tablolar korunur.
-2. **Chunking:** Yapıya göre bölme (bölüm → paragraf → cümle).
+1. **Parse:** PDF için PdfPig, DOCX için OpenXML SDK, XLSX için ClosedXML. Her parser belgeyi aynı ortak modele çevirir: sıralı bloklar (başlık + seviye, paragraf, tablo). Dosyalar PDF'e dönüştürülmez. Faz 2'de PDF'te başlıklar yazı tipi boyutundan tahmin edilir, tablolar algılanmaz; taranmış PDF açık bir hatayla reddedilir (`docs/decisions.md` #21–25).
+2. **Chunking:** Tek algoritma, yalnızca blokları görür. Yapıya göre bölme (bölüm → paragraf → cümle).
    - Türkçe kısaltmalarda ("Dr.", "vb.", "md.") yanlış cümle kesilmez.
-   - Her chunk'ın başına bağlam başlığı eklenir: `Belge: İK Yönetmeliği > Bölüm 3: İzinler`
-   - Tablolar satır bazında, başlık satırıyla birlikte saklanır.
-3. **Embedding:** bge-m3. Hangi model ve sürümle üretildiği her chunk'a yazılır.
+   - Her chunk'ın başına bağlam başlığı eklenir: `Belge: İK Yönetmeliği > Bölüm 3: İzinler`. Bölüm yolu çıkarılamıyorsa en azından belge adı eklenir.
+   - Tablolar satır bazında, başlık satırıyla birlikte saklanır (Faz 2'de yalnızca DOCX).
+3. **Embedding:** bge-m3. Hangi model ve sürümle üretildiği her chunk'a yazılır. Faz 2'de chunk'lar embedding'siz kaydedilir; Faz 3'te doldurulur (#28).
 4. **Durum takibi:** Belge durumu veritabanında tutulur: `Pending → Processing → Done / Failed`. Uygulama açılışında yarım kalan işler tekrar kuyruğa alınır. (`Channel` bellekte durduğu için yeniden başlatmada iş kaybolmasın diye.)
 
-### Chunk metadata (zorunlu alanlar)
-`TenantId`, `DocumentId`, `DocumentVersion`, `PageNumber`, `SectionPath`, `EmbeddingModel`, `CreatedAt`
+### Chunk metadata
+Zorunlu: `TenantId`, `DocumentId`, `DocumentVersion`, `Ordinal` (belge içindeki sıra), `SourceType` (PDF/DOCX), `CreatedAt`
 
-Belge yeniden yüklendiğinde eski sürümün chunk'ları silinir.
+Boş olabilir: `PageNumber` (DOCX'te sayfa bilgisi yoktur), `SectionPath` (çıkarılamadıysa), `EmbeddingModel` (Faz 3'e kadar)
+
+Ayrıntı: `docs/decisions.md` #22, #27–29.
+
+Belge yeniden yüklendiğinde eski sürümün chunk'ları silinir. Sürümleme Faz 2 kapsamında değildir; her belge 1. sürümde kalır (#32).
 
 ### Retrieval
 1. **Hibrit arama:** pgvector benzerlik araması + PostgreSQL `turkish` full-text araması, Reciprocal Rank Fusion (RRF) ile birleştirilir.
@@ -157,8 +161,11 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 | Dide | Erva | Birlikte |
 |---|---|---|
-| DOCX parser (OpenXML) | PDF parser (PdfPig) | **Pair:** Chunking algoritması |
-| Arka plan işi (`BackgroundService` + `Channel`) ve belge durum takibi, açılışta yarım işleri kurtarma | Yükleme endpoint'i, S3'e (SeaweedFS) dosya saklama | **İlk değerlendirme seti:** 30–50 soru-cevap çifti |
+| DOCX parser (OpenXML) | PDF parser (PdfPig) | Başlangıç kararları: `docs/decisions.md` #21–34 |
+| Arka plan işi (`BackgroundService` + `Channel`) ve belge durum takibi, açılışta yarım işleri kurtarma | Yükleme endpoint'i, `documents` tablosunun yeni alanları, S3'e (SeaweedFS) dosya saklama (`IFileStorage`) | Parser sözleşmesi (ortak blok modeli) ve kuyruk sözleşmesi (`IIngestionQueue`): ilk iş, paralel çalışmanın ön koşulu |
+| `IIngestionQueue` uygulaması, kurtarma için veritabanı fonksiyonu | Arka plan işleri için tenant'ı kodla ayarlayan `ITenantContext` | **Pair:** Chunking algoritması ve `chunks` tablosu |
+| | | Ortak örnek test belgeleri (PDF ve DOCX) |
+| | | **İlk değerlendirme seti:** 30–50 soru-cevap çifti; PDF ve DOCX birlikte |
 | **Çapraz test:** PDF parser testleri | **Çapraz test:** DOCX parser ve arka plan işi testleri | |
 
 **Bitiş koşulu:**
