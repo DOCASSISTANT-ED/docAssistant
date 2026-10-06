@@ -21,7 +21,7 @@ public class TenantIsolationScenarioTests(PostgresFixture database)
         var carolMemberships = await db.Memberships.IgnoreQueryFilters()
             .CountAsync(m => m.UserId == scenario.Carol);
 
-        Assert.Equivalent(new[] { scenario.DocumentA1, scenario.DocumentA2, scenario.DocumentB1 }, documents);
+        Assert.Equivalent(new[] { scenario.DocumentA1, scenario.DocumentA2, scenario.DocumentB1 }, documents, strict: true);
         Assert.Equal(2, carolMemberships);
     }
 }

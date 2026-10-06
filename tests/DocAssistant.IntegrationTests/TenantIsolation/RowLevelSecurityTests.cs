@@ -27,7 +27,7 @@ public class RowLevelSecurityTests(PostgresFixture database) : IAsyncLifetime
 
         var documents = await db.Documents.IgnoreQueryFilters().Select(d => d.Id).ToListAsync();
 
-        Assert.Equivalent(new[] { _scenario.DocumentA1, _scenario.DocumentA2 }, documents);
+        Assert.Equivalent(new[] { _scenario.DocumentA1, _scenario.DocumentA2 }, documents, strict: true);
     }
 
     // Raw SQL never sees EF Core's filters (as the Phase 3 search queries will be).
@@ -40,7 +40,7 @@ public class RowLevelSecurityTests(PostgresFixture database) : IAsyncLifetime
             .SqlQuery<Guid>($"""SELECT id AS "Value" FROM documents""")
             .ToListAsync();
 
-        Assert.Equivalent(new[] { _scenario.DocumentA1, _scenario.DocumentA2 }, documents);
+        Assert.Equivalent(new[] { _scenario.DocumentA1, _scenario.DocumentA2 }, documents, strict: true);
     }
 
     [Fact]

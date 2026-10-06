@@ -23,7 +23,7 @@ public class QueryFilterTests(PostgresFixture database) : IAsyncLifetime
 
         var documents = await db.Documents.Select(d => d.Id).ToListAsync();
 
-        Assert.Equivalent(new[] { _scenario.DocumentA1, _scenario.DocumentA2 }, documents);
+        Assert.Equivalent(new[] { _scenario.DocumentA1, _scenario.DocumentA2 }, documents, strict: true);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class QueryFilterTests(PostgresFixture database) : IAsyncLifetime
 
         var users = await db.Users.Select(u => u.Id).ToListAsync();
 
-        Assert.Equivalent(new[] { _scenario.Alice, _scenario.Carol }, users);
+        Assert.Equivalent(new[] { _scenario.Alice, _scenario.Carol }, users, strict: true);
     }
 
     [Fact]
