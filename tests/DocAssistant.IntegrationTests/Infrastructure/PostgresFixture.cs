@@ -52,14 +52,30 @@ public sealed class PostgresFixture : IAsyncLifetime
         Api = new DocAssistantApiFactory(AppConnectionString);
     }
 
-    // Bypasses Row-Level Security (superuser). For setup and checks only, never for
-    // asserting tenant isolation.
-    public AppDbContext CreateOwnerDbContext()
+    // Bypasses Row-Level Security (superuser). For setup and checks, and for testing the
+    // query filters on their own (with a tenantId, the filters are the only active layer).
+    // Never use it to assert that RLS isolates tenants.
+    public AppDbContext CreateOwnerDbContext(Guid? tenantId = null)
     {
         var options = new DbContextOptionsBuilder<AppDbContext>();
         options.UseAppDatabase(SuperuserConnectionString);
 
-        return new AppDbContext(options.Options, new NoTenantContext());
+        return new AppDbContext(options.Options, new FixedTenantContext(tenantId));
+    }
+
+    // Wired like the running app (Program.cs): restricted user, query filters, write rules
+    // and the interceptor that hands the tenant to Row-Level Security. Null = no tenant
+    // selected, as before login. connectionString overrides AppConnectionString (it must
+    // still log in as the app user).
+    public AppDbContext CreateAppDbContext(Guid? tenantId, string? connectionString = null)
+    {
+        var tenantContext = new FixedTenantContext(tenantId);
+
+        var options = new DbContextOptionsBuilder<AppDbContext>();
+        options.UseAppDatabase(connectionString ?? AppConnectionString)
+            .AddInterceptors(new TenantConnectionInterceptor(tenantContext));
+
+        return new AppDbContext(options.Options, tenantContext);
     }
 
     public async Task DisposeAsync()
@@ -83,9 +99,9 @@ public sealed class PostgresFixture : IAsyncLifetime
         throw new DirectoryNotFoundException("docker/postgres/init was not found above the test output folder.");
     }
 
-    private sealed class NoTenantContext : ITenantContext
+    private sealed class FixedTenantContext(Guid? tenantId) : ITenantContext
     {
-        public Guid? TenantId => null;
+        public Guid? TenantId => tenantId;
     }
 }
 
