@@ -23,6 +23,7 @@ Başlangıç toplantısında alınan, sonradan değiştirmesi zor kararlar. Değ
 | 17 | Faz 1'de RLS tablosu | `documents` tablosunun yalın hâli (kimlik, tenant, başlık, durum) Faz 1'e çekilir; RLS ve izolasyon testleri bu tablo üzerinde kurulur. | 2026-10-05 |
 | 18 | Entegrasyon testlerinde veritabanı | Testcontainers Faz 5'ten Faz 1'e çekilir. Testler `pgvector/pgvector:pg17` imajıyla açılan gerçek PostgreSQL'e bağlanır; bellek içi veritabanı ya da SQLite kullanılmaz. | 2026-10-05 |
 | 19 | Kısıtlı veritabanı kullanıcısı | Uygulama kullanıcısı (`docassistant_app`) `docker/postgres/init/` altındaki init betiğiyle oluşturulur; parolası `.env`'den gelir. Tablo yetkileri ve RLS politikaları migration'larla verilir. Testcontainers aynı init betiğini kullanır. | 2026-10-05 |
+| 20 | Toplu güncellemede tenant koruması | `ExecuteUpdate` / `ExecuteDelete` `SaveChanges`'i çağırmadığı için uygulamanın yazma kuralları bunlara uygulanmaz; query filter yalnızca etkilenen satırları sınırlar. Bir toplu güncellemeyle satırı başka tenant'a taşımayı RLS'in `WITH CHECK` kuralı engeller; uygulama katmanında ayrıca engellenmez. Toplu güncellemeler yaygınlaşırsa yeniden değerlendirilir. | 2026-10-06 |
 
 ## Notlar
 
@@ -36,3 +37,4 @@ Başlangıç toplantısında alınan, sonradan değiştirmesi zor kararlar. Değ
 - #18 gerekçesi: RLS bir PostgreSQL özelliğidir; başka bir veritabanında izolasyon testleri RLS'i hiç sınamadan geçer.
 - #19 gerekçesi: parola migration koduna yazılmaz, çünkü migration'lar repoda durur. Init betikleri yalnızca volume ilk oluşturulurken çalışır; mevcut bir veritabanında betik bir kez elle çalıştırılır (`docker compose exec postgres bash /docker-entrypoint-initdb.d/02-app-user.sh`), volume'u sıfırlamak gerekmez. Uygulama `Default`, `dotnet ef` komutları `Migrations` bağlantı cümlesini kullanır.
 - #16 gerekçesi: tek `AppDbContext` hem modüllerin tablolarını bilmek hem de modüller tarafından kullanılmak zorunda; ayrı projelerde bu döngüsel başvuruya yol açar.
+- #20 gerekçesi: tenant izolasyon testleri sırasında bulundu. Uygulama bağlantısında RLS bu taşımayı reddediyor ve `RowLevelSecurityTests.BulkUpdateCannotMoveDocumentsToAnotherTenant` bunu güvence altına alıyor; şu an toplu güncelleme kullanan kod olmadığı için uygulama katmanına ek kod yazılmadı.

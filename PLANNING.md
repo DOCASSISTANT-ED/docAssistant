@@ -133,10 +133,10 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 | **Çapraz PR:** Compose'a SeaweedFS (S3) ekler | **Çapraz PR:** CI'a test adımı ekler | |
 
 **Bitiş koşulu:**
-- [ ] İki bilgisayarda da `git clone` → `docker compose up` → `dotnet run` sorunsuz çalışıyor
-- [ ] CI yeşil
-- [ ] Boş bir test geçiyor
-- [ ] README'de kurulum adımları yazılı
+- [x] İki bilgisayarda da `git clone` → `docker compose up` → `dotnet run` sorunsuz çalışıyor
+- [x] CI yeşil
+- [x] Boş bir test geçiyor
+- [x] README'de kurulum adımları yazılı
 
 > Windows notu: Ollama'yı geliştirme sırasında doğrudan Windows'a kurmak, Docker içinde GPU ayarlamaktan çok daha kolay. Compose'a sadece Linux sunucu için bir profil olarak eklenebilir.
 
@@ -150,8 +150,8 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 | **Çapraz test:** Tenant izolasyon testleri (query filter + RLS) | **Çapraz test:** Auth testleri | |
 
 **Bitiş koşulu:**
-- [ ] Bir kullanıcı kayıt olup giriş yapabiliyor
-- [ ] İki farklı tenant'ın verisi birbirine görünmüyor (testle kanıtlanmış)
+- [x] Bir kullanıcı kayıt olup giriş yapabiliyor
+- [x] İki farklı tenant'ın verisi birbirine görünmüyor (testle kanıtlanmış)
 
 ### Faz 2 — Ingestion
 
