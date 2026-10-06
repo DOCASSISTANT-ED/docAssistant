@@ -52,6 +52,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
                 applyTenantFilter.MakeGenericMethod(entityType.ClrType).Invoke(this, [modelBuilder]);
             }
         }
+
+        // docs/decisions.md #15: identity tables are not ITenantOwned and have no RLS, so
+        // these filters are their only isolation. They are read filters only; registration
+        // still writes to these tables before any tenant is selected. Code that must look
+        // up identity data without a tenant (register, login) uses IgnoreQueryFilters().
+        modelBuilder.Entity<Tenant>()
+            .HasQueryFilter(tenant => tenant.Id == CurrentTenantId);
+
+        modelBuilder.Entity<Membership>()
+            .HasQueryFilter(membership => membership.TenantId == CurrentTenantId);
+
+        // users has no tenant column (decisions #12): a user is visible to the tenants
+        // they are a member of.
+        modelBuilder.Entity<User>()
+            .HasQueryFilter(user => user.Memberships.Any(m => m.TenantId == CurrentTenantId));
     }
 
     // When no tenant is selected CurrentTenantId is null and the filter matches no rows.
