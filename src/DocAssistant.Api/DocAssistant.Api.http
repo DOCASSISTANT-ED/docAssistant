@@ -1,5 +1,49 @@
 @DocAssistant.Api_HostAddress = http://localhost:5174
 
+### Health check
 GET {{DocAssistant.Api_HostAddress}}/health
 
-###
+### Register a new organization and its first admin (returns a token)
+# Running it twice returns 409: the email is already registered.
+# @name register
+POST {{DocAssistant.Api_HostAddress}}/auth/register
+Content-Type: application/json
+
+{
+  "companyName": "Yıldız Lojistik",
+  "email": "ayse@yildiz.com",
+  "password": "Gizli123!"
+}
+
+### Log in (returns a token)
+# @name login
+POST {{DocAssistant.Api_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ayse@yildiz.com",
+  "password": "Gizli123!"
+}
+
+### Current user, with the token from the login request above
+GET {{DocAssistant.Api_HostAddress}}/auth/me
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Wrong password: 401
+POST {{DocAssistant.Api_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ayse@yildiz.com",
+  "password": "wrong-password"
+}
+
+### Invalid input: 400 with the field errors
+POST {{DocAssistant.Api_HostAddress}}/auth/register
+Content-Type: application/json
+
+{
+  "companyName": "",
+  "email": "not-an-email",
+  "password": "short"
+}

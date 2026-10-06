@@ -150,6 +150,7 @@ dotnet run --project src/DocAssistant.Web
 | Servisleri durdur (veri kalır) | `docker compose down` |
 | Servisleri sıfırla (veritabanı ve yüklenen dosyalar silinir) | `docker compose down -v` |
 | Testleri çalıştır | `dotnet test` |
+| API'yi elle dene (kayıt, giriş, `/auth/me`) | `src/DocAssistant.Api/DocAssistant.Api.http`; VS Code'da [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) eklentisiyle her isteğin üstündeki "Send Request" |
 | Bekleyen migration'ları uygula (`git pull` sonrası) | `dotnet ef database update --project src/DocAssistant.Api` |
 | Yeni migration üret | `dotnet ef migrations add <Ad> --project src/DocAssistant.Api --output-dir Data/Migrations` |
 
