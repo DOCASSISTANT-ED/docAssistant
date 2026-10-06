@@ -34,13 +34,22 @@ public sealed class PostgresFixture : IAsyncLifetime
             Password = AppPassword,
         }.ConnectionString;
 
+    // The API running in memory against this database as the restricted user. Shared, so
+    // it starts once per test run. Tests that need different services can derive one with
+    // Api.WithWebHostBuilder(...).
+    public DocAssistantApiFactory Api { get; private set; } = null!;
+
     public async Task InitializeAsync()
     {
         await _container.StartAsync();
 
         // Like `dotnet ef database update`: migrations run as the database owner.
-        await using var db = CreateOwnerDbContext();
-        await db.Database.MigrateAsync();
+        await using (var db = CreateOwnerDbContext())
+        {
+            await db.Database.MigrateAsync();
+        }
+
+        Api = new DocAssistantApiFactory(AppConnectionString);
     }
 
     // Bypasses Row-Level Security (superuser). For setup and checks only, never for
@@ -53,7 +62,11 @@ public sealed class PostgresFixture : IAsyncLifetime
         return new AppDbContext(options.Options, new NoTenantContext());
     }
 
-    public Task DisposeAsync() => _container.DisposeAsync().AsTask();
+    public async Task DisposeAsync()
+    {
+        await Api.DisposeAsync();
+        await _container.DisposeAsync();
+    }
 
     // Walks up from the test output folder (tests/.../bin/Debug/net10.0) to the repo root.
     private static string FindInitScriptsDirectory()
