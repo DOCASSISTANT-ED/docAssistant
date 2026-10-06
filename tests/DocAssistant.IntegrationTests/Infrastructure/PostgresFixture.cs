@@ -65,13 +65,14 @@ public sealed class PostgresFixture : IAsyncLifetime
 
     // Wired like the running app (Program.cs): restricted user, query filters, write rules
     // and the interceptor that hands the tenant to Row-Level Security. Null = no tenant
-    // selected, as before login.
-    public AppDbContext CreateAppDbContext(Guid? tenantId)
+    // selected, as before login. connectionString overrides AppConnectionString (it must
+    // still log in as the app user).
+    public AppDbContext CreateAppDbContext(Guid? tenantId, string? connectionString = null)
     {
         var tenantContext = new FixedTenantContext(tenantId);
 
         var options = new DbContextOptionsBuilder<AppDbContext>();
-        options.UseAppDatabase(AppConnectionString)
+        options.UseAppDatabase(connectionString ?? AppConnectionString)
             .AddInterceptors(new TenantConnectionInterceptor(tenantContext));
 
         return new AppDbContext(options.Options, tenantContext);
