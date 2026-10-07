@@ -14,6 +14,12 @@ public static class IngestionModule
         services.AddSingleton<IIngestionQueue>(sp => sp.GetRequiredService<ChannelIngestionQueue>());
 
         services.AddHostedService<IngestionRecoveryService>();
+        services.AddHostedService<IngestionWorker>();
+
+        // Scoped: the worker resolves these from a new scope per document, together with
+        // that document's AppDbContext and tenant (decisions #31).
+        services.AddScoped<DocumentIngestionHandler>();
+        services.AddScoped<IDocumentProcessor, PendingDocumentProcessor>(); // replaced in K4
 
         // One parser per file format; the worker picks the one whose SourceType matches
         // the document (DocumentSourceTypes.TryFromContentType). Parsers keep no state.
