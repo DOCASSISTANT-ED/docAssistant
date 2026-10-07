@@ -35,7 +35,7 @@ Bu bölüm başlangıç toplantısında doldurulacak. Değişen her karar tarihi
 | Proje adı / namespace | `DocAssistant` (kesinleşecek) |
 | Repo sahibi | Organizasyon hesabı (önerilen) |
 | .NET sürümü | .NET 10 |
-| Arayüz | Blazor Web App |
+| Arayüz | Angular (TypeScript). Başlangıçta Blazor Web App seçilmişti, bkz. `docs/decisions.md` #41 |
 | Veritabanı | PostgreSQL 17 + pgvector |
 | Dosya saklama | SeaweedFS (geliştirme), S3 uyumlu depolama (canlı). MinIO'dan vazgeçildi, bkz. `docs/decisions.md` #9 |
 | Embedding modeli | bge-m3 (Ollama) |
@@ -69,8 +69,8 @@ src/
       Ingestion               Parse → chunk → embed hattı
       Retrieval               Hibrit arama, reranking
       Chat                    LLM, prompt, sohbet geçmişi
-  DocAssistant.Web            Blazor Web App
   DocAssistant.Shared         Ortak tipler, sonuç nesneleri, ITenantContext
+  web/                        Angular arayüzü (ayrı uygulama; API ile HTTP üzerinden konuşur)
 tests/
   DocAssistant.UnitTests
   DocAssistant.IntegrationTests
@@ -188,9 +188,10 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 | Dide | Erva | Birlikte |
 |---|---|---|
-| Blazor sohbet ekranı, streaming'in arayüz tarafı | `IChatClient` entegrasyonu, streaming endpoint'i | **Pair:** Prompt tasarımı ve kaynak numaralandırma |
-| Kaynağa tıklayınca belge sayfasını açma | Sohbet geçmişi | |
-| **Çapraz test:** Sohbet backend testleri | **Çapraz test:** Sohbet arayüzü testleri (bUnit) | |
+| Angular sohbet ekranı, streaming'in arayüz tarafı | `IChatClient` entegrasyonu, streaming endpoint'i | **Pair:** Prompt tasarımı ve kaynak numaralandırma |
+| Kaynağa tıklayınca belge sayfasını açma | Sohbet geçmişi | Faz başı kararları (#41): bileşen kütüphanesi, API tiplerinin TypeScript'e taşınması, JWT'nin tarayıcıda saklanması |
+| Giriş ve kayıt ekranları | | |
+| **Çapraz test:** Sohbet backend testleri | **Çapraz test:** Sohbet arayüzü testleri (Angular test araçları) | |
 
 > Daha dengeli olsun istenirse bu fazda backend ve arayüz yer değiştirilebilir.
 
@@ -202,7 +203,7 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 | Dide | Erva | Birlikte |
 |---|---|---|
-| Entegrasyon testlerini genişletme (Testcontainers altyapısı Faz 1'de kuruldu) | Blazor belge yönetimi sayfası | `v0.1.0` release |
+| Entegrasyon testlerini genişletme (Testcontainers altyapısı Faz 1'de kuruldu) | Angular belge yönetimi sayfası | `v0.1.0` release |
 | Docker ile canlı ortama deploy | Değerlendirme setini genişletme (100+ soru) | 2–3 pilot firma ile deneme |
 | | Tenant bazlı token kotası ve rate limiting | |
 | **Çapraz test:** Belge yönetimi ve kota testleri | **Çapraz test:** Deploy sonrası smoke testleri | |
@@ -229,8 +230,8 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 | Full-text arama | Yazıyor | RRF birleştirme |
 | Reranking | Entegrasyon | Testleri |
 | LLM sohbet + prompt | Pair + backend testleri | `IChatClient` + pair |
-| Blazor | Sohbet ekranı | Belge yönetimi sayfası |
-| Test (xUnit, bUnit, Testcontainers) | İzolasyon, entegrasyon testleri | Auth, parser, arama, UI testleri |
+| Angular / TypeScript | Sohbet ekranı, giriş ve kayıt ekranları | Belge yönetimi sayfası |
+| Test (xUnit, Testcontainers, Angular test araçları) | İzolasyon, entegrasyon testleri | Auth, parser, arama, UI testleri |
 
 ---
 
