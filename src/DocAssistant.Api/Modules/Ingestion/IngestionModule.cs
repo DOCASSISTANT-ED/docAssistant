@@ -1,3 +1,6 @@
+using DocAssistant.Api.Modules.Ingestion.Parsing;
+using DocAssistant.Api.Modules.Ingestion.Parsing.Pdf;
+
 namespace DocAssistant.Api.Modules.Ingestion;
 
 public static class IngestionModule
@@ -10,6 +13,10 @@ public static class IngestionModule
         services.AddSingleton<IIngestionQueue>(sp => sp.GetRequiredService<ChannelIngestionQueue>());
 
         services.AddHostedService<IngestionRecoveryService>();
+
+        // One parser per file format; the worker picks the one whose SourceType matches
+        // the document (DocumentSourceTypes.TryFromContentType). Parsers keep no state.
+        services.AddSingleton<IDocumentParser, PdfDocumentParser>();
 
         return services;
     }
