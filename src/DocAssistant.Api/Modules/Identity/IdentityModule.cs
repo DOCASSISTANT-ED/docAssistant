@@ -1,4 +1,3 @@
-using DocAssistant.Shared.Tenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -48,9 +47,10 @@ public static class IdentityModule
         services.AddAuthorization();
 
         // Scoped: one instance per HTTP request, so one request's tenant can never
-        // leak into another request.
+        // leak into another request. Registered as itself: ITenantContext is provided by
+        // TenantsModule, which uses this reader inside requests (decisions #31).
         services.AddHttpContextAccessor();
-        services.AddScoped<ITenantContext, JwtTenantContext>();
+        services.AddScoped<JwtTenantContext>();
 
         // TimeProvider instead of DateTime.UtcNow so tests can control the clock.
         services.TryAddSingleton(TimeProvider.System);
