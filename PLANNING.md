@@ -122,7 +122,7 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 - **Paralel ikizler:** Aynı türden iki iş varsa ikiye bölünür (ör. biri PDF parser, diğeri DOCX parser).
 - **Çapraz test:** Herkes karşı tarafın yazdığı kodun testini yazar. Bu kural **her fazda** geçerlidir.
-- **Pair programming:** Chunking ve prompt tasarımı tek klavyede birlikte yazılır, yarı zamanda sürücü değişir.
+- **Pair programming:** Prompt tasarımı tek klavyede birlikte yazılır, yarı zamanda sürücü değişir. Chunking başlangıçta pair olarak planlanmıştı; Dide yazar, Erva test eder (`docs/decisions.md` #44).
 
 ---
 
@@ -163,10 +163,9 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 |---|---|---|
 | DOCX parser (OpenXML) | PDF parser (PdfPig) | Başlangıç kararları: `docs/decisions.md` #21–40 |
 | Arka plan işi (`BackgroundService` + `Channel`) ve belge durum takibi, açılışta yarım işleri kurtarma | Yükleme endpoint'i, `documents` tablosunun yeni alanları, S3'e (SeaweedFS) dosya saklama (`IFileStorage`) | Parser sözleşmesi (ortak blok modeli) ve kuyruk sözleşmesi (`IIngestionQueue`): ilk iş, paralel çalışmanın ön koşulu |
-| `IIngestionQueue` uygulaması, kurtarma için veritabanı fonksiyonu | Arka plan işleri için tenant'ı kodla ayarlayan `ITenantContext` | **Pair:** Chunking algoritması ve `chunks` tablosu |
-| | | Ortak örnek test belgeleri (PDF ve DOCX) |
-| | | **İlk değerlendirme seti:** 30–50 soru-cevap çifti; PDF ve DOCX birlikte |
-| **Çapraz test:** PDF parser testleri | **Çapraz test:** DOCX parser ve arka plan işi testleri | |
+| `IIngestionQueue` uygulaması, kurtarma için veritabanı fonksiyonu | Arka plan işleri için tenant'ı kodla ayarlayan `ITenantContext` | Ortak örnek test belgeleri (PDF ve DOCX) |
+| Chunking algoritması ve `chunks` tablosu (#44; ilk planda pair'di) | | **İlk değerlendirme seti:** 30–50 soru-cevap çifti; PDF ve DOCX birlikte |
+| **Çapraz test:** PDF parser testleri | **Çapraz test:** DOCX parser, arka plan işi ve chunking testleri | |
 
 **Bitiş koşulu:**
 - [ ] Yüklenen PDF ve DOCX chunk'lara bölünüp metadata ile veritabanına yazılıyor
