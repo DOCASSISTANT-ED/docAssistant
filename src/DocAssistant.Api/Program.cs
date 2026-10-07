@@ -1,5 +1,6 @@
 using DocAssistant.Api.Data;
 using DocAssistant.Api.Modules.Identity;
+using DocAssistant.Api.Modules.Ingestion;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
     .AddInterceptors(services.GetRequiredService<TenantConnectionInterceptor>()));
 
 builder.Services.AddIdentityModule();
+builder.Services.AddIngestionModule();
 
 var app = builder.Build();
 
