@@ -1,6 +1,7 @@
 using DocAssistant.Api.Data;
 using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
+using DocAssistant.Api.Modules.Tenants;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
     .AddInterceptors(services.GetRequiredService<TenantConnectionInterceptor>()));
 
 builder.Services.AddIdentityModule();
+builder.Services.AddTenantsModule();
 builder.Services.AddIngestionModule();
 
 // The Angular app is served from another origin (docs/decisions.md #41). Browsers only let
