@@ -1,3 +1,5 @@
+using DocAssistant.Api.Modules.Documents;
+using DocAssistant.IntegrationTests.Documents;
 using DocAssistant.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -61,8 +63,14 @@ public class RowLevelSecurityTests(PostgresFixture database) : IAsyncLifetime
     {
         await using var db = database.CreateAppDbContext(_scenario.TenantA);
 
+        // A complete, valid row: the only thing wrong with it is the tenant.
         var error = await Assert.ThrowsAsync<PostgresException>(() => db.Database.ExecuteSqlAsync(
-            $"INSERT INTO documents (id, tenant_id, title, status) VALUES ({Guid.CreateVersion7()}, {_scenario.TenantB}, 'planted', 'Pending')"));
+            $"""
+            INSERT INTO documents
+                (id, tenant_id, title, status, file_name, content_type, size_bytes, storage_key, uploaded_by_user_id)
+            VALUES
+                ({Guid.CreateVersion7()}, {_scenario.TenantB}, 'planted', 'Pending', 'planted.pdf', {DocumentContentTypes.Pdf}, {TestDocuments.SizeBytes}, {TestDocuments.NewStorageKey()}, {_scenario.Alice})
+            """));
 
         Assert.Equal(RlsViolation, error.SqlState);
     }
