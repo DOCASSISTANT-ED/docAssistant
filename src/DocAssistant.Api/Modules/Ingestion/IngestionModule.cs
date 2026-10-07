@@ -9,6 +9,8 @@ public static class IngestionModule
         services.AddSingleton<ChannelIngestionQueue>();
         services.AddSingleton<IIngestionQueue>(sp => sp.GetRequiredService<ChannelIngestionQueue>());
 
+        services.AddHostedService<IngestionRecoveryService>();
+
         return services;
     }
 }
