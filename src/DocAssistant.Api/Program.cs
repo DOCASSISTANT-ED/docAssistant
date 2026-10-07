@@ -27,6 +27,16 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
 builder.Services.AddIdentityModule();
 builder.Services.AddIngestionModule();
 
+// The Angular app is served from another origin (docs/decisions.md #41). Browsers only let
+// it call this API from the origins listed here; with none configured, none are allowed.
+// No AllowCredentials: the access token travels in the Authorization header, not a cookie.
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy
+    .WithOrigins(allowedOrigins)
+    .AllowAnyHeader()
+    .AllowAnyMethod()));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,6 +46,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Before authentication: a browser's preflight (OPTIONS) request carries no token.
+app.UseCors();
 
 // Order matters: identify the caller first, then check what they may access.
 app.UseAuthentication();

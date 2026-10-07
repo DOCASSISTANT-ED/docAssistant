@@ -36,3 +36,33 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --configuration Release
+
+  # Angular arayüzü (src/web). .NET işinden bağımsızdır; ikisi paralel çalışır.
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: src/web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+
+      # npm ci: package-lock.json'daki sürümleri birebir kurar; dosyayla uyuşmazsa hata verir.
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test -- --watch=false

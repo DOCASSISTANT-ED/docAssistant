@@ -46,11 +46,11 @@ Paket sürümleri yalnızca `Directory.Packages.props` içinde tutulur (merkezi 
 
 | Teknoloji | Ne için | Faz | Durum |
 |---|---|---|---|
-| Angular (`src/web`) | Giriş ve kayıt, sohbet ekranı, belge yönetimi, yönetim paneli. API ile HTTP üzerinden konuşan ayrı bir uygulama; SSR yok | 2 (iskelet), 4–5 (ekranlar) | Planlı |
-| TypeScript | Arayüzün dili | 2 | Planlı |
-| Node.js + npm | Arayüzün derlenmesi, paketleri ve geliştirme sunucusu | 2 | Planlı |
+| Angular (`src/web`) | Giriş ve kayıt, sohbet ekranı, belge yönetimi, yönetim paneli. API ile HTTP üzerinden konuşan ayrı bir uygulama; SSR yok | 2 (iskelet), 4–5 (ekranlar) | Kurulu (iskelet) |
+| TypeScript | Arayüzün dili | 2 | Kurulu |
+| Node.js + npm | Arayüzün derlenmesi, paketleri ve geliştirme sunucusu. Node 24 LTS | 2 | Kurulu |
 
-Arayüz başlangıçta Blazor Web App olarak planlanmıştı; ekranlar yazılmadan Angular'a geçildi (decisions.md #41). Şablon hâlindeki Blazor projesi (`src/DocAssistant.Web`) Angular iskeletiyle birlikte kaldırılır.
+Arayüz başlangıçta Blazor Web App olarak planlanmıştı; ekranlar yazılmadan Angular'a geçildi (decisions.md #41). Şablon hâlindeki Blazor projesi (`src/DocAssistant.Web`) Angular iskeletiyle birlikte kaldırıldı.
 
 ## Veri
 
@@ -96,7 +96,7 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 | Teknoloji | Ne için | Faz | Durum |
 |---|---|---|---|
 | xUnit | Birim ve entegrasyon testleri | 0 (boş test) | Planlı |
-| Angular test araçları | Arayüz bileşen testleri | 4 | Planlı |
+| Vitest (Angular'ın varsayılan test düzeni) | Arayüz bileşen testleri; `npm test` | 2 (iskelet), 4 (ekran testleri) | Kurulu |
 | Testcontainers | Testlerde gerçek PostgreSQL'i container olarak ayağa kaldırma; RLS testleri için zorunlu | 1 | Planlı |
 | Değerlendirme seti | Arama ve cevap kalitesini ölçen soru-cevap çiftleri (30–50, sonra 100+) | 2'den itibaren | Planlı |
 
@@ -107,7 +107,7 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 | Teknoloji | Ne için | Faz | Durum |
 |---|---|---|---|
 | Docker Compose | Geliştirme ortamı: PostgreSQL, SeaweedFS, (Linux'ta) Ollama | 0 | Kurulu (PostgreSQL, SeaweedFS) |
-| GitHub Actions | CI: build, ardından test adımı | 0 | Planlı |
+| GitHub Actions | CI: iki paralel iş. `Build`: .NET derleme ve testler. `Web`: arayüzün derlenmesi ve testleri | 0 | Kurulu |
 | Docker | Canlı ortama deploy | 5 | Planlı |
 | `.editorconfig` | Ortak kod stili | 0 | Kurulu |
 | Git + GitHub | `main` korumalı, `feature/*` branch'leri, en az 1 onaylı PR, Conventional Commits | 0 | Kurulu |

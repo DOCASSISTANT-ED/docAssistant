@@ -11,6 +11,7 @@ KOBİ'ler için çok kiracılı (multi-tenant) Türkçe doküman asistanı. Firm
 |---|---|---|
 | [.NET SDK](https://dotnet.microsoft.com/download) | 10.0.100 veya üstü (10.0.x) | Sürüm `global.json` ile sabitlenir |
 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Güncel | PostgreSQL ve SeaweedFS bunun içinde çalışır |
+| [Node.js](https://nodejs.org/) | 24 LTS (en az 24.15) ya da 22 LTS (en az 22.22) | Angular arayüzü (`src/web`) için; npm onunla birlikte gelir |
 | [Ollama](https://ollama.com/download) | Güncel | Windows'a doğrudan kurulur, Docker içinde değil |
 | Git | Güncel | |
 
@@ -127,22 +128,37 @@ $b = New-Object byte[] 64; [Security.Cryptography.RandomNumberGenerator]::Create
 dotnet user-secrets set "Jwt:SigningKey" "<üretilen-anahtar>" --project src/DocAssistant.Api
 ```
 
-### 8. Uygulamayı çalıştır
+### 8. Arayüzün paketlerini kur
 
-API ve Web ayrı projelerdir; her biri kendi terminalinde çalıştırılır.
+Arayüz, `src/web` altında ayrı bir Angular uygulamasıdır. Paketleri bir kez (ve `package-lock.json` her değiştiğinde) kurulur:
+
+```bash
+cd src/web
+npm install
+```
+
+### 9. Uygulamayı çalıştır
+
+API ve arayüz ayrı uygulamalardır; her biri kendi terminalinde çalıştırılır.
+
+Proje klasöründe:
 
 ```bash
 dotnet run --project src/DocAssistant.Api
 ```
 
+`src/web` klasöründe:
+
 ```bash
-dotnet run --project src/DocAssistant.Web
+npm start
 ```
 
 | Uygulama | Adres | Kontrol |
 |---|---|---|
 | API | http://localhost:5174 | http://localhost:5174/health `Healthy` döndürür |
-| Web | http://localhost:5078 | Ana sayfa açılır |
+| Arayüz | http://localhost:4200 | Sayfanın üstünde "API çalışıyor" yazar |
+
+Arayüz API'ye tarayıcıdan, başka bir adresten istek gönderir. API buna yalnızca izin verdiği adresler için razı olur (CORS); geliştirmede izinli adres `appsettings.Development.json` içindeki `Cors:AllowedOrigins` listesindedir (`http://localhost:4200`).
 
 ## Günlük kullanım
 
@@ -152,6 +168,7 @@ dotnet run --project src/DocAssistant.Web
 | Servisleri durdur (veri kalır) | `docker compose down` |
 | Servisleri sıfırla (veritabanı ve yüklenen dosyalar silinir) | `docker compose down -v` |
 | Testleri çalıştır | `dotnet test` |
+| Arayüz testlerini çalıştır (`src/web` içinde) | `npm test` |
 | API'yi elle dene (kayıt, giriş, `/auth/me`) | `src/DocAssistant.Api/DocAssistant.Api.http`; VS Code'da [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) eklentisiyle her isteğin üstündeki "Send Request" |
 | Bekleyen migration'ları uygula (`git pull` sonrası) | `dotnet ef database update --project src/DocAssistant.Api` |
 | Yeni migration üret | `dotnet ef migrations add <Ad> --project src/DocAssistant.Api --output-dir Data/Migrations` |
@@ -161,6 +178,8 @@ dotnet run --project src/DocAssistant.Web
 - **`ollama` komutu tanınmıyor:** Terminal Ollama kurulmadan önce açılmıştır. Terminali, VS Code kullanıyorsan VS Code'u tamamen kapatıp yeniden aç.
 - **`docker compose up` bağlanamıyor:** Docker Desktop çalışmıyordur; açıp motorun başlamasını bekle.
 - **Entegrasyon testleri "Docker is either not running or misconfigured" hatasıyla başarısız oluyor:** Aynı sebep; Docker Desktop'ı açıp `dotnet test`'i yeniden çalıştır. Birim testleri Docker'a ihtiyaç duymaz.
+- **Arayüzde "API'ye ulaşılamıyor" yazıyor:** API çalışmıyordur (`dotnet run --project src/DocAssistant.Api`) ya da arayüz 4200 dışında bir porttan açılmıştır; API yalnızca `Cors:AllowedOrigins` listesindeki adreslere izin verir. Tarayıcı konsolunda "CORS" hatası görürsen ikinci durumdur.
+- **`npm start` "ng tanınmıyor" ya da modül bulunamadı hatası veriyor:** Paketler kurulmamıştır; `src/web` içinde `npm install` çalıştır.
 - **API açılışta `The SigningKey field is required` hatası veriyor:** Bu bilgisayarda JWT anahtarı ayarlanmamıştır; 7. adımı uygula.
 - **5432 portu kullanımda:** Bilgisayarında başka bir PostgreSQL çalışıyordur. `.env` dosyasında `POSTGRES_PORT` değerini değiştir. 8333 veya 23646 portları için aynı şekilde `S3_PORT` ve `SEAWEEDFS_ADMIN_PORT` kullanılır.
 - **`.env` dosyan bu değişiklikten önce oluşturulduysa:** `.env.example`'daki `S3_` ve `SEAWEEDFS_` satırlarını kendi `.env` dosyana ekle; yoksa SeaweedFS anahtarsız açılır.

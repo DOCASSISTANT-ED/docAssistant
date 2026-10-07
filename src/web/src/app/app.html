@@ -1,0 +1,20 @@
+<header class="app-header">
+  <h1>{{ title }}</h1>
+  <p class="api-status" [attr.data-status]="apiStatus()">
+    @switch (apiStatus()) {
+      @case ('checking') {
+        API kontrol ediliyor…
+      }
+      @case ('up') {
+        API çalışıyor
+      }
+      @case ('down') {
+        API'ye ulaşılamıyor
+      }
+    }
+  </p>
+</header>
+
+<main>
+  <router-outlet />
+</main>
