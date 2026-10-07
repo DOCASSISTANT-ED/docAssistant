@@ -23,6 +23,9 @@ public sealed class DocxDocumentParser : IDocumentParser
     // them as corrupt, so they get their own, clearer message.
     private static readonly byte[] CompoundFileSignature = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1];
 
+    // How far a style's "based on" chain is followed when looking for a heading level.
+    private const int MaxStyleChainLength = 20;
+
     public DocumentSourceType SourceType => DocumentSourceType.Docx;
 
     public ParsedDocument Parse(Stream content)
@@ -58,7 +61,8 @@ public sealed class DocxDocumentParser : IDocumentParser
         var body = document.MainDocumentPart?.Document?.Body
             ?? throw new DocumentParseException(UnreadableFileMessage);
 
-        var blocks = ReadBlocks(body);
+        var styles = ParagraphStylesById(document.MainDocumentPart.StyleDefinitionsPart);
+        var blocks = ReadBlocks(body, styles);
 
         // Failing loudly beats reporting "done, 0 chunks" (decisions #23, #24).
         if (blocks.Count == 0)
@@ -69,20 +73,77 @@ public sealed class DocxDocumentParser : IDocumentParser
         return new ParsedDocument(blocks);
     }
 
-    private static List<DocumentBlock> ReadBlocks(Body body)
+    private static List<DocumentBlock> ReadBlocks(Body body, IReadOnlyDictionary<string, Style> styles)
     {
         var blocks = new List<DocumentBlock>();
 
         foreach (var paragraph in body.Elements<Paragraph>())
         {
             var text = TextOf(paragraph);
-            if (text.Length > 0)
+            if (text.Length == 0)
             {
-                blocks.Add(new ParagraphBlock(text, PageNumber: null));
+                continue;
             }
+
+            blocks.Add(HeadingLevel(paragraph, styles) is { } level
+                ? new HeadingBlock(text, level, PageNumber: null)
+                : new ParagraphBlock(text, PageNumber: null));
         }
 
         return blocks;
+    }
+
+    // Headings are found by outline level, the number Word itself uses for the navigation
+    // pane, not by style name: Word localizes style ids (a Turkish Word may save
+    // "Heading 2" as "Balk2"), but the outline level is the same in every language.
+    private static int? HeadingLevel(Paragraph paragraph, IReadOnlyDictionary<string, Style> styles)
+    {
+        var properties = paragraph.ParagraphProperties;
+
+        // An outline level set on the paragraph itself overrides its style.
+        if (properties?.OutlineLevel?.Val?.Value is { } direct)
+        {
+            return ToHeadingLevel(direct);
+        }
+
+        // Otherwise follow the style and the styles it is based on. The step limit guards
+        // against a malformed file whose styles are based on each other in a loop.
+        var styleId = properties?.ParagraphStyleId?.Val?.Value;
+        for (var step = 0; styleId is not null && step < MaxStyleChainLength; step++)
+        {
+            if (!styles.TryGetValue(styleId, out var style))
+            {
+                break;
+            }
+
+            if (style.StyleParagraphProperties?.OutlineLevel?.Val?.Value is { } inherited)
+            {
+                return ToHeadingLevel(inherited);
+            }
+
+            styleId = style.BasedOn?.Val?.Value;
+        }
+
+        return null;
+    }
+
+    // Word's outline levels 0–8 are heading levels 1–9; 9 means "body text".
+    private static int? ToHeadingLevel(int outlineLevel) =>
+        outlineLevel is >= 0 and <= 8 ? outlineLevel + 1 : null;
+
+    private static Dictionary<string, Style> ParagraphStylesById(StyleDefinitionsPart? part)
+    {
+        var styles = new Dictionary<string, Style>();
+
+        foreach (var style in part?.Styles?.Elements<Style>() ?? [])
+        {
+            if (style.Type?.Value == StyleValues.Paragraph && style.StyleId?.Value is { } id)
+            {
+                styles.TryAdd(id, style);
+            }
+        }
+
+        return styles;
     }
 
     // Only the visible text runs (w:t): field codes such as PAGE and text deleted under
