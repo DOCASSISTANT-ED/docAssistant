@@ -18,6 +18,11 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>
 
+  <!-- Belge okuma -->
+  <ItemGroup>
+    <PackageVersion Include="PdfPig" Version="0.1.16" />
+  </ItemGroup>
+
   <!-- Test -->
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
