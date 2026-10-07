@@ -47,3 +47,32 @@ Content-Type: application/json
   "email": "not-an-email",
   "password": "short"
 }
+
+### Upload a document (admins only; returns 202 and the document as Pending)
+# Run "Log in" first. The path after "<" is relative to this file.
+# @name upload
+POST {{DocAssistant.Api_HostAddress}}/documents
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: multipart/form-data; boundary=DocAssistantBoundary
+
+--DocAssistantBoundary
+Content-Disposition: form-data; name="file"; filename="ik-yonetmeligi.pdf"
+Content-Type: application/pdf
+
+< ../../tests/TestData/ik-yonetmeligi.pdf
+--DocAssistantBoundary--
+
+### Status of the document uploaded above
+GET {{DocAssistant.Api_HostAddress}}/documents/{{upload.response.body.$.id}}
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Upload without a token: 401
+POST {{DocAssistant.Api_HostAddress}}/documents
+Content-Type: multipart/form-data; boundary=DocAssistantBoundary
+
+--DocAssistantBoundary
+Content-Disposition: form-data; name="file"; filename="ik-yonetmeligi.pdf"
+Content-Type: application/pdf
+
+< ../../tests/TestData/ik-yonetmeligi.pdf
+--DocAssistantBoundary--
