@@ -77,21 +77,53 @@ public sealed class DocxDocumentParser : IDocumentParser
     {
         var blocks = new List<DocumentBlock>();
 
-        foreach (var paragraph in body.Elements<Paragraph>())
+        // Paragraphs and tables are siblings in the body; walking them together keeps the
+        // reading order.
+        foreach (var element in body.ChildElements)
         {
-            var text = TextOf(paragraph);
-            if (text.Length == 0)
+            switch (element)
             {
-                continue;
-            }
+                case Paragraph paragraph when TextOf(paragraph) is { Length: > 0 } text:
+                    blocks.Add(HeadingLevel(paragraph, styles) is { } level
+                        ? new HeadingBlock(text, level, PageNumber: null)
+                        : new ParagraphBlock(text, PageNumber: null));
+                    break;
 
-            blocks.Add(HeadingLevel(paragraph, styles) is { } level
-                ? new HeadingBlock(text, level, PageNumber: null)
-                : new ParagraphBlock(text, PageNumber: null));
+                case Table table when ReadTable(table) is { } tableBlock:
+                    blocks.Add(tableBlock);
+                    break;
+            }
         }
 
         return blocks;
     }
+
+    private static TableBlock? ReadTable(Table table)
+    {
+        // Rows with no text at all are left out.
+        var rows = table.Elements<TableRow>()
+            .Select(row => (Row: row, Cells: row.Elements<TableCell>().Select(TextOf).ToList()))
+            .Where(row => row.Cells.Any(cell => cell.Length > 0))
+            .ToList();
+
+        if (rows.Count == 0)
+        {
+            return null;
+        }
+
+        // Word's "Repeat as header row" marks the rows that hold the column names. Only an
+        // explicit mark counts: a bold first row is a guess we leave to the reader.
+        var hasHeaderRow = rows[0].Row.TableRowProperties?.GetFirstChild<TableHeader>() is not null;
+
+        return new TableBlock(
+            rows.Select(row => (IReadOnlyList<string>)row.Cells).ToList(),
+            hasHeaderRow,
+            PageNumber: null);
+    }
+
+    // A cell can hold several paragraphs; they are joined with a space.
+    private static string TextOf(TableCell cell) =>
+        string.Join(" ", cell.Elements<Paragraph>().Select(TextOf).Where(text => text.Length > 0));
 
     // Headings are found by outline level, the number Word itself uses for the navigation
     // pane, not by style name: Word localizes style ids (a Turkish Word may save
