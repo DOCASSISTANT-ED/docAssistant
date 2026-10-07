@@ -161,7 +161,7 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 | Dide | Erva | Birlikte |
 |---|---|---|
-| DOCX parser (OpenXML) | PDF parser (PdfPig) | Başlangıç kararları: `docs/decisions.md` #21–34 |
+| DOCX parser (OpenXML) | PDF parser (PdfPig) | Başlangıç kararları: `docs/decisions.md` #21–40 |
 | Arka plan işi (`BackgroundService` + `Channel`) ve belge durum takibi, açılışta yarım işleri kurtarma | Yükleme endpoint'i, `documents` tablosunun yeni alanları, S3'e (SeaweedFS) dosya saklama (`IFileStorage`) | Parser sözleşmesi (ortak blok modeli) ve kuyruk sözleşmesi (`IIngestionQueue`): ilk iş, paralel çalışmanın ön koşulu |
 | `IIngestionQueue` uygulaması, kurtarma için veritabanı fonksiyonu | Arka plan işleri için tenant'ı kodla ayarlayan `ITenantContext` | **Pair:** Chunking algoritması ve `chunks` tablosu |
 | | | Ortak örnek test belgeleri (PDF ve DOCX) |
