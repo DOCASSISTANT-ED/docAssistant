@@ -1,4 +1,4 @@
-using DocAssistant.Api.Modules.Documents;
+using DocAssistant.IntegrationTests.Documents;
 using DocAssistant.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +20,7 @@ public class WriteRuleTests(PostgresFixture database) : IAsyncLifetime
     [Fact]
     public async Task NewDocumentIsStampedWithTheSelectedTenant()
     {
-        var document = new Document { Title = "new" };
+        var document = TestDocuments.New("new", uploadedByUserId: _scenario.Alice);
 
         await using (var db = database.CreateOwnerDbContext(_scenario.TenantA))
         {
@@ -35,7 +35,7 @@ public class WriteRuleTests(PostgresFixture database) : IAsyncLifetime
     public async Task CannotInsertDocumentForAnotherTenant()
     {
         await using var db = database.CreateOwnerDbContext(_scenario.TenantA);
-        db.Documents.Add(new Document { Title = "for B", TenantId = _scenario.TenantB });
+        db.Documents.Add(TestDocuments.New("for B", uploadedByUserId: _scenario.Alice, tenantId: _scenario.TenantB));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => db.SaveChangesAsync());
     }
@@ -44,7 +44,7 @@ public class WriteRuleTests(PostgresFixture database) : IAsyncLifetime
     public async Task CannotInsertDocumentWithoutSelectedTenant()
     {
         await using var db = database.CreateOwnerDbContext(tenantId: null);
-        db.Documents.Add(new Document { Title = "no tenant", TenantId = _scenario.TenantA });
+        db.Documents.Add(TestDocuments.New("no tenant", uploadedByUserId: _scenario.Alice, tenantId: _scenario.TenantA));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => db.SaveChangesAsync());
     }

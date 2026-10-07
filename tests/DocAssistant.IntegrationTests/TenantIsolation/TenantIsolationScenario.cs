@@ -1,5 +1,7 @@
+using DocAssistant.Api.Modules.Documents;
 using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Tenants;
+using DocAssistant.IntegrationTests.Documents;
 using DocAssistant.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -64,10 +66,12 @@ public sealed class TenantIsolationScenario
 
         await db.Database.ExecuteSqlAsync(
             $"""
-            INSERT INTO documents (id, tenant_id, title, status) VALUES
-                ({scenario.DocumentA1}, {scenario.TenantA}, 'A-1', 'Pending'),
-                ({scenario.DocumentA2}, {scenario.TenantA}, 'A-2', 'Pending'),
-                ({scenario.DocumentB1}, {scenario.TenantB}, 'B-1', 'Pending')
+            INSERT INTO documents
+                (id, tenant_id, title, status, file_name, content_type, size_bytes, storage_key, uploaded_by_user_id)
+            VALUES
+                ({scenario.DocumentA1}, {scenario.TenantA}, 'A-1', 'Pending', 'a-1.pdf', {DocumentContentTypes.Pdf}, {TestDocuments.SizeBytes}, {TestDocuments.NewStorageKey()}, {scenario.Alice}),
+                ({scenario.DocumentA2}, {scenario.TenantA}, 'A-2', 'Pending', 'a-2.pdf', {DocumentContentTypes.Pdf}, {TestDocuments.SizeBytes}, {TestDocuments.NewStorageKey()}, {scenario.Alice}),
+                ({scenario.DocumentB1}, {scenario.TenantB}, 'B-1', 'Pending', 'b-1.pdf', {DocumentContentTypes.Pdf}, {TestDocuments.SizeBytes}, {TestDocuments.NewStorageKey()}, {scenario.Bob})
             """);
 
         return scenario;

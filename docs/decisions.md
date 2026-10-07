@@ -6,7 +6,7 @@ Başlangıç toplantısında alınan, sonradan değiştirmesi zor kararlar. Değ
 |---|------|-------|-------|
 | 1 | Proje adı / namespace | `DocAssistant` | 2026-10-01 |
 | 2 | Repo sahibi | Organizasyon hesabı: `DOCASSISTANT-ED` (repo: `docAssistant`, public) | 2026-10-01 |
-| 3 | Teknoloji sürümleri | .NET 10, Blazor Web App, PostgreSQL 17 + pgvector 0.8+ | 2026-10-01 |
+| 3 | Teknoloji sürümleri | .NET 10, PostgreSQL 17 + pgvector 0.8+. Arayüz başlangıçta Blazor Web App olarak seçilmişti; #41 ile Angular'a geçildi. | 2026-10-01 |
 | 4 | Branch stratejisi | `main` korumalı; `feature/...` branch + en az 1 onaylı PR | 2026-10-01 |
 | 5 | Merge yöntemi | Merge commit (squash ve rebase kullanılmaz) | 2026-10-05 |
 | 6 | Commit formatı | Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`, `chore:`) | 2026-10-01 |
@@ -44,6 +44,7 @@ Başlangıç toplantısında alınan, sonradan değiştirmesi zor kararlar. Değ
 | 38 | Deneme sınırı | `documents.attempt_count` her işleme başlangıcında artar; 3 denemeden sonra belge `Failed` olur ve nedeni `failure_reason`'a yazılır. | 2026-10-07 |
 | 39 | İşleme hızı | Belgeler tek tek işlenir; kuyrukta en fazla 100 mesaj bekler, kuyruk doluysa yükleme yer açılmasını bekler. | 2026-10-07 |
 | 40 | Değerlendirme seti | `eval/questions.json`: her soru için soru, beklenen cevap ve kaynak (belge, bölüm, sayfa). #26'daki örnek belgeler kullanılır. | 2026-10-07 |
+| 41 | Arayüz teknolojisi | Arayüz Blazor yerine Angular (TypeScript) ile yazılır. Ayrı bir uygulamadır: `src/web` altında durur, API ile yalnızca HTTP üzerinden konuşur. Sunucu tarafı işleme (SSR) kullanılmaz; paket yöneticisi npm'dir. Blazor projesi (`src/DocAssistant.Web`) kaldırılır. Bileşen kütüphanesi, API tiplerinin TypeScript'e nasıl taşınacağı ve JWT'nin tarayıcıda nerede saklanacağı Faz 4 başında kararlaştırılır. | 2026-10-07 |
 
 ## Notlar
 
@@ -72,3 +73,4 @@ Başlangıç toplantısında alınan, sonradan değiştirmesi zor kararlar. Değ
 - #37 gerekçesi: ters sırada dosya saklama başarısız olursa veritabanında dosyası olmayan bir belge kalırdı. Bu sırayla en kötü durum, nadiren ortada kalan bir dosyadır.
 - #38 gerekçesi: işlenirken uygulamayı çökerten bir belge, kurtarma yüzünden her açılışta yeniden denenir ve uygulama hiç ayağa kalkamaz. Sayaç bu döngüyü 3 denemede keser.
 - #39 gerekçesi: tek tek işleme hataları anlamayı ve test etmeyi kolaylaştırır; KOBİ ölçeğinde başlangıç için yeterlidir. Sınır, kuyruğun belleği sınırsız büyütmesini önler.
+- #41 gerekçesi: arayüz henüz yazılmadı (Blazor projesinde yalnızca şablon vardı), yani geçişin maliyeti şu an en düşük. Angular ve TypeScript iş ilanlarında Blazor'dan çok daha sık aranıyor; ".NET arka uç + Angular ön yüz" yaygın bir düzen. Bedeli: ikinci bir dil ve araç zinciri (Node, npm), CI'da ikinci bir iş, API için CORS ayarı ve API tiplerinin TypeScript'te ayrıca tanımlanması. API tarafındaki hiçbir karar değişmez; `DocAssistant.Shared` API'nin iç tipleri için kalır.

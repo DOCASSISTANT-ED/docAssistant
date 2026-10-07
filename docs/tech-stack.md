@@ -9,14 +9,14 @@ Durum sütunu: **Kurulu** = repoda var, **Planlı** = kararı verilmiş ama hen�
 
 | Katman | Teknoloji |
 |---|---|
-| Dil / çalışma zamanı | C#, .NET 10 |
+| Dil / çalışma zamanı | C#, .NET 10 (arka uç); TypeScript, Node.js (arayüz) |
 | Backend | ASP.NET Core Web API |
-| Arayüz | Blazor Web App |
+| Arayüz | Angular |
 | Veritabanı | PostgreSQL 17 + pgvector |
 | Veri erişimi | EF Core |
 | Dosya saklama | SeaweedFS (geliştirme), S3 uyumlu depolama (canlı) |
 | Yapay zekâ | Ollama, bge-m3 (embedding), `IChatClient` / `IEmbeddingGenerator` |
-| Test | xUnit, bUnit, Testcontainers |
+| Test | xUnit, Testcontainers, Angular test araçları |
 | Altyapı | Docker Compose, GitHub Actions |
 
 Mimari: modüler monolit. Mikroservis yok.
@@ -46,7 +46,11 @@ Paket sürümleri yalnızca `Directory.Packages.props` içinde tutulur (merkezi 
 
 | Teknoloji | Ne için | Faz | Durum |
 |---|---|---|---|
-| Blazor Web App (`DocAssistant.Web`) | Sohbet ekranı, belge yönetimi, yönetim paneli | 0 (iskelet), 4–5 (ekranlar) | Kurulu |
+| Angular (`src/web`) | Giriş ve kayıt, sohbet ekranı, belge yönetimi, yönetim paneli. API ile HTTP üzerinden konuşan ayrı bir uygulama; SSR yok | 2 (iskelet), 4–5 (ekranlar) | Planlı |
+| TypeScript | Arayüzün dili | 2 | Planlı |
+| Node.js + npm | Arayüzün derlenmesi, paketleri ve geliştirme sunucusu | 2 | Planlı |
+
+Arayüz başlangıçta Blazor Web App olarak planlanmıştı; ekranlar yazılmadan Angular'a geçildi (decisions.md #41). Şablon hâlindeki Blazor projesi (`src/DocAssistant.Web`) Angular iskeletiyle birlikte kaldırılır.
 
 ## Veri
 
@@ -92,7 +96,7 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 | Teknoloji | Ne için | Faz | Durum |
 |---|---|---|---|
 | xUnit | Birim ve entegrasyon testleri | 0 (boş test) | Planlı |
-| bUnit | Blazor bileşen testleri | 4 | Planlı |
+| Angular test araçları | Arayüz bileşen testleri | 4 | Planlı |
 | Testcontainers | Testlerde gerçek PostgreSQL'i container olarak ayağa kaldırma; RLS testleri için zorunlu | 1 | Planlı |
 | Değerlendirme seti | Arama ve cevap kalitesini ölçen soru-cevap çiftleri (30–50, sonra 100+) | 2'den itibaren | Planlı |
 
