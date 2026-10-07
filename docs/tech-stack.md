@@ -62,6 +62,7 @@ Arayüz başlangıçta Blazor Web App olarak planlanmıştı; ekranlar yazılmad
 | Row-Level Security | PostgreSQL özelliği | Tenant izolasyonunun veritabanı katmanı | 1 | Planlı |
 | Full-text arama (`turkish`) | PostgreSQL özelliği | Anahtar kelime araması | 3 | Planlı |
 | SeaweedFS | 4.48 (`chrislusf/seaweedfs`, `mini` modu) | Yüklenen dosyaların S3 API'si üzerinden saklanması (geliştirme). MinIO yerine, bkz. decisions.md #9 | 0 (compose), 2 (kullanım) | Kurulu |
+| AWSSDK.S3 | 4.0.104 | Depolamaya S3 API'siyle erişim; `IFileStorage` arkasında, kod SeaweedFS'e özel değil (decisions.md #33) | 2 | Kurulu |
 | S3 uyumlu depolama | — | Dosya saklama (canlı) | 5 | Planlı |
 
 Tenant izolasyonu iki katmanlıdır: uygulamada EF Core global query filter, veritabanında Row-Level Security.

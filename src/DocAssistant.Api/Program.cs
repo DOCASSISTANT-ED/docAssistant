@@ -1,4 +1,5 @@
 using DocAssistant.Api.Data;
+using DocAssistant.Api.Modules.Documents;
 using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
 using DocAssistant.Api.Modules.Tenants;
@@ -27,6 +28,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
 
 builder.Services.AddIdentityModule();
 builder.Services.AddTenantsModule();
+builder.Services.AddDocumentsModule();
 builder.Services.AddIngestionModule();
 
 // The Angular app is served from another origin (docs/decisions.md #41). Browsers only let

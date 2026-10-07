@@ -19,5 +19,13 @@ public sealed class DocAssistantApiFactory(string connectionString) : WebApplica
         // UseSetting, because Program.cs reads these while the app is still being built.
         builder.UseSetting("ConnectionStrings:Default", connectionString);
         builder.UseSetting("Jwt:SigningKey", SigningKey);
+
+        // The app refuses to start without storage settings. These point nowhere on
+        // purpose (.invalid never resolves): no test may reach a real bucket by accident.
+        // Tests that upload replace IFileStorage or supply their own storage.
+        builder.UseSetting("Storage:ServiceUrl", "http://storage.invalid");
+        builder.UseSetting("Storage:AccessKey", "integration-tests");
+        builder.UseSetting("Storage:SecretKey", "integration-tests");
+        builder.UseSetting("Storage:Bucket", "integration-tests");
     }
 }
