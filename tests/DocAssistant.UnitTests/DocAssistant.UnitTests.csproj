@@ -12,6 +12,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\DocAssistant.Api\DocAssistant.Api.csproj" />
+  </ItemGroup>
+
+  <!-- Ortak örnek belgeler (tests/TestData) test çıktısının yanına kopyalanır; testler
+       onları TestData/ altından okur. -->
+  <ItemGroup>
+    <None Include="..\TestData\**\*" LinkBase="TestData" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
