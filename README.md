@@ -60,6 +60,8 @@ docker compose exec postgres psql -U docassistant -d docassistant -c "SELECT '[1
 
 İlk komutta `docassistant-postgres` ve `docassistant-seaweedfs` satırlarında `healthy` görünmeli, ikincisi `1` döndürmelidir.
 
+API dosya depolamaya `appsettings.Development.json` içindeki `Storage` ayarlarıyla bağlanır (adres, erişim anahtarı, gizli anahtar, bucket). Bu değerler `.env.example`'daki `S3_` değerleriyle aynıdır; `.env` dosyanda `S3_` değerlerini değiştirirsen `Storage` ayarlarını da aynı yap.
+
 ### 4. Embedding modelini indir
 
 Ollama kurulduktan sonra yeni bir terminal aç (eski terminaller `ollama` komutunu tanımaz) ve modeli indir. Yaklaşık 1,2 GB.
@@ -192,6 +194,8 @@ Arayüz API'ye tarayıcıdan, başka bir adresten istek gönderir. API buna yaln
 
   Ardından `dotnet ef database update --project src/DocAssistant.Api` komutunu yeniden çalıştır.
 - **API bir sorguda `permission denied for table ...` hatası veriyor:** Migration'lar uygulanmamıştır; tablo yetkilerini migration'lar verir. `dotnet ef database update --project src/DocAssistant.Api` çalıştır.
+- **Dosya kaydederken `The request signature we calculated does not match` hatası:** API'nin `Storage:AccessKey` / `Storage:SecretKey` ayarları SeaweedFS'in açıldığı `S3_ACCESS_KEY` / `S3_SECRET_KEY` değerleriyle aynı değildir (`.env` ile `appsettings.Development.json`'ı karşılaştır).
+- **API açılışta `Storage` ile ilgili bir doğrulama hatası veriyor:** Çalıştığı ortamda `Storage` ayarları tanımlı değildir; geliştirmede `appsettings.Development.json`'dan gelir.
 - **`dotnet ef` komutu tanınmıyor:** `dotnet tool restore` çalıştırılmamıştır.
 - **API açılışta "Connection string 'Default' is not configured" hatası veriyor:** Uygulama `Development` ortamında çalışmıyordur; bağlantı cümlesi `appsettings.Development.json` içindedir. `dotnet run` bunu kendiliğinden ayarlar.
 - **İlk embedding isteği yavaş:** Model belleğe yüklenirken ilk istek yarım dakika kadar sürebilir; sonrakiler hızlıdır.
