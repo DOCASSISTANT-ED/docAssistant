@@ -58,6 +58,7 @@ Arayüz başlangıçta Blazor Web App olarak planlanmıştı; ekranlar yazılmad
 |---|---|---|---|---|
 | PostgreSQL | 17 (`pgvector/pgvector:pg17` imajı) | Ana veritabanı | 0 | Kurulu |
 | pgvector | 0.8+ | Vektör saklama ve benzerlik araması; filtreli aramada HNSW indeksinin verimli çalışması için 0.8+ gerekli | 0 (eklenti), 3 (arama) | Kurulu |
+| Pgvector.EntityFrameworkCore | 0.3.0 | C#'taki `Vector` türünü `vector` sütununa bağlar; `chunks.embedding` (decisions.md #28) | 2 (sütun), 3 (doldurma) | Kurulu |
 | EF Core + migration | — | Veri erişimi, şema değişiklikleri, global query filter | 1 | Planlı |
 | Row-Level Security | PostgreSQL özelliği | Tenant izolasyonunun veritabanı katmanı | 1 | Planlı |
 | Full-text arama (`turkish`) | PostgreSQL özelliği | Anahtar kelime araması | 3 | Planlı |
