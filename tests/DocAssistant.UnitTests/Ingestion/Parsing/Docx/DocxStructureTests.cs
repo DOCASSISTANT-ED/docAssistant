@@ -258,8 +258,8 @@ public class DocxStructureTests
 
     private const string KnownGap = "Known gap in DocxDocumentParser; see the pull request that added this test.";
 
-    // Shift+Enter inside a paragraph. Today the two lines are glued: "satırikinci".
-    [Fact(Skip = KnownGap)]
+    // Shift+Enter inside a paragraph. Was a known gap: the two lines were glued ("satırikinci").
+    [Fact]
     public void LineBreakInsideAParagraphSeparatesWords()
     {
         var paragraph = new Paragraph(new Run(new Text("Birinci satır"), new Break(), new Text("ikinci satır")));
@@ -269,8 +269,8 @@ public class DocxStructureTests
         Assert.Equal("Birinci satır ikinci satır", Assert.IsType<ParagraphBlock>(Assert.Single(blocks)).Text);
     }
 
-    // Today the tab disappears: "Ad:Ayşe".
-    [Fact(Skip = KnownGap)]
+    // Was a known gap: the tab disappeared ("Ad:Ayşe").
+    [Fact]
     public void TabInsideAParagraphSeparatesWords()
     {
         var paragraph = new Paragraph(new Run(new Text("Ad:"), new TabChar(), new Text("Ayşe")));

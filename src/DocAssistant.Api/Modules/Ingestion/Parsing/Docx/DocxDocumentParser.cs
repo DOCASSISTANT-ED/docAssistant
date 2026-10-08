@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 
@@ -6,7 +8,7 @@ namespace DocAssistant.Api.Modules.Ingestion.Parsing.Docx;
 // A DOCX file is a zip of XML parts. Unlike a PDF it stores structure, not just looks:
 // paragraphs, their styles and tables are marked explicitly (docs/decisions.md #21).
 // It stores no page numbers, so every block's PageNumber is null (decisions #22).
-public sealed class DocxDocumentParser : IDocumentParser
+public sealed partial class DocxDocumentParser : IDocumentParser
 {
     // Shown to the user and stored in documents.failure_reason (docs/decisions.md #24),
     // so they are written in the product's language.
@@ -179,9 +181,32 @@ public sealed class DocxDocumentParser : IDocumentParser
     }
 
     // Only the visible text runs (w:t): field codes such as PAGE and text deleted under
-    // track changes are separate elements and are left out.
-    private static string TextOf(Paragraph paragraph) =>
-        string.Concat(paragraph.Descendants<Text>().Select(text => text.Text)).Trim();
+    // track changes are separate elements and are left out. Line breaks (w:br, w:cr) and
+    // tabs (w:tab) are elements too, not characters inside w:t; they become spaces so the
+    // words around them stay apart. Runs of whitespace are then collapsed to one space.
+    private static string TextOf(Paragraph paragraph)
+    {
+        var text = new StringBuilder();
+
+        foreach (var element in paragraph.Descendants())
+        {
+            switch (element)
+            {
+                case Text run:
+                    text.Append(run.Text);
+                    break;
+
+                case Break or CarriageReturn or TabChar:
+                    text.Append(' ');
+                    break;
+            }
+        }
+
+        return Whitespace().Replace(text.ToString(), " ").Trim();
+    }
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex Whitespace();
 
     private static bool StartsWith(Stream stream, byte[] signature)
     {
