@@ -281,8 +281,8 @@ public class DocxStructureTests
     }
 
     // Content controls (w:sdt) wrap ordinary paragraphs in templates, forms, cover pages
-    // and tables of contents. Today everything inside one is silently dropped.
-    [Fact(Skip = KnownGap)]
+    // and tables of contents. Was a known gap: everything inside one was silently dropped.
+    [Fact]
     public void TextInsideAContentControlIsRead()
     {
         var contentControl = new SdtBlock(

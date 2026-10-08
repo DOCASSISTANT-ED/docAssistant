@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 
@@ -81,7 +82,7 @@ public sealed partial class DocxDocumentParser : IDocumentParser
 
         // Paragraphs and tables are siblings in the body; walking them together keeps the
         // reading order.
-        foreach (var element in body.ChildElements)
+        foreach (var element in Unwrapped(body))
         {
             switch (element)
             {
@@ -103,8 +104,8 @@ public sealed partial class DocxDocumentParser : IDocumentParser
     private static TableBlock? ReadTable(Table table)
     {
         // Rows with no text at all are left out.
-        var rows = table.Elements<TableRow>()
-            .Select(row => (Row: row, Cells: row.Elements<TableCell>().Select(TextOf).ToList()))
+        var rows = Unwrapped(table).OfType<TableRow>()
+            .Select(row => (Row: row, Cells: Unwrapped(row).OfType<TableCell>().Select(TextOf).ToList()))
             .Where(row => row.Cells.Any(cell => cell.Length > 0))
             .ToList();
 
@@ -125,7 +126,36 @@ public sealed partial class DocxDocumentParser : IDocumentParser
 
     // A cell can hold several paragraphs; they are joined with a space.
     private static string TextOf(TableCell cell) =>
-        string.Join(" ", cell.Elements<Paragraph>().Select(TextOf).Where(text => text.Length > 0));
+        string.Join(" ", Unwrapped(cell).OfType<Paragraph>().Select(TextOf).Where(text => text.Length > 0));
+
+    // The children of container, with content controls (w:sdt) opened up. Templates, forms,
+    // cover pages and tables of contents wrap ordinary paragraphs, tables, rows or cells in
+    // them; reading only direct children would silently drop that text. Content controls
+    // can be nested, so their content is unwrapped the same way.
+    private static IEnumerable<OpenXmlElement> Unwrapped(OpenXmlElement container)
+    {
+        foreach (var child in container.ChildElements)
+        {
+            if (child is not SdtElement contentControl)
+            {
+                yield return child;
+                continue;
+            }
+
+            var content = contentControl.ChildElements
+                .FirstOrDefault(e => e is SdtContentBlock or SdtContentRow or SdtContentCell);
+
+            if (content is null)
+            {
+                continue;
+            }
+
+            foreach (var inner in Unwrapped(content))
+            {
+                yield return inner;
+            }
+        }
+    }
 
     // Headings are found by outline level, the number Word itself uses for the navigation
     // pane, not by style name: Word localizes style ids (a Turkish Word may save
