@@ -100,7 +100,7 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 | xUnit 2.9.3 | Birim ve entegrasyon testleri | 0 (boş test) | Kurulu |
 | Vitest (Angular'ın varsayılan test düzeni) | Arayüz bileşen testleri; `npm test` | 2 (iskelet), 4 (ekran testleri) | Kurulu |
 | Testcontainers (`Testcontainers.PostgreSql` 4.15.0) | Testlerde gerçek PostgreSQL'i container olarak ayağa kaldırma; RLS testleri için zorunlu | 1 | Kurulu |
-| Değerlendirme seti | Arama ve cevap kalitesini ölçen soru-cevap çiftleri (30–50, sonra 100+) | 2'den itibaren | Planlı |
+| Değerlendirme seti (`eval/questions.json`) | Arama ve cevap kalitesini ölçen soru-cevap çiftleri: 5 örnek belge, 96 soru (decisions.md #40, #45); setin çalıştırılması Faz 3'te | 2'den itibaren | Kurulu (soru seti) |
 
 Çapraz test kuralı her fazda geçerlidir: herkes karşı tarafın yazdığı kodun testini yazar.
 
