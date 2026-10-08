@@ -171,7 +171,7 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 - [x] Yüklenen PDF ve DOCX chunk'lara bölünüp metadata ile veritabanına yazılıyor (elle denendi; `DocumentProcessorTests`)
 - [x] Uygulama işlem ortasında kapatılıp açılınca yarım kalan belge tekrar işleniyor (`IngestionWorkerTests.UnfinishedDocumentIsProcessedAfterARestart`)
 
-İlk değerlendirme seti (#40) bitiş koşullarından bağımsız olarak hâlâ açık.
+İlk değerlendirme seti hazır: 5 örnek belge, 96 soru (`eval/`, decisions #40, #45).
 
 ### Faz 3 — Arama
 
@@ -184,6 +184,10 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 **Bitiş koşulu:**
 - [ ] Hibrit arama, değerlendirme setinde tek başına vektör aramadan daha iyi sonuç veriyor (ölçülmüş)
+
+**Faz başında karar verilecekler** (Faz 2 sonunda değerlendirme seti gözden geçirilirken bulundu):
+- **Bölüm yolu uyuşmazlığı:** Setteki `section` değerleri belge adının belgenin ilk başlığı olduğunu varsayar (`Bölüm 1: Çalışma Saatleri`). Gerçek yüklemede belge adı dosya adından gelir (`ik-yonetmeligi`), ilk başlık bölüm yolunda kalır (`İK Yönetmeliği > Bölüm 1: Çalışma Saatleri`) ve giriş metninin yolu `null` yerine `İK Yönetmeliği` olur. Seti çalıştıran araç yazılmadan önce seçilmeli: belgeleri ilk başlıklarıyla adlandırarak yüklemek, karşılaştırmada yolun başındaki belge adını yok saymak ya da chunker'ın belgenin ilk 1. seviye başlığını bölüm yoluna hiç koymaması.
+- **Chunk boyutu sınanmıyor:** Örnek belgelerde her bölüm tek chunk'a sığıyor (en uzun chunk ~560 karakter, sınır 1500). Set, #43'teki boyut ve örtüşme kararlarını ölçemez; bunun için uzun bölümlü en az bir belge eklenmeli.
 
 ### Faz 4 — Sohbet
 
