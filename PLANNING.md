@@ -168,8 +168,10 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 | **Çapraz test:** PDF parser testleri | **Çapraz test:** DOCX parser, arka plan işi ve chunking testleri | |
 
 **Bitiş koşulu:**
-- [ ] Yüklenen PDF ve DOCX chunk'lara bölünüp metadata ile veritabanına yazılıyor
-- [ ] Uygulama işlem ortasında kapatılıp açılınca yarım kalan belge tekrar işleniyor
+- [x] Yüklenen PDF ve DOCX chunk'lara bölünüp metadata ile veritabanına yazılıyor (elle denendi; `DocumentProcessorTests`)
+- [x] Uygulama işlem ortasında kapatılıp açılınca yarım kalan belge tekrar işleniyor (`IngestionWorkerTests.UnfinishedDocumentIsProcessedAfterARestart`)
+
+İlk değerlendirme seti (#40) bitiş koşullarından bağımsız olarak hâlâ açık.
 
 ### Faz 3 — Arama
 
