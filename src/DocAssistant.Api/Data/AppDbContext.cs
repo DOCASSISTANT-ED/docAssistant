@@ -1,6 +1,7 @@
 using System.Reflection;
 using DocAssistant.Api.Modules.Documents;
 using DocAssistant.Api.Modules.Identity;
+using DocAssistant.Api.Modules.Ingestion;
 using DocAssistant.Api.Modules.Tenants;
 using DocAssistant.Shared.Tenancy;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
     public DbSet<Membership> Memberships => Set<Membership>();
 
     public DbSet<Document> Documents => Set<Document>();
+
+    public DbSet<Chunk> Chunks => Set<Chunk>();
 
     // Query filters must read the tenant through a member of the context: EF Core then
     // re-evaluates it for every query instead of baking one value into the cached model.
@@ -38,6 +41,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // pgvector adds the vector column type used by chunks.embedding.
+        modelBuilder.HasPostgresExtension("vector");
+
         // Picks up every IEntityTypeConfiguration in the Modules folders.
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 

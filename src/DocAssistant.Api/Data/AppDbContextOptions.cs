@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Pgvector.EntityFrameworkCore;
 
 namespace DocAssistant.Api.Data;
 
@@ -11,7 +12,8 @@ public static class AppDbContextOptions
         string connectionString)
     {
         return options
-            .UseNpgsql(connectionString)
+            // UseVector: maps Pgvector's Vector type to the vector column type.
+            .UseNpgsql(connectionString, npgsql => npgsql.UseVector())
             .UseSnakeCaseNamingConvention();
     }
 }
