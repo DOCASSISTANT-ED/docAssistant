@@ -1,8 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using DocAssistant.Api.Modules.Documents;
+using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
 using DocAssistant.IntegrationTests.Infrastructure;
+using DocAssistant.IntegrationTests.Ingestion;
 using Microsoft.EntityFrameworkCore;
 
 namespace DocAssistant.IntegrationTests.Documents;
@@ -241,6 +243,58 @@ public class DocumentUploadTests(PostgresFixture database)
         Assert.DoesNotContain(admin.TenantId.ToString(), json);
     }
 
+    // ---- When a step fails (decisions #37) ---------------------------------------------
+    // Order: file, then row, then queue. A row must never point at a missing file, and a
+    // file whose row could not be written is removed again.
+    //
+    // The app has no exception handler outside Development, and the test server passes an
+    // unhandled exception on to the caller instead of answering 500; a real client gets a
+    // 500. So these tests expect the exception the endpoint let through.
+
+    [Fact]
+    public async Task WhenStorageFailsNoDocumentIsRecorded()
+    {
+        await using var api = UploadTestApi.Start(database, new InMemoryFileStorage { FailSaves = true });
+        var admin = await api.RegisterAdminAsync();
+
+        var error = await Assert.ThrowsAsync<IOException>(() => api.UploadAsync(admin.Token, UploadFiles.Pdf(), "ik.pdf"));
+
+        Assert.Equal("Simulated storage failure.", error.Message);
+        Assert.Equal(0, await CountDocumentsAsync(admin.TenantId));
+        Assert.Empty(api.QueuedItems);
+    }
+
+    // The row cannot be written when the uploader in the token is not a real user (the
+    // foreign key to users rejects it): a natural way to make the second step fail.
+    [Fact]
+    public async Task WhenTheDocumentCannotBeRecordedTheStoredFileIsRemoved()
+    {
+        await using var api = UploadTestApi.Start(database);
+        var admin = await api.RegisterAdminAsync();
+        var unknownUserToken = api.IssueToken(admin.TenantId, Guid.NewGuid(), nameof(MembershipRole.Admin));
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => api.UploadAsync(unknownUserToken, UploadFiles.Pdf(), "ik.pdf"));
+
+        Assert.Empty(api.Storage.Files);
+        Assert.StartsWith($"tenants/{admin.TenantId}/documents/", Assert.Single(api.Storage.DeletedKeys));
+        Assert.Equal(0, await CountDocumentsAsync(admin.TenantId));
+        Assert.Empty(api.QueuedItems);
+    }
+
+    // The document is safely stored as Pending; startup recovery queues it later (#34),
+    // so the upload itself has succeeded.
+    [Fact]
+    public async Task WhenQueueingFailsTheUploadStillSucceedsAndTheDocumentStaysPending()
+    {
+        await using var api = UploadTestApi.Start(database, queue: new BrokenQueue());
+        var admin = await api.RegisterAdminAsync();
+
+        var document = await UploadAndReadAsync(api, admin, UploadFiles.Pdf(), "ik.pdf");
+
+        Assert.Equal(DocumentStatus.Pending, (await ReadStoredAsync(document.Id)).Status);
+        Assert.Single(api.Storage.Files);
+    }
+
     private static async Task<DocumentResponse> UploadAndReadAsync(
         UploadTestApi api,
         TestAdmin admin,
@@ -260,5 +314,13 @@ public class DocumentUploadTests(PostgresFixture database)
         await using var db = database.CreateOwnerDbContext();
 
         return await db.Documents.IgnoreQueryFilters().AsNoTracking().SingleAsync(d => d.Id == documentId);
+    }
+
+    // Every test registers its own organization, so its tenant holds only its own documents.
+    private async Task<int> CountDocumentsAsync(Guid tenantId)
+    {
+        await using var db = database.CreateOwnerDbContext();
+
+        return await db.Documents.IgnoreQueryFilters().CountAsync(d => d.TenantId == tenantId);
     }
 }
