@@ -173,17 +173,10 @@ public class PdfStructureTests
         Assert.All(blocks, block => Assert.IsType<ParagraphBlock>(block));
     }
 
-    // ---- Known gaps -------------------------------------------------------------------
-    // Found while writing these tests. Each test states the behaviour that seems right and
-    // is skipped because the parser does not do it yet; remove Skip when it is fixed (or
-    // change the expectation if another behaviour is chosen).
-
-    private const string KnownGap = "Known gap in PdfDocumentParser; see the pull request that added this test.";
-
     // The normal line spacing is the smallest gap between two lines of the same size. When
-    // no paragraph has a second line, that smallest gap is the space between paragraphs,
-    // so separate one-line paragraphs (a list, short clauses) are glued into one.
-    [Fact(Skip = KnownGap)]
+    // no paragraph has a second line, that smallest gap is the space between paragraphs;
+    // separate one-line paragraphs (a list, short clauses) must still not be glued into one.
+    [Fact]
     public void OneLineParagraphsStaySeparate()
     {
         var blocks = Parse(new PdfBuilder()

@@ -11,6 +11,10 @@ internal static class PdfTextLayout
     // Lines further apart than the normal spacing by this factor start a new paragraph.
     private const double ParagraphGapFactor = 1.25;
 
+    // Single spacing is about 1.2 × the font size, 1.5 spacing about 1.7 ×. A "normal"
+    // spacing from this factor up may really be the gap between one-line paragraphs.
+    private const double LooseSpacingFactor = 1.5;
+
     // Words whose baselines differ by less than this share of the font size are on one line.
     private const double SameLineTolerance = 0.3;
 
@@ -81,7 +85,28 @@ internal static class PdfTextLayout
 
         var gap = previous.Baseline - line.Baseline;
 
-        return !normalSpacing.TryGetValue(line.FontSize, out var normal) || gap > normal * ParagraphGapFactor;
+        if (!normalSpacing.TryGetValue(line.FontSize, out var normal) || gap > normal * ParagraphGapFactor)
+        {
+            return true;
+        }
+
+        // Loose spacing looks the same for a double-spaced paragraph and for a list of
+        // one-line paragraphs, so the text decides: a line that ends a sentence, followed
+        // by one that does not continue in lower case, closes the paragraph.
+        return normal >= line.FontSize * LooseSpacingFactor
+            && EndsSentence(previous.Text)
+            && !char.IsLower(line.Text[0]);
+    }
+
+    private static bool EndsSentence(string text)
+    {
+        var end = text.Length - 1;
+        while (end > 0 && text[end] is ')' or ']' or '"' or '\'' or '”' or '’' or '»')
+        {
+            end--;
+        }
+
+        return text[end] is '.' or '!' or '?' or '…' or ':';
     }
 
     // Line spacing differs per document (single, 1.5, double), so it is measured instead
