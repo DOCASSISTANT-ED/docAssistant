@@ -258,8 +258,8 @@ public class DocxStructureTests
 
     private const string KnownGap = "Known gap in DocxDocumentParser; see the pull request that added this test.";
 
-    // Shift+Enter inside a paragraph. Today the two lines are glued: "satırikinci".
-    [Fact(Skip = KnownGap)]
+    // Shift+Enter inside a paragraph. Was a known gap: the two lines were glued ("satırikinci").
+    [Fact]
     public void LineBreakInsideAParagraphSeparatesWords()
     {
         var paragraph = new Paragraph(new Run(new Text("Birinci satır"), new Break(), new Text("ikinci satır")));
@@ -269,8 +269,8 @@ public class DocxStructureTests
         Assert.Equal("Birinci satır ikinci satır", Assert.IsType<ParagraphBlock>(Assert.Single(blocks)).Text);
     }
 
-    // Today the tab disappears: "Ad:Ayşe".
-    [Fact(Skip = KnownGap)]
+    // Was a known gap: the tab disappeared ("Ad:Ayşe").
+    [Fact]
     public void TabInsideAParagraphSeparatesWords()
     {
         var paragraph = new Paragraph(new Run(new Text("Ad:"), new TabChar(), new Text("Ayşe")));
@@ -281,8 +281,8 @@ public class DocxStructureTests
     }
 
     // Content controls (w:sdt) wrap ordinary paragraphs in templates, forms, cover pages
-    // and tables of contents. Today everything inside one is silently dropped.
-    [Fact(Skip = KnownGap)]
+    // and tables of contents. Was a known gap: everything inside one was silently dropped.
+    [Fact]
     public void TextInsideAContentControlIsRead()
     {
         var contentControl = new SdtBlock(
@@ -298,8 +298,8 @@ public class DocxStructureTests
             blocks.Cast<ParagraphBlock>().Select(p => p.Text));
     }
 
-    // Today the inner table's text is lost.
-    [Fact(Skip = KnownGap)]
+    // Was a known gap: the inner table's text was lost.
+    [Fact]
     public void TextOfATableNestedInACellIsKept()
     {
         var inner = new Table(new TableRow(new TableCell(new Paragraph(new Run(new Text("iç"))))));

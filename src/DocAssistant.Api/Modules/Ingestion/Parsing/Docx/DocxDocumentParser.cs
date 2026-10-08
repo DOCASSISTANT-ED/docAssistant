@@ -1,3 +1,6 @@
+using System.Text;
+using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 
@@ -6,7 +9,7 @@ namespace DocAssistant.Api.Modules.Ingestion.Parsing.Docx;
 // A DOCX file is a zip of XML parts. Unlike a PDF it stores structure, not just looks:
 // paragraphs, their styles and tables are marked explicitly (docs/decisions.md #21).
 // It stores no page numbers, so every block's PageNumber is null (decisions #22).
-public sealed class DocxDocumentParser : IDocumentParser
+public sealed partial class DocxDocumentParser : IDocumentParser
 {
     // Shown to the user and stored in documents.failure_reason (docs/decisions.md #24),
     // so they are written in the product's language.
@@ -79,7 +82,7 @@ public sealed class DocxDocumentParser : IDocumentParser
 
         // Paragraphs and tables are siblings in the body; walking them together keeps the
         // reading order.
-        foreach (var element in body.ChildElements)
+        foreach (var element in Unwrapped(body))
         {
             switch (element)
             {
@@ -101,8 +104,8 @@ public sealed class DocxDocumentParser : IDocumentParser
     private static TableBlock? ReadTable(Table table)
     {
         // Rows with no text at all are left out.
-        var rows = table.Elements<TableRow>()
-            .Select(row => (Row: row, Cells: row.Elements<TableCell>().Select(TextOf).ToList()))
+        var rows = Unwrapped(table).OfType<TableRow>()
+            .Select(row => (Row: row, Cells: Unwrapped(row).OfType<TableCell>().Select(TextOf).ToList()))
             .Where(row => row.Cells.Any(cell => cell.Length > 0))
             .ToList();
 
@@ -121,9 +124,62 @@ public sealed class DocxDocumentParser : IDocumentParser
             PageNumber: null);
     }
 
-    // A cell can hold several paragraphs; they are joined with a space.
-    private static string TextOf(TableCell cell) =>
-        string.Join(" ", cell.Elements<Paragraph>().Select(TextOf).Where(text => text.Length > 0));
+    // A cell can hold several paragraphs, and even whole tables; their text is joined with
+    // spaces in reading order. A table inside a cell has no TableBlock of its own (a cell's
+    // value is one string), so its rows and columns are flattened into the cell's text.
+    private static string TextOf(TableCell cell)
+    {
+        var texts = new List<string>();
+
+        foreach (var element in Unwrapped(cell))
+        {
+            switch (element)
+            {
+                case Paragraph paragraph:
+                    texts.Add(TextOf(paragraph));
+                    break;
+
+                case Table nested:
+                    foreach (var row in Unwrapped(nested).OfType<TableRow>())
+                    {
+                        texts.AddRange(Unwrapped(row).OfType<TableCell>().Select(TextOf));
+                    }
+
+                    break;
+            }
+        }
+
+        return string.Join(" ", texts.Where(text => text.Length > 0));
+    }
+
+    // The children of container, with content controls (w:sdt) opened up. Templates, forms,
+    // cover pages and tables of contents wrap ordinary paragraphs, tables, rows or cells in
+    // them; reading only direct children would silently drop that text. Content controls
+    // can be nested, so their content is unwrapped the same way.
+    private static IEnumerable<OpenXmlElement> Unwrapped(OpenXmlElement container)
+    {
+        foreach (var child in container.ChildElements)
+        {
+            if (child is not SdtElement contentControl)
+            {
+                yield return child;
+                continue;
+            }
+
+            var content = contentControl.ChildElements
+                .FirstOrDefault(e => e is SdtContentBlock or SdtContentRow or SdtContentCell);
+
+            if (content is null)
+            {
+                continue;
+            }
+
+            foreach (var inner in Unwrapped(content))
+            {
+                yield return inner;
+            }
+        }
+    }
 
     // Headings are found by outline level, the number Word itself uses for the navigation
     // pane, not by style name: Word localizes style ids (a Turkish Word may save
@@ -179,9 +235,32 @@ public sealed class DocxDocumentParser : IDocumentParser
     }
 
     // Only the visible text runs (w:t): field codes such as PAGE and text deleted under
-    // track changes are separate elements and are left out.
-    private static string TextOf(Paragraph paragraph) =>
-        string.Concat(paragraph.Descendants<Text>().Select(text => text.Text)).Trim();
+    // track changes are separate elements and are left out. Line breaks (w:br, w:cr) and
+    // tabs (w:tab) are elements too, not characters inside w:t; they become spaces so the
+    // words around them stay apart. Runs of whitespace are then collapsed to one space.
+    private static string TextOf(Paragraph paragraph)
+    {
+        var text = new StringBuilder();
+
+        foreach (var element in paragraph.Descendants())
+        {
+            switch (element)
+            {
+                case Text run:
+                    text.Append(run.Text);
+                    break;
+
+                case Break or CarriageReturn or TabChar:
+                    text.Append(' ');
+                    break;
+            }
+        }
+
+        return Whitespace().Replace(text.ToString(), " ").Trim();
+    }
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex Whitespace();
 
     private static bool StartsWith(Stream stream, byte[] signature)
     {
