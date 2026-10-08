@@ -124,9 +124,33 @@ public sealed partial class DocxDocumentParser : IDocumentParser
             PageNumber: null);
     }
 
-    // A cell can hold several paragraphs; they are joined with a space.
-    private static string TextOf(TableCell cell) =>
-        string.Join(" ", Unwrapped(cell).OfType<Paragraph>().Select(TextOf).Where(text => text.Length > 0));
+    // A cell can hold several paragraphs, and even whole tables; their text is joined with
+    // spaces in reading order. A table inside a cell has no TableBlock of its own (a cell's
+    // value is one string), so its rows and columns are flattened into the cell's text.
+    private static string TextOf(TableCell cell)
+    {
+        var texts = new List<string>();
+
+        foreach (var element in Unwrapped(cell))
+        {
+            switch (element)
+            {
+                case Paragraph paragraph:
+                    texts.Add(TextOf(paragraph));
+                    break;
+
+                case Table nested:
+                    foreach (var row in Unwrapped(nested).OfType<TableRow>())
+                    {
+                        texts.AddRange(Unwrapped(row).OfType<TableCell>().Select(TextOf));
+                    }
+
+                    break;
+            }
+        }
+
+        return string.Join(" ", texts.Where(text => text.Length > 0));
+    }
 
     // The children of container, with content controls (w:sdt) opened up. Templates, forms,
     // cover pages and tables of contents wrap ordinary paragraphs, tables, rows or cells in

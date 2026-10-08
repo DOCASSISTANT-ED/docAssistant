@@ -298,8 +298,8 @@ public class DocxStructureTests
             blocks.Cast<ParagraphBlock>().Select(p => p.Text));
     }
 
-    // Today the inner table's text is lost.
-    [Fact(Skip = KnownGap)]
+    // Was a known gap: the inner table's text was lost.
+    [Fact]
     public void TextOfATableNestedInACellIsKept()
     {
         var inner = new Table(new TableRow(new TableCell(new Paragraph(new Run(new Text("iç"))))));
