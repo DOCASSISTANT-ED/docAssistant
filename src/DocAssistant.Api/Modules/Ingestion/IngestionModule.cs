@@ -1,6 +1,7 @@
 using DocAssistant.Api.Modules.Ingestion.Parsing;
 using DocAssistant.Api.Modules.Ingestion.Parsing.Docx;
 using DocAssistant.Api.Modules.Ingestion.Parsing.Pdf;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace DocAssistant.Api.Modules.Ingestion;
 
@@ -19,7 +20,10 @@ public static class IngestionModule
         // Scoped: the worker resolves these from a new scope per document, together with
         // that document's AppDbContext and tenant (decisions #31).
         services.AddScoped<DocumentIngestionHandler>();
-        services.AddScoped<IDocumentProcessor, PendingDocumentProcessor>(); // replaced in K4
+        services.AddScoped<IDocumentProcessor, DocumentProcessor>();
+
+        // Also registered by the identity module; TryAdd keeps a single instance.
+        services.TryAddSingleton(TimeProvider.System);
 
         // One parser per file format; the worker picks the one whose SourceType matches
         // the document (DocumentSourceTypes.TryFromContentType). Parsers keep no state.
