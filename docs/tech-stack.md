@@ -38,8 +38,8 @@ Paket sürümleri yalnızca `Directory.Packages.props` içinde tutulur (merkezi 
 |---|---|---|---|
 | ASP.NET Core Web API (`DocAssistant.Api`) | HTTP uç noktaları: kimlik, yükleme, sohbet | 0 | Kurulu |
 | `Microsoft.AspNetCore.OpenApi` 10.0.12 | API'nin OpenAPI tanımını üretir | 0 | Kurulu |
-| JWT kimlik doğrulama | Kayıt, giriş, istekte kullanıcı ve tenant bilgisinin taşınması | 1 | Planlı |
-| `BackgroundService` + `Channel` | Belge işleme kuyruğu (ingestion) | 2 | Planlı |
+| JWT kimlik doğrulama (`Microsoft.AspNetCore.Authentication.JwtBearer` 10.0.12) | Kayıt, giriş, istekte kullanıcı ve tenant bilgisinin taşınması | 1 | Kurulu |
+| `BackgroundService` + `Channel` | Belge işleme kuyruğu (ingestion): tek tek işleme, en fazla 100 bekleyen mesaj, açılışta yarım işleri kurtarma (decisions.md #34, #39) | 2 | Kurulu |
 | Rate limiting ve token kotası | Tenant bazlı kullanım sınırı | 5 | Planlı |
 
 ## Arayüz
@@ -59,8 +59,8 @@ Arayüz başlangıçta Blazor Web App olarak planlanmıştı; ekranlar yazılmad
 | PostgreSQL | 17 (`pgvector/pgvector:pg17` imajı) | Ana veritabanı | 0 | Kurulu |
 | pgvector | 0.8+ | Vektör saklama ve benzerlik araması; filtreli aramada HNSW indeksinin verimli çalışması için 0.8+ gerekli | 0 (eklenti), 3 (arama) | Kurulu |
 | Pgvector.EntityFrameworkCore | 0.3.0 | C#'taki `Vector` türünü `vector` sütununa bağlar; `chunks.embedding` (decisions.md #28) | 2 (sütun), 3 (doldurma) | Kurulu |
-| EF Core + migration | — | Veri erişimi, şema değişiklikleri, global query filter | 1 | Planlı |
-| Row-Level Security | PostgreSQL özelliği | Tenant izolasyonunun veritabanı katmanı | 1 | Planlı |
+| EF Core + migration | 10 (`Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3) | Veri erişimi, şema değişiklikleri, global query filter | 1 | Kurulu |
+| Row-Level Security | PostgreSQL özelliği | Tenant izolasyonunun veritabanı katmanı; `documents` ve `chunks` tablolarında açık | 1 | Kurulu |
 | Full-text arama (`turkish`) | PostgreSQL özelliği | Anahtar kelime araması | 3 | Planlı |
 | SeaweedFS | 4.48 (`chrislusf/seaweedfs`, `mini` modu) | Yüklenen dosyaların S3 API'si üzerinden saklanması (geliştirme). MinIO yerine, bkz. decisions.md #9 | 0 (compose), 2 (kullanım) | Kurulu |
 | AWSSDK.S3 | 4.0.104 | Depolamaya S3 API'siyle erişim; `IFileStorage` arkasında, kod SeaweedFS'e özel değil (decisions.md #33) | 2 | Kurulu |
@@ -72,10 +72,10 @@ Tenant izolasyonu iki katmanlıdır: uygulamada EF Core global query filter, ver
 
 | Teknoloji | Ne için | Faz | Durum |
 |---|---|---|---|
-| PdfPig | PDF'ten metin, sayfa numarası ve yapı çıkarma | 2 | Planlı |
-| OpenXML SDK | DOCX okuma | 2 | Planlı |
+| PdfPig 0.1.16 | PDF'ten metin, sayfa numarası ve yapı çıkarma; başlıklar yazı boyutundan tahmin edilir (decisions.md #23) | 2 | Kurulu |
+| OpenXML SDK (`DocumentFormat.OpenXml` 3.5.1) | DOCX okuma: başlıklar, paragraflar, tablolar | 2 | Kurulu |
 | ClosedXML | XLSX okuma | 2 sonrası | Planlı |
-| Kendi chunking algoritmamız | Yapıya göre bölme (bölüm → paragraf → cümle), Türkçe kısaltma desteği | 2 | Planlı |
+| Kendi chunking algoritmamız | Yapıya göre bölme (bölüm → paragraf → cümle), Türkçe kısaltma desteği, en fazla 1500 karakter (decisions.md #43) | 2 | Kurulu |
 
 Taranmış PDF için OCR bilinçli olarak MVP dışında.
 
@@ -97,9 +97,9 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 
 | Teknoloji | Ne için | Faz | Durum |
 |---|---|---|---|
-| xUnit | Birim ve entegrasyon testleri | 0 (boş test) | Planlı |
+| xUnit 2.9.3 | Birim ve entegrasyon testleri | 0 (boş test) | Kurulu |
 | Vitest (Angular'ın varsayılan test düzeni) | Arayüz bileşen testleri; `npm test` | 2 (iskelet), 4 (ekran testleri) | Kurulu |
-| Testcontainers | Testlerde gerçek PostgreSQL'i container olarak ayağa kaldırma; RLS testleri için zorunlu | 1 | Planlı |
+| Testcontainers (`Testcontainers.PostgreSql` 4.15.0) | Testlerde gerçek PostgreSQL'i container olarak ayağa kaldırma; RLS testleri için zorunlu | 1 | Kurulu |
 | Değerlendirme seti | Arama ve cevap kalitesini ölçen soru-cevap çiftleri (30–50, sonra 100+) | 2'den itibaren | Planlı |
 
 Çapraz test kuralı her fazda geçerlidir: herkes karşı tarafın yazdığı kodun testini yazar.
