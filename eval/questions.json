@@ -1,0 +1,865 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "ik-001",
+      "type": "direct",
+      "question": "Haftalık çalışma süresi kaç saattir?",
+      "expected_answer": "Kırk beş saat.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-002",
+      "type": "direct",
+      "question": "Mesai saatleri nedir?",
+      "expected_answer": "Hafta içi 09:00 ile 18:00 arası; öğle arası bir saattir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-003",
+      "type": "paraphrase",
+      "question": "Sabah işe yetişemezsem kime, ne zaman haber vermem gerekir?",
+      "expected_answer": "Aynı gün içinde yöneticisine bildirir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-004",
+      "type": "paraphrase",
+      "question": "Depoda çalışanların gelecek ayki vardiya programı ne zaman belli olur?",
+      "expected_answer": "Her ayın son haftasında, bir sonraki ay için birim yöneticisi tarafından duyurulur.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-005",
+      "type": "direct",
+      "question": "Vardiya çizelgesindeki değişiklik talepleri kaç gün içinde iletilmelidir?",
+      "expected_answer": "En geç üç iş günü içinde yöneticiye iletilir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-006",
+      "type": "direct",
+      "question": "Fazla mesai ücreti nasıl hesaplanır?",
+      "expected_answer": "Saatlik ücretin yüzde elli fazlasıyla ödenir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-007",
+      "type": "paraphrase",
+      "question": "Normal saatlerin dışında ek çalışma yapabilmem için kimden izin almalıyım?",
+      "expected_answer": "Birim yöneticisinin yazılı onayı gerekir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-008",
+      "type": "direct",
+      "question": "Hangi çalışmalar fazla mesai sayılır?",
+      "expected_answer": "Haftalık kırk beş saati aşan çalışmalar.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-009",
+      "type": "direct",
+      "question": "Yıllık ücretli izne ne zaman hak kazanılır?",
+      "expected_answer": "İşe giriş tarihinden itibaren bir yıl doldurulduğunda.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-010",
+      "type": "table",
+      "question": "On yıldır şirkette çalışan birinin yıllık izni kaç gündür?",
+      "expected_answer": "20 gün (5–15 yıl kıdem).",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-011",
+      "type": "table",
+      "question": "15 yıl ve üzeri kıdemi olan çalışanın yıllık izni kaç gündür?",
+      "expected_answer": "26 gün.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-012",
+      "type": "table",
+      "question": "Şirkette üçüncü yılındaki bir çalışan kaç gün yıllık izin kullanabilir?",
+      "expected_answer": "14 gün (1–5 yıl kıdem).",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-013",
+      "type": "direct",
+      "question": "İzin talebi kaç gün önceden yapılmalıdır?",
+      "expected_answer": "En az on gün önceden.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-014",
+      "type": "paraphrase",
+      "question": "Yıllık iznimdeyken hastalanıp rapor alırsam iznime ne olur?",
+      "expected_answer": "İzin, doktor raporunda belirtilen süre kadar uzatılır.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-015",
+      "type": "exact_term",
+      "question": "1.500 TL hangi ödemenin tutarıdır?",
+      "expected_answer": "Şehir dışı görevlendirmelerde ödenen günlük harcırah.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-016",
+      "type": "paraphrase",
+      "question": "Başka bir şehre görevle gittiğimde otel masrafını şirket öder mi?",
+      "expected_answer": "Evet; konaklama giderleri fatura karşılığında ayrıca karşılanır.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-017",
+      "type": "direct",
+      "question": "Harcırah talepleri ne zamana kadar, nasıl ve nereye iletilir?",
+      "expected_answer": "Görev dönüşünü izleyen beş iş günü içinde, masraf formu ile muhasebe birimine.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-018",
+      "type": "paraphrase",
+      "question": "Masraf formunu süresi geçtikten sonra verirsem param ne zaman ödenir?",
+      "expected_answer": "Talep bir sonraki ayın ödemesine eklenir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-019",
+      "type": "exact_term",
+      "question": "Yönetmeliğin uygulanmasından kim sorumludur?",
+      "expected_answer": "İnsan Kaynakları Müdürü (belgede \"İnsan Kaynakları Md.\" olarak geçer).",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": null, "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-020",
+      "type": "direct",
+      "question": "İK Yönetmeliği hangi birimlerde geçerlidir?",
+      "expected_answer": "Merkez ofis, depo, şube ve benzeri bütün birimlerde.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": null, "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-021",
+      "type": "multi_section",
+      "question": "Çalışanın yöneticisine bildirim yapması ya da yöneticisinden onay alması gereken durumlar nelerdir?",
+      "expected_answer": "İşe geç kalma aynı gün yöneticiye bildirilir; vardiya çizelgesi değişiklik talepleri üç iş günü içinde yöneticiye iletilir; fazla mesai için birim yöneticisinin yazılı onayı gerekir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 },
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-022",
+      "type": "multi_section",
+      "question": "Yönetmelikte iş günü olarak verilen süreler hangileridir?",
+      "expected_answer": "Vardiya çizelgesi değişiklik talepleri için üç iş günü; harcırah talepleri için görev dönüşünden sonra beş iş günü.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 },
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-023",
+      "type": "unanswerable",
+      "question": "Doğum izni kaç gündür?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "ik-024",
+      "type": "unanswerable",
+      "question": "Evden çalışma hangi günlerde yapılabilir?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "ik-025",
+      "type": "unanswerable",
+      "question": "Günlük yemek ücreti ne kadardır?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "bg-001",
+      "type": "direct",
+      "question": "Parola en az kaç karakter olmalıdır?",
+      "expected_answer": "En az on iki karakter; en az bir büyük harf, bir rakam ve bir özel işaret içermelidir.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 1: Parolalar", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-002",
+      "type": "direct",
+      "question": "Parolalar ne sıklıkla değiştirilir?",
+      "expected_answer": "Doksan günde bir; son beş parola yeniden kullanılamaz.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 1: Parolalar", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-003",
+      "type": "paraphrase",
+      "question": "Şifremi birkaç kez yanlış girdim ve hesabım kapandı; ne kadar beklemem gerekiyor?",
+      "expected_answer": "Beş hatalı girişten sonra hesap otuz dakika kilitlenir; daha erken açılması için Bilgi İşlem Destek Hattı (dahili 4040) aranır.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 1: Parolalar", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-004",
+      "type": "exact_term",
+      "question": "Dahili 4040 hangi birimin numarasıdır?",
+      "expected_answer": "Bilgi İşlem Destek Hattı.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 1: Parolalar", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-005",
+      "type": "paraphrase",
+      "question": "Yöneticim parolamı isterse vermeli miyim?",
+      "expected_answer": "Hayır; parola kimseyle paylaşılmaz, yöneticiler de çalışandan parolasını isteyemez.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 1: Parolalar", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-006",
+      "type": "direct",
+      "question": "Hangi sistemlere girişte iki adımlı doğrulama zorunludur?",
+      "expected_answer": "E-posta, VPN ve muhasebe yazılımı.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 1: Parolalar > 1.1 İki Adımlı Doğrulama", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-007",
+      "type": "paraphrase",
+      "question": "Doğrulama kodunu kısa mesajla alabilir miyim?",
+      "expected_answer": "Yalnızca telefon uygulamasının kullanılamadığı durumlarda, Bilgi İşlem'in onayıyla.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 1: Parolalar > 1.1 İki Adımlı Doğrulama", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-008",
+      "type": "paraphrase",
+      "question": "Evden getirdiğim flaş belleği iş bilgisayarıma takabilir miyim?",
+      "expected_answer": "Hayır; kişisel USB bellek takmak yasaktır. Dosya aktarımı için şirketin dosya paylaşım alanı kullanılır.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 2: Cihazlar", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-009",
+      "type": "direct",
+      "question": "Bilgisayar ekranı kaç dakika sonra kendiliğinden kilitlenir?",
+      "expected_answer": "Beş dakika işlem yapılmadığında.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 2: Cihazlar", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-010",
+      "type": "paraphrase",
+      "question": "Şirketin verdiği dizüstü bilgisayarı kaybettim, ne yapmalıyım?",
+      "expected_answer": "En geç iki saat içinde Bilgi İşlem Destek Hattı'na bildirilir; Bilgi İşlem cihazdaki verileri uzaktan siler.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 2: Cihazlar > 2.1 Kayıp ve Çalıntı", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-011",
+      "type": "direct",
+      "question": "Çalınan cihaz için polis tutanağı kime ve ne kadar sürede iletilir?",
+      "expected_answer": "Üç iş günü içinde İnsan Kaynakları'na.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 2: Cihazlar > 2.1 Kayıp ve Çalıntı", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-012",
+      "type": "paraphrase",
+      "question": "Kendi telefonumda şirket e-postasını kullanabilmem için ne gerekiyor?",
+      "expected_answer": "Birim yöneticisinin yazılı onayı ve telefonda ekran kilidi.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 2: Cihazlar > 2.2 Kişisel Cihazlar", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-013",
+      "type": "table",
+      "question": "Müşteri sözleşmesi hangi veri sınıfına girer ve şirket dışıyla hangi koşulda paylaşılabilir?",
+      "expected_answer": "Gizli sınıfına girer; yalnızca gizlilik sözleşmesi imzalanmışsa paylaşılabilir.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 3: Verilerin Sınıflandırılması", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-014",
+      "type": "table",
+      "question": "Vardiya çizelgesini şirket dışından biriyle paylaşmak için kimin onayı gerekir?",
+      "expected_answer": "Birim yöneticisinin onayı (\"Şirket içi\" sınıfı).",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 3: Verilerin Sınıflandırılması", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-015",
+      "type": "direct",
+      "question": "Gizli veriler e-posta ile nasıl gönderilir?",
+      "expected_answer": "Dosya şifrelenir; şifre alıcıya telefon gibi ayrı bir kanaldan iletilir.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 3: Verilerin Sınıflandırılması", "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-016",
+      "type": "paraphrase",
+      "question": "Sahte olduğundan şüphelendiğim bir e-posta aldım, ne yapmalıyım?",
+      "expected_answer": "Bağlantıya tıklanmaz, ek açılmaz ve e-posta guvenlik@orneklojistik.example adresine iletilir.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 4: İhlal Bildirimi", "page": 3 }
+      ]
+    },
+    {
+      "id": "bg-017",
+      "type": "direct",
+      "question": "Kişisel verilerin etkilendiği ihlaller kaç saat içinde ve hangi kuruma bildirilir?",
+      "expected_answer": "Yetmiş iki saat içinde, Bilgi İşlem Müdürü tarafından Kişisel Verileri Koruma Kurulu'na.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 4: İhlal Bildirimi", "page": 3 }
+      ]
+    },
+    {
+      "id": "bg-018",
+      "type": "direct",
+      "question": "Bilgi Güvenliği Politikası ne zaman gözden geçirilir?",
+      "expected_answer": "Yılda bir kez, ocak ayında.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": null, "page": 1 }
+      ]
+    },
+    {
+      "id": "bg-019",
+      "type": "unanswerable",
+      "question": "Parolaları saklamak için hangi parola yöneticisi uygulaması kullanılmalıdır?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "ak-001",
+      "type": "direct",
+      "question": "Araç talebi görevden kaç gün önce yapılmalıdır?",
+      "expected_answer": "En az iki iş günü önce, araç talep formu ile Filo Yönetimi'ne.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 1: Araç Tahsisi", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-002",
+      "type": "paraphrase",
+      "question": "İşe yeni başladım, şirket arabasını kullanabilir miyim?",
+      "expected_answer": "Geçerli ehliyet ve şirkette en az altı aydır çalışıyor olmak gerekir.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 1: Araç Tahsisi", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-003",
+      "type": "paraphrase",
+      "question": "Şirket aracıyla hafta sonu kendi taşınma işimi yapabilir miyim?",
+      "expected_answer": "Hayır; araçlar özel işler için kullanılamaz.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 1: Araç Tahsisi", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-004",
+      "type": "exact_term",
+      "question": "Kamyonlar için şehirler arası yollarda hız sınırı kaç km/s'dir?",
+      "expected_answer": "80 km/s.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 2: Sürüş Kuralları", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-005",
+      "type": "direct",
+      "question": "Sürücü kesintisiz en fazla ne kadar süre araç kullanabilir?",
+      "expected_answer": "Dört buçuk saat; ardından en az kırk beş dakika mola verir.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 2: Sürüş Kuralları > 2.1 Dinlenme Süreleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-006",
+      "type": "direct",
+      "question": "Günlük toplam sürüş süresi en fazla kaç saattir?",
+      "expected_answer": "Dokuz saat.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 2: Sürüş Kuralları > 2.1 Dinlenme Süreleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-007",
+      "type": "exact_term",
+      "question": "Kırk beş dakikalık zorunlu mola hangi durumda verilir?",
+      "expected_answer": "Sürücü dört buçuk saat kesintisiz araç kullandıktan sonra.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 2: Sürüş Kuralları > 2.1 Dinlenme Süreleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-008",
+      "type": "paraphrase",
+      "question": "Yakıt kartım çalışmadı ve benzini cebimden ödedim; parayı nasıl geri alırım?",
+      "expected_answer": "Fiş ile birlikte beş iş günü içinde masraf formu ile muhasebe birimine iletilir.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 2: Sürüş Kuralları > 2.2 Yakıt", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-009",
+      "type": "table",
+      "question": "Kamyonetin bakım aralığı kaç kilometredir?",
+      "expected_answer": "10.000 km.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 3: Bakım ve Muayene", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-010",
+      "type": "table",
+      "question": "Kamyonlarda lastik kontrolü ne sıklıkla yapılır?",
+      "expected_answer": "Her sefer öncesi.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 3: Bakım ve Muayene", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-011",
+      "type": "direct",
+      "question": "Araçta arıza fark eden sürücü ne yapar?",
+      "expected_answer": "Aracı kullanmaz ve durumu aynı gün içinde Filo Yönetimi'ne bildirir.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 3: Bakım ve Muayene", "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-012",
+      "type": "paraphrase",
+      "question": "Şirket aracıyla kaza yaptım; kime, ne zaman haber vermeliyim?",
+      "expected_answer": "Önce can güvenliği sağlanır, gerekiyorsa 112 aranır; en geç bir saat içinde Filo Yönetimi'ne haber verilir. Kaza tutanağı ve fotoğraflar iki iş günü içinde teslim edilir.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 4: Kaza ve Cezalar", "page": 3 }
+      ]
+    },
+    {
+      "id": "ak-013",
+      "type": "paraphrase",
+      "question": "Hız yaptığım için gelen trafik cezasını kim öder?",
+      "expected_answer": "Sürücü öder; ceza şirkete tebliğ edilmişse tutar, sürücünün yazılı onayıyla izleyen ayın ücretinden kesilir.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 4: Kaza ve Cezalar > 4.1 Trafik Cezaları", "page": 3 }
+      ]
+    },
+    {
+      "id": "ak-014",
+      "type": "direct",
+      "question": "Araç Kullanım Talimatı hangi araçları kapsar?",
+      "expected_answer": "Şirkete ait ya da şirketin kiraladığı binek araçlar, kamyonetler ve kamyonlar; forkliftler kapsam dışıdır.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": null, "page": 1 }
+      ]
+    },
+    {
+      "id": "ak-015",
+      "type": "unanswerable",
+      "question": "Şirket aracıyla yurt dışına çıkılabilir mi?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "sa-001",
+      "type": "direct",
+      "question": "Satın alma talebi teslim tarihinden kaç gün önce yapılmalıdır?",
+      "expected_answer": "En az on iş günü önce.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 1: Talep", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-002",
+      "type": "exact_term",
+      "question": "Acil alımın üst sınırı kaç TL'dir?",
+      "expected_answer": "50.000 TL.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 1: Talep > 1.1 Acil Alımlar", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-003",
+      "type": "paraphrase",
+      "question": "Sevkiyat durduğu için teklif toplamadan alım yaptım; sonrasında ne yapmam gerekir?",
+      "expected_answer": "Alım, izleyen iki iş günü içinde gerekçesiyle birlikte Satın Alma Müdürü'ne bildirilir.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 1: Talep > 1.1 Acil Alımlar", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-004",
+      "type": "table",
+      "question": "100.000 TL'lik bir alım için kaç teklif alınır ve alımı kim onaylar?",
+      "expected_answer": "3 teklif alınır; Satın Alma Müdürü onaylar.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 2: Teklif ve Onay", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-005",
+      "type": "table",
+      "question": "250.000 TL'nin üzerindeki alımları kim onaylar?",
+      "expected_answer": "Genel Müdür; 3 teklif ve yazılı sözleşme gerekir.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 2: Teklif ve Onay", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-006",
+      "type": "table",
+      "question": "10.000 TL'lik bir alım için kaç teklif gerekir?",
+      "expected_answer": "1 teklif; birim yöneticisi onaylar.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 2: Teklif ve Onay", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-007",
+      "type": "paraphrase",
+      "question": "Büyük bir siparişi onay sınırına takılmamak için ikiye bölebilir miyim?",
+      "expected_answer": "Hayır; bir alım onay sınırının altında kalmak amacıyla parçalara bölünemez.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 2: Teklif ve Onay", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-008",
+      "type": "direct",
+      "question": "Teklifler en az kaç gün geçerli olmalıdır?",
+      "expected_answer": "Otuz gün.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 2: Teklif ve Onay", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-009",
+      "type": "paraphrase",
+      "question": "Eşimin ortağı olduğu firma teklif verdi; bu süreçte görev alabilir miyim?",
+      "expected_answer": "Hayır; durum yazılı olarak Satın Alma Müdürü'ne bildirilir.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 2: Teklif ve Onay > 2.1 Tedarikçi Seçimi", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-010",
+      "type": "direct",
+      "question": "Yeni bir tedarikçiyle çalışılmadan önce hangi belgeler alınır?",
+      "expected_answer": "Vergi levhası ve imza sirküleri.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 2: Teklif ve Onay > 2.1 Tedarikçi Seçimi", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-011",
+      "type": "direct",
+      "question": "Hasarlı teslimat tedarikçiye kaç gün içinde bildirilir?",
+      "expected_answer": "Üç iş günü içinde, yazılı olarak.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 3: Teslim Alma", "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-012",
+      "type": "exact_term",
+      "question": "Tedarikçi ödemeleri ayın hangi günlerinde yapılır?",
+      "expected_answer": "Her ayın 15'inde ve 30'unda; fatura tarihinden itibaren otuz gün içinde.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 4: Ödeme", "page": 2 }
+      ]
+    },
+    {
+      "id": "sa-013",
+      "type": "direct",
+      "question": "Avans ödemesi hangi koşullarda yapılabilir?",
+      "expected_answer": "Yalnızca Genel Müdür'ün onayıyla ve sipariş tutarının yüzde yirmisini aşmamak üzere.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 4: Ödeme", "page": 2 }
+      ]
+    },
+    {
+      "id": "sa-014",
+      "type": "paraphrase",
+      "question": "Bir tedarikçi yılbaşında hediye gönderdi, kabul edebilir miyim?",
+      "expected_answer": "Değeri 500 TL'yi aşan hediye kabul edilemez; daha düşük değerli hediyeler birim yöneticisine bildirilir.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 5: Hediye ve İkram", "page": 2 }
+      ]
+    },
+    {
+      "id": "sa-015",
+      "type": "exact_term",
+      "question": "Satın Alma Prosedürü'nün uygulanmasından kim sorumludur?",
+      "expected_answer": "Satın Alma Müdürü (belgede \"Satın Alma Md.\" olarak geçer).",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": null, "page": 1 }
+      ]
+    },
+    {
+      "id": "sa-016",
+      "type": "unanswerable",
+      "question": "Tedarikçi performans puanı nasıl hesaplanır?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "dg-001",
+      "type": "direct",
+      "question": "Depo alanında hangi koruyucu donanım zorunludur?",
+      "expected_answer": "Çelik burunlu ayakkabı ve reflektörlü yelek.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 1: Kişisel Koruyucu Donanım", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-002",
+      "type": "paraphrase",
+      "question": "İş ayakkabım eskidi, yenisini nasıl alırım?",
+      "expected_answer": "Yıpranan donanım depo sorumlusuna teslim edilerek yenisiyle değiştirilir; donanım ücretsizdir.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 1: Kişisel Koruyucu Donanım", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-003",
+      "type": "paraphrase",
+      "question": "Depoya misafir getirebilir miyim?",
+      "expected_answer": "Ziyaretçiler girişte yelek ve baret alır ve depoda yalnızca bir çalışanın eşliğinde bulunabilir.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 1: Kişisel Koruyucu Donanım", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-004",
+      "type": "direct",
+      "question": "Forklifti kimler kullanabilir?",
+      "expected_answer": "Operatör belgesi olan ve şirketin yıllık tazeleme eğitimini tamamlamış çalışanlar.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 2: Forklift Kullanımı", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-005",
+      "type": "exact_term",
+      "question": "Depo içinde forklift hız sınırı kaç km/s'dir?",
+      "expected_answer": "10 km/s; kapı ve kavşaklarda 5 km/s.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 2: Forklift Kullanımı", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-006",
+      "type": "direct",
+      "question": "Arızalı forklift için ne yapılır?",
+      "expected_answer": "Kullanılmaz; anahtarı depo sorumlusuna teslim edilir ve araca \"Arızalı\" etiketi asılır.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 2: Forklift Kullanımı > 2.1 Günlük Kontrol", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-007",
+      "type": "direct",
+      "question": "Akü şarjı sırasında hangi koruyucular takılır?",
+      "expected_answer": "Koruyucu gözlük ve eldiven.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 2: Forklift Kullanımı > 2.2 Akü Şarjı", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-008",
+      "type": "table",
+      "question": "Zemin kattaki rafa en fazla kaç kilogram yük konabilir?",
+      "expected_answer": "1.200 kg.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 3: İstifleme ve Raflar", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-009",
+      "type": "table",
+      "question": "Üçüncü kattaki rafta palet yüksekliği en fazla kaç santimetre olabilir?",
+      "expected_answer": "140 cm.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 3: İstifleme ve Raflar", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-010",
+      "type": "paraphrase",
+      "question": "30 kiloluk bir koliyi tek başıma taşıyabilir miyim?",
+      "expected_answer": "Hayır; tek kişi en fazla 25 kg kaldırabilir. Daha ağır yükler iki kişiyle ya da transpaletle taşınır.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 3: İstifleme ve Raflar", "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-011",
+      "type": "paraphrase",
+      "question": "Yangın alarmı çalınca nereye gitmeliyim?",
+      "expected_answer": "En yakın acil çıkıştan çıkıp otoparktaki toplanma alanına; asansör ve forklift kullanılmaz.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 4: Acil Durumlar", "page": 3 }
+      ]
+    },
+    {
+      "id": "dg-012",
+      "type": "direct",
+      "question": "Tahliye tatbikatı yılda kaç kez yapılır?",
+      "expected_answer": "İki kez.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 4: Acil Durumlar", "page": 3 }
+      ]
+    },
+    {
+      "id": "dg-013",
+      "type": "direct",
+      "question": "Ramak kala olaylar ne kadar sürede ve nasıl bildirilir?",
+      "expected_answer": "Üç iş günü içinde, kaza bildirim formuyla.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 4: Acil Durumlar > 4.1 İş Kazası ve Ramak Kala", "page": 3 }
+      ]
+    },
+    {
+      "id": "dg-014",
+      "type": "paraphrase",
+      "question": "Depoda yere kimyasal bir madde döküldü, ne yapmalıyım?",
+      "expected_answer": "Alan şeritle çevrilir, dökülme emici malzemeyle sınırlandırılır ve depo sorumlusuna haber verilir.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 4: Acil Durumlar > 4.2 Kimyasal Dökülmesi", "page": 3 }
+      ]
+    },
+    {
+      "id": "dg-015",
+      "type": "direct",
+      "question": "Depo İş Güvenliği Talimatı ziyaretçiler için de geçerli midir?",
+      "expected_answer": "Evet; ziyaretçiler ve yüklenici personeli de kapsama dahildir.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": null, "page": 1 }
+      ]
+    },
+    {
+      "id": "dg-016",
+      "type": "unanswerable",
+      "question": "Depoda gece vardiyası saat kaçta başlar?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "x-001",
+      "type": "cross_document",
+      "question": "Hangi işlemler için birim yöneticisinin yazılı onayı gerekir?",
+      "expected_answer": "Fazla mesai yapılması, kişisel telefonda şirket e-postası kullanılması ve araç talebi.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai", "page": 1 },
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 2: Cihazlar > 2.2 Kişisel Cihazlar", "page": 1 },
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 1: Araç Tahsisi", "page": 1 }
+      ]
+    },
+    {
+      "id": "x-002",
+      "type": "cross_document",
+      "question": "Üç iş günü içinde yapılması gereken bildirimler hangileridir?",
+      "expected_answer": "Vardiya çizelgesi değişiklik talepleri, çalınan cihazın polis tutanağı, eksik ya da hasarlı teslimat ve ramak kala olaylar.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 },
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 2: Cihazlar > 2.1 Kayıp ve Çalıntı", "page": 1 },
+        { "document": "satin-alma-proseduru", "section": "Bölüm 3: Teslim Alma", "page": 1 },
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 4: Acil Durumlar > 4.1 İş Kazası ve Ramak Kala", "page": 3 }
+      ]
+    },
+    {
+      "id": "x-003",
+      "type": "cross_document",
+      "question": "Masraf formu ile muhasebe birimine hangi harcamalar iletilir ve süresi nedir?",
+      "expected_answer": "Harcırah talepleri ve yakıt kartının kullanılamadığı durumlardaki yakıt harcamaları; ikisi de beş iş günü içinde.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 },
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 2: Sürüş Kuralları > 2.2 Yakıt", "page": 1 }
+      ]
+    },
+    {
+      "id": "x-004",
+      "type": "cross_document",
+      "question": "Forklift kullanımının kuralları hangi belgede yer alır?",
+      "expected_answer": "Depo İş Güvenliği Talimatı'nda; Araç Kullanım Talimatı forkliftleri kapsam dışında bırakır.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": null, "page": 1 },
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 2: Forklift Kullanımı", "page": 1 }
+      ]
+    },
+    {
+      "id": "x-005",
+      "type": "cross_document",
+      "question": "Bir kazadan sonra kime ve ne kadar sürede haber verilir?",
+      "expected_answer": "Araç kazasında en geç bir saat içinde Filo Yönetimi'ne; iş kazasında derhal vardiya amirine.",
+      "sources": [
+        { "document": "arac-kullanim-talimati", "section": "Bölüm 4: Kaza ve Cezalar", "page": 3 },
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 4: Acil Durumlar > 4.1 İş Kazası ve Ramak Kala", "page": 3 }
+      ]
+    }
+  ]
+}

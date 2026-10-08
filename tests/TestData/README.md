@@ -50,3 +50,27 @@ Satır sayıları PDF'teki satırlardır; DOCX'te paragraflar tek parçadır.
 - Cümle sonu olmayan noktalar: "A.Ş.", "vb.", "Md.", "Dr.", "1.500", "09:00", "1.1".
 - Tablo (DOCX'te tablo bloğu; PDF'te Faz 2'de düz metin).
 - Sayfa numarası (PDF'te iki sayfa; DOCX'te sayfa bilgisi yoktur).
+
+## Değerlendirme seti için ek belgeler
+
+`eval/questions.json` tek belgeyle anlamlı ölçüm veremediği için eklenen dört belge. Hepsi aynı uydurma şirkete (Örnek Lojistik A.Ş.) aittir ve bilerek ortak ifadeler içerir ("birim yöneticisinin yazılı onayı", "üç iş günü", "masraf formu ile muhasebe birimine"), ki arama yanlış belgeye gidebilsin.
+
+| Dosya | Başlık 1 | Chunk | Tablo |
+|---|---|---|---|
+| `bilgi-guvenligi-politikasi` | Bilgi Güvenliği Politikası | 8 | Veri sınıfları (3 satır × 3 sütun) |
+| `arac-kullanim-talimati` | Araç Kullanım Talimatı | 8 | Araç türüne göre bakım (3 × 3) |
+| `satin-alma-proseduru` | Satın Alma Prosedürü | 8 | Tutara göre teklif ve onay (3 × 3) |
+| `depo-is-guvenligi-talimati` | Depo İş Güvenliği Talimatı | 9 | Raf katına göre yük sınırı (3 × 3) |
+
+Chunk sayıları DOCX hâli içindir (başlık olarak belgenin Başlık 1'i verildiğinde).
+
+### Ortak yapı
+
+- Başlık 1 (belge adı), ardından iki giriş paragrafı: kapsam ve sorumlu birim ("… Md.", "… Uzm.").
+- Dört ya da beş "Bölüm N: …" başlığı (Başlık 2), bazılarının altında "N.M …" alt başlıkları (Başlık 3).
+- Bir bölümde, ilk satırı başlık satırı olan bir tablo.
+- "Bölüm 4"ün önünde sayfa sonu vardır. PDF'te "Bölüm 4" `satin-alma-proseduru` belgesinde 2. sayfada, diğer üçünde 3. sayfada başlar (bu PDF'ler üç sayfadır); önceki bölümlerin hepsi 1. sayfada başlar.
+
+### Nasıl üretildi
+
+DOCX dosyaları `ik-yonetmeligi.docx` şablon alınarak (aynı stiller, yazı tipleri ve sayfa düzeni) betikle üretildi; yazar bilgisi boştur. PDF'ler her DOCX'in Word'de açılıp "PDF olarak kaydet" ile kaydedilmesiyle alındı. PDF ve DOCX hâlleri aynı bölüm yollarını verir; PDF'te tablolar düz metin olarak gelir (#23). Bir belgenin metni değişirse iki hâli de yeniden üretilmeli ve `eval/questions.json` içindeki soruları gözden geçirilmelidir.
