@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "ik-001",
+      "type": "direct",
+      "question": "Haftalık çalışma süresi kaç saattir?",
+      "expected_answer": "Kırk beş saat.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-002",
+      "type": "direct",
+      "question": "Mesai saatleri nedir?",
+      "expected_answer": "Hafta içi 09:00 ile 18:00 arası; öğle arası bir saattir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-003",
+      "type": "paraphrase",
+      "question": "Sabah işe yetişemezsem kime, ne zaman haber vermem gerekir?",
+      "expected_answer": "Aynı gün içinde yöneticisine bildirir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-004",
+      "type": "paraphrase",
+      "question": "Depoda çalışanların gelecek ayki vardiya programı ne zaman belli olur?",
+      "expected_answer": "Her ayın son haftasında, bir sonraki ay için birim yöneticisi tarafından duyurulur.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-005",
+      "type": "direct",
+      "question": "Vardiya çizelgesindeki değişiklik talepleri kaç gün içinde iletilmelidir?",
+      "expected_answer": "En geç üç iş günü içinde yöneticiye iletilir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-006",
+      "type": "direct",
+      "question": "Fazla mesai ücreti nasıl hesaplanır?",
+      "expected_answer": "Saatlik ücretin yüzde elli fazlasıyla ödenir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-007",
+      "type": "paraphrase",
+      "question": "Normal saatlerin dışında ek çalışma yapabilmem için kimden izin almalıyım?",
+      "expected_answer": "Birim yöneticisinin yazılı onayı gerekir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-008",
+      "type": "direct",
+      "question": "Hangi çalışmalar fazla mesai sayılır?",
+      "expected_answer": "Haftalık kırk beş saati aşan çalışmalar.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-009",
+      "type": "direct",
+      "question": "Yıllık ücretli izne ne zaman hak kazanılır?",
+      "expected_answer": "İşe giriş tarihinden itibaren bir yıl doldurulduğunda.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-010",
+      "type": "table",
+      "question": "On yıldır şirkette çalışan birinin yıllık izni kaç gündür?",
+      "expected_answer": "20 gün (5–15 yıl kıdem).",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-011",
+      "type": "table",
+      "question": "15 yıl ve üzeri kıdemi olan çalışanın yıllık izni kaç gündür?",
+      "expected_answer": "26 gün.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-012",
+      "type": "table",
+      "question": "Şirkette üçüncü yılındaki bir çalışan kaç gün yıllık izin kullanabilir?",
+      "expected_answer": "14 gün (1–5 yıl kıdem).",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-013",
+      "type": "direct",
+      "question": "İzin talebi kaç gün önceden yapılmalıdır?",
+      "expected_answer": "En az on gün önceden.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-014",
+      "type": "paraphrase",
+      "question": "Yıllık iznimdeyken hastalanıp rapor alırsam iznime ne olur?",
+      "expected_answer": "İzin, doktor raporunda belirtilen süre kadar uzatılır.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-015",
+      "type": "exact_term",
+      "question": "1.500 TL hangi ödemenin tutarıdır?",
+      "expected_answer": "Şehir dışı görevlendirmelerde ödenen günlük harcırah.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-016",
+      "type": "paraphrase",
+      "question": "Başka bir şehre görevle gittiğimde otel masrafını şirket öder mi?",
+      "expected_answer": "Evet; konaklama giderleri fatura karşılığında ayrıca karşılanır.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-017",
+      "type": "direct",
+      "question": "Harcırah talepleri ne zamana kadar, nasıl ve nereye iletilir?",
+      "expected_answer": "Görev dönüşünü izleyen beş iş günü içinde, masraf formu ile muhasebe birimine.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-018",
+      "type": "paraphrase",
+      "question": "Masraf formunu süresi geçtikten sonra verirsem param ne zaman ödenir?",
+      "expected_answer": "Talep bir sonraki ayın ödemesine eklenir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-019",
+      "type": "exact_term",
+      "question": "Yönetmeliğin uygulanmasından kim sorumludur?",
+      "expected_answer": "İnsan Kaynakları Müdürü (belgede \"İnsan Kaynakları Md.\" olarak geçer).",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": null, "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-020",
+      "type": "direct",
+      "question": "İK Yönetmeliği hangi birimlerde geçerlidir?",
+      "expected_answer": "Merkez ofis, depo, şube ve benzeri bütün birimlerde.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": null, "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-021",
+      "type": "multi_section",
+      "question": "Çalışanın yöneticisine bildirim yapması ya da yöneticisinden onay alması gereken durumlar nelerdir?",
+      "expected_answer": "İşe geç kalma aynı gün yöneticiye bildirilir; vardiya çizelgesi değişiklik talepleri üç iş günü içinde yöneticiye iletilir; fazla mesai için birim yöneticisinin yazılı onayı gerekir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 },
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai", "page": 1 }
+      ]
+    },
+    {
+      "id": "ik-022",
+      "type": "multi_section",
+      "question": "Yönetmelikte iş günü olarak verilen süreler hangileridir?",
+      "expected_answer": "Vardiya çizelgesi değişiklik talepleri için üç iş günü; harcırah talepleri için görev dönüşünden sonra beş iş günü.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1 },
+        { "document": "ik-yonetmeligi", "section": "Bölüm 3: Harcırah", "page": 2 }
+      ]
+    },
+    {
+      "id": "ik-023",
+      "type": "unanswerable",
+      "question": "Doğum izni kaç gündür?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "ik-024",
+      "type": "unanswerable",
+      "question": "Evden çalışma hangi günlerde yapılabilir?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "ik-025",
+      "type": "unanswerable",
+      "question": "Günlük yemek ücreti ne kadardır?",
+      "expected_answer": null,
+      "sources": []
+    }
+  ]
+}
