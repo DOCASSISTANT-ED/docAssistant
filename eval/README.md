@@ -15,7 +15,12 @@ Sorular `tests/TestData` altındaki örnek belgelerden yazılır; belgelerin yap
 | `sources` | Cevabın bulunduğu yerler. Cevabı olmayan sorularda boş liste. |
 | `sources[].document` | Belgenin uzantısız dosya adı (`ik-yonetmeligi`); PDF ve DOCX hâlleri için ortaktır. |
 | `sources[].section` | Chunk'ın bölüm yolu, `chunks.section_path` ile aynı yazılır (`Bölüm 1: Çalışma Saatleri > 1.1 Fazla Mesai`). Başlıktan önceki giriş metni için `null`. |
-| `sources[].page` | Bölümün PDF'te başladığı sayfa, `chunks.page_number` ile aynı (#43). DOCX'te sayfa bilgisi yoktur (#22); DOCX sonuçları yalnızca bölümle eşleştirilir. |
+| `sources[].page` | Bölümün PDF'te başladığı sayfa, `chunks.page_number` ile aynı (#43). DOCX'te sayfa bilgisi yoktur (#22). |
+| `sources[].evidence` | Cevabın geçtiği yer, belgeden birebir alınmış en fazla bir cümle (#47). Kaynak, getirilen chunk'lardan biri bu metni içeriyorsa bulunmuş sayılır. |
+
+`version` alanı dosyanın biçimini gösterir; `evidence` alanı 2. sürümle eklendi.
+
+**Kaynak nasıl eşleştirilir:** Değerlendirme aracı bir kaynağı `evidence` ile eşleştirir; `section` ve `page` sonuçları raporlamak içindir. Kanıt chunk sınırlarından bağımsız olduğu için chunk boyutu ya da örtüşme değişse de aynı soru seti kullanılabilir.
 
 ## Soru türleri
 
@@ -48,3 +53,7 @@ Beş belge PDF ve DOCX hâlinde aynı 38 bölüme (chunk'a) ayrılır; her böl�
 - Belgenin cümlesini kopyalayıp soru yapma; kullanıcının soracağı gibi yaz.
 - Sınırda kalan değerlerden kaçın (ör. tabloda hem "1–5 yıl" hem "5–15 yıl" satırına uyan "5 yıl").
 - Belge değişirse o belgenin sorularını ve kaynaklarını gözden geçir.
+- Her kaynağa bir `evidence` yaz. Kanıt:
+  - belgeden harfi harfine kopyalanır ve bir cümleyi aşmaz; cümlenin cevabı taşıyan kısmı da olabilir;
+  - hem DOCX'ten hem PDF'ten çıkan chunk'ta aynen geçmelidir. Tablolarda iki biçim farklıdır (DOCX'te `Kıdem: 5–15 yıl; Yıllık izin günü: 20`, PDF'te `5–15 yıl 20`), bu yüzden tablo kanıtı iki biçimde de aynı kalan bir hücre değeridir (`5–15 yıl`). PDF'te iki satıra taşan hücreler komşu hücrelerle karışabilir; kanıtı taşmadan önceki kısımla sınırla;
+  - bütün örnek belgelerde yalnızca bir chunk'ta geçmelidir; belgelerde bilerek ortak ifadeler olduğu için ("üç iş günü") kısa kanıtlar başka chunk'larda da bulunabilir.
