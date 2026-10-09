@@ -185,9 +185,11 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 **Bitiş koşulu:**
 - [ ] Hibrit arama, değerlendirme setinde tek başına vektör aramadan daha iyi sonuç veriyor (ölçülmüş)
 
-**Faz başında karar verilecekler** (Faz 2 sonunda değerlendirme seti gözden geçirilirken bulundu):
-- **Bölüm yolu uyuşmazlığı:** Setteki `section` değerleri belge adının belgenin ilk başlığı olduğunu varsayar (`Bölüm 1: Çalışma Saatleri`). Gerçek yüklemede belge adı dosya adından gelir (`ik-yonetmeligi`), ilk başlık bölüm yolunda kalır (`İK Yönetmeliği > Bölüm 1: Çalışma Saatleri`) ve giriş metninin yolu `null` yerine `İK Yönetmeliği` olur. Seti çalıştıran araç yazılmadan önce seçilmeli: belgeleri ilk başlıklarıyla adlandırarak yüklemek, karşılaştırmada yolun başındaki belge adını yok saymak ya da chunker'ın belgenin ilk 1. seviye başlığını bölüm yoluna hiç koymaması.
-- **Chunk boyutu sınanmıyor:** Örnek belgelerde her bölüm tek chunk'a sığıyor (en uzun chunk ~560 karakter, sınır 1500). Set, #43'teki boyut ve örtüşme kararlarını ölçemez; bunun için uzun bölümlü en az bir belge eklenmeli.
+**Faz başında verilen kararlar** (Faz 2 sonunda değerlendirme seti gözden geçirilirken bulunan iki sorun için):
+- **Bölüm yolu uyuşmazlığı → `docs/decisions.md` #46:** Setteki bölüm yolları belgenin kendi adını taşıyan ilk başlığı içermiyordu, chunker'ın ürettikleri içeriyordu. Chunker bu başlığı artık belge adı sayıyor.
+- **Chunk boyutu sınanmıyor → #47:** Sete uzun bölümlü yeni bir belge eklenecek; kaynaklar chunk sınırlarından bağımsız bir kanıt metniyle eşleştirilecek.
+
+Bu iki karar, değerlendirme setini çalıştıran araç yazılmadan önce uygulanmalı.
 
 ### Faz 4 — Sohbet
 
