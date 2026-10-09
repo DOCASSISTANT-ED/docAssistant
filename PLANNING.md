@@ -178,8 +178,8 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 | Dide | Erva | Birlikte |
 |---|---|---|
 | PostgreSQL `turkish` full-text arama | Embedding hattı (`IEmbeddingGenerator`, bge-m3), pgvector + HNSW | Değerlendirme setini çalıştırıp sonuçları birlikte inceleme |
-| Re-indexleme işi (embedding modeli değişince chunk'ları yeniden embed etme) | RRF ile hibrit birleştirme | |
-| Reranker entegrasyonu | | |
+| Re-indexleme işi (embedding modeli değişince chunk'ları yeniden embed etme) | RRF ile hibrit birleştirme | Arama hattının sözleşmesi (`docs/decisions.md` #48): ilk iş, paralel çalışmanın ön koşulu |
+| Reranker entegrasyonu | Arama giriş noktası (`IChunkRetrieval`, #48) | |
 | **Çapraz test:** Embedding hattı ve RRF testleri | **Çapraz test:** Full-text arama ve reranker testleri | |
 
 **Bitiş koşulu:**
