@@ -11,6 +11,9 @@ public class DocumentChunkerTests
     private const int Max = DocumentChunker.MaxTextLength;
 
     // ---- Context header and section path ----
+    // Most tests below open like a real document: a level-1 heading with the document's
+    // name, then its sections from level 2 down. A document's only level-1 heading names
+    // the document instead of opening a section (decisions #46).
 
     [Fact]
     public void ChunkWithoutHeadingStartsWithTheDocumentTitle()
@@ -25,7 +28,8 @@ public class DocumentChunkerTests
     public void ChunkUnderAHeadingCarriesTheHeadingInItsHeader()
     {
         var chunk = Assert.Single(Chunk(
-            Heading("Bölüm 1: Çalışma Saatleri", 1),
+            Heading(Title, 1),
+            Heading("Bölüm 1: Çalışma Saatleri", 2),
             Paragraph("Metin.")));
 
         Assert.Equal("Belge: İK Yönetmeliği > Bölüm 1: Çalışma Saatleri\n\nMetin.", chunk.Content);
@@ -36,9 +40,10 @@ public class DocumentChunkerTests
     public void NestedHeadingsFormTheSectionPath()
     {
         var chunk = Assert.Single(Chunk(
-            Heading("Bölüm 1", 1),
-            Heading("1.1 Fazla Mesai", 2),
-            Heading("1.1.1 Hafta Sonu", 3),
+            Heading(Title, 1),
+            Heading("Bölüm 1", 2),
+            Heading("1.1 Fazla Mesai", 3),
+            Heading("1.1.1 Hafta Sonu", 4),
             Paragraph("Metin.")));
 
         Assert.Equal("Bölüm 1 > 1.1 Fazla Mesai > 1.1.1 Hafta Sonu", chunk.SectionPath);
@@ -49,10 +54,11 @@ public class DocumentChunkerTests
     public void HeadingAtTheSameLevelReplacesThePreviousOne()
     {
         var chunks = Chunk(
-            Heading("Bölüm 1", 1),
-            Heading("1.1", 2),
+            Heading(Title, 1),
+            Heading("Bölüm 1", 2),
+            Heading("1.1", 3),
             Paragraph("Bir."),
-            Heading("1.2", 2),
+            Heading("1.2", 3),
             Paragraph("İki."));
 
         Assert.Equal(["Bölüm 1 > 1.1", "Bölüm 1 > 1.2"], chunks.Select(c => c.SectionPath));
@@ -76,10 +82,11 @@ public class DocumentChunkerTests
     public void HeadingThatSkipsALevelIsStillClosedByAHigherOne()
     {
         var chunks = Chunk(
-            Heading("Bölüm 1", 1),
-            Heading("Ayrıntı", 3),
+            Heading(Title, 1),
+            Heading("Bölüm 1", 2),
+            Heading("Ayrıntı", 4),
             Paragraph("Bir."),
-            Heading("1.1", 2),
+            Heading("1.1", 3),
             Paragraph("İki."));
 
         Assert.Equal(["Bölüm 1 > Ayrıntı", "Bölüm 1 > 1.1"], chunks.Select(c => c.SectionPath));
@@ -106,7 +113,7 @@ public class DocumentChunkerTests
     [Fact]
     public void HeadingTextIsTrimmed()
     {
-        var chunk = Assert.Single(Chunk(Heading("  Bölüm 1  ", 1), Paragraph("Metin.")));
+        var chunk = Assert.Single(Chunk(Heading(Title, 1), Heading("  Bölüm 1  ", 2), Paragraph("Metin.")));
 
         Assert.Equal("Bölüm 1", chunk.SectionPath);
     }

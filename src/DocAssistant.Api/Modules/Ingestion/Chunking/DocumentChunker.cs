@@ -16,11 +16,31 @@ public static class DocumentChunker
     // Characters of text per chunk, not counting the context header.
     public const int MaxTextLength = 1500;
 
+    // Compares titles the way a reader would: case-insensitive, with Turkish i/İ and ı/I.
+    private static readonly StringComparer TitleComparer =
+        StringComparer.Create(CultureInfo.GetCultureInfo("tr-TR"), ignoreCase: true);
+
     public static IReadOnlyList<ChunkDraft> Chunk(string documentTitle, ParsedDocument document)
     {
-        var builder = new ChunkBuilder(documentTitle);
+        var blocks = document.Blocks;
+        var name = documentTitle;
 
-        foreach (var block in document.Blocks)
+        // decisions #46: the heading that names the document is not a section. It replaces
+        // the upload's name (taken from the file name) in the context header, unless it only
+        // repeats that name.
+        if (TitleHeading(blocks) is { } title)
+        {
+            blocks = blocks.Skip(1).ToList();
+
+            if (!TitleComparer.Equals(title, documentTitle.Trim()))
+            {
+                name = title;
+            }
+        }
+
+        var builder = new ChunkBuilder(name);
+
+        foreach (var block in blocks)
         {
             switch (block)
             {
@@ -47,6 +67,22 @@ public static class DocumentChunker
         builder.Flush();
 
         return builder.Chunks;
+    }
+
+    // The document's name, when the document opens with its only level-1 heading. With more
+    // than one level-1 heading they are the main sections ("Bölüm 1", "Bölüm 2"), and the
+    // first of them must stay in the section path.
+    private static string? TitleHeading(IReadOnlyList<DocumentBlock> blocks)
+    {
+        if (blocks.Count == 0 || blocks[0] is not HeadingBlock { Level: 1 } first)
+        {
+            return null;
+        }
+
+        var text = first.Text.Trim();
+        var levelOneHeadings = blocks.OfType<HeadingBlock>().Count(heading => heading.Level == 1);
+
+        return text.Length > 0 && levelOneHeadings == 1 ? text : null;
     }
 
     // One line per data row, "Sütun: değer; Sütun: değer", so each row can be understood
@@ -146,9 +182,6 @@ public static class DocumentChunker
 
     private sealed class ChunkBuilder(string documentTitle)
     {
-        private static readonly StringComparer TitleComparer =
-            StringComparer.Create(CultureInfo.GetCultureInfo("tr-TR"), ignoreCase: true);
-
         private readonly List<(int Level, string Text)> _headings = [];
         private readonly StringBuilder _text = new();
         private int? _pageNumber;
