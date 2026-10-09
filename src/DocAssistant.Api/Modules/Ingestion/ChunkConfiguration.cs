@@ -12,6 +12,11 @@ public class ChunkConfiguration : IEntityTypeConfiguration<Chunk>
 
     public const int EmbeddingModelMaxLength = 100;
 
+    // decisions #49: Turkish casing first (I → ı, İ → i; the database's en_US locale would
+    // turn "IŞIK" into "işik"), then PostgreSQL's turkish configuration. Keyword search
+    // applies the same casing to the query. Changing this needs a migration.
+    public const string SearchVectorSql = "to_tsvector('turkish'::regconfig, translate(content, 'Iİ', 'ıi'))";
+
     public void Configure(EntityTypeBuilder<Chunk> builder)
     {
         builder.ToTable("chunks");
@@ -30,6 +35,14 @@ public class ChunkConfiguration : IEntityTypeConfiguration<Chunk>
 
         builder.Property(c => c.EmbeddingModel)
             .HasMaxLength(EmbeddingModelMaxLength);
+
+        // Stored, so it is computed once when a chunk is written, not on every search.
+        builder.Property(c => c.SearchVector)
+            .HasComputedColumnSql(SearchVectorSql, stored: true);
+
+        // GIN: an index from each word to the chunks that contain it.
+        builder.HasIndex(c => c.SearchVector)
+            .HasMethod("GIN");
 
         builder.Property(c => c.CreatedAt)
             .HasDefaultValueSql("now()");

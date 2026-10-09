@@ -1,5 +1,6 @@
 using DocAssistant.Api.Modules.Ingestion.Parsing;
 using DocAssistant.Shared.Tenancy;
+using NpgsqlTypes;
 using Pgvector;
 
 namespace DocAssistant.Api.Modules.Ingestion;
@@ -37,6 +38,10 @@ public class Chunk : ITenantOwned
     public Vector? Embedding { get; set; }
 
     public string? EmbeddingModel { get; set; }
+
+    // Content prepared for keyword search (decisions #49). Computed by the database from
+    // Content; the app never writes it.
+    public NpgsqlTsVector SearchVector { get; set; } = null!;
 
     public DateTimeOffset CreatedAt { get; set; }
 }
