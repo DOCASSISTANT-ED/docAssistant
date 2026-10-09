@@ -209,13 +209,6 @@
       "sources": []
     },
     {
-      "id": "ik-024",
-      "type": "unanswerable",
-      "question": "Evden çalışma hangi günlerde yapılabilir?",
-      "expected_answer": null,
-      "sources": []
-    },
-    {
       "id": "ik-025",
       "type": "unanswerable",
       "question": "Günlük yemek ücreti ne kadardır?",
@@ -809,6 +802,183 @@
       "sources": []
     },
     {
+      "id": "uc-001",
+      "type": "direct",
+      "question": "Uzaktan çalışmaya başvurabilmek için şirkette kaç ay çalışmış olmak gerekir?",
+      "expected_answer": "En az altı ay; ayrıca son performans değerlendirmesinde \"beklentiyi karşılar\" ya da daha yüksek bir sonuç alınmış olmalıdır.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "1. Uygunluk ve Başvuru", "page": 1, "evidence": "Uzaktan çalışmaya başvurabilmek için çalışanın şirkette en az altı aydır çalışıyor olması" }
+      ]
+    },
+    {
+      "id": "uc-002",
+      "type": "paraphrase",
+      "question": "Forklift kullanıyorum; ben de evden çalışabilir miyim?",
+      "expected_answer": "Hayır; forklift operatörleri uzaktan çalışmaya başvuramaz.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "1. Uygunluk ve Başvuru", "page": 1, "evidence": "Depo, sevkiyat ve bakım birimlerinde çalışanlar, forklift operatörleri ve şirket aracı kullanan sürücüler uzaktan çalışmaya başvuramaz." }
+      ]
+    },
+    {
+      "id": "uc-003",
+      "type": "paraphrase",
+      "question": "Haftanın ilk günü evden çalışmayı seçebilir miyim?",
+      "expected_answer": "Hayır; pazartesi haftalık birim toplantısı ofiste yapıldığı için uzaktan çalışma günü olarak seçilemez.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "1. Uygunluk ve Başvuru", "page": 1, "evidence": "Pazartesi günleri yapılan haftalık birim toplantısı ofiste yapıldığından pazartesi, uzaktan çalışma günü olarak seçilemez." }
+      ]
+    },
+    {
+      "id": "uc-004",
+      "type": "direct",
+      "question": "Bir birimde aynı gün en fazla kaç kişi uzaktan çalışabilir?",
+      "expected_answer": "Birimin toplam çalışan sayısının yarısı; sınır aşılırsa başvurular başvuru tarihine göre sırayla değerlendirilir.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "1. Uygunluk ve Başvuru", "page": 1, "evidence": "Aynı birimde aynı gün uzaktan çalışan personel sayısı, birimin toplam çalışan sayısının yarısını geçemez" }
+      ]
+    },
+    {
+      "id": "uc-005",
+      "type": "direct",
+      "question": "Uzaktan çalışma onayı ne kadar süre geçerlidir?",
+      "expected_answer": "Bir yıl; süresi dolmadan en az bir ay önce yenileme başvurusu yapılmazsa çalışan ofis düzenine döner.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "1. Uygunluk ve Başvuru > 1.1 Başvurunun Değerlendirilmesi", "page": 2, "evidence": "Uzaktan çalışma onayı bir yıl geçerlidir" }
+      ]
+    },
+    {
+      "id": "uc-006",
+      "type": "exact_term",
+      "question": "Uzaktan çalışmada 10:00 ile 16:00 arası ne anlama gelir?",
+      "expected_answer": "Çekirdek çalışma saatleridir; çalışan bu saatlerde çevrim içi ve ulaşılabilir olmak zorundadır.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "2. Çalışma Düzeni", "page": 2, "evidence": "ancak 10:00 ile 16:00 arası çekirdek çalışma saatleridir" }
+      ]
+    },
+    {
+      "id": "uc-007",
+      "type": "paraphrase",
+      "question": "Evden çalıştığım gün çocuğuma da bakmam gerekiyor; bu bir sorun olur mu?",
+      "expected_answer": "Çocuk ya da yaşlı bakımı gibi sürekli ilgi gerektiren sorumlulukların çalışma saatleriyle çakışmaması çalışanın sorumluluğundadır.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "2. Çalışma Düzeni", "page": 2, "evidence": "Uzaktan çalışma günlerinde çocuk ya da yaşlı bakımı gibi sürekli ilgi gerektiren sorumlulukların çalışma saatleriyle çakışmaması çalışanın sorumluluğundadır." }
+      ]
+    },
+    {
+      "id": "uc-008",
+      "type": "paraphrase",
+      "question": "Evde internetim kesilirse ne yapmalıyım?",
+      "expected_answer": "Bağlantı yarım saat içinde sağlanamazsa ofise gelinir ya da birim yöneticisine bildirilerek günün kalan kısmı izin olarak kullanılır.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "2. Çalışma Düzeni", "page": 2, "evidence": "İnternet bağlantısı kesilen çalışan, bağlantıyı yarım saat içinde sağlayamazsa ofise gelir" }
+      ]
+    },
+    {
+      "id": "uc-009",
+      "type": "direct",
+      "question": "Uzaktan çalışırken iş mesajlarına ne kadar sürede yanıt verilmelidir?",
+      "expected_answer": "Çekirdek saatlerde en geç otuz dakika içinde; telefonla aranıp yanıt veremeyen çalışan bir saat içinde geri döner.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "2. Çalışma Düzeni > 2.1 Ulaşılabilirlik", "page": 3, "evidence": "iş mesajlarına en geç otuz dakika içinde yanıt verir" }
+      ]
+    },
+    {
+      "id": "uc-010",
+      "type": "table",
+      "question": "Ergonomik sandalyenin masrafını kim karşılar ve nasıl talep edilir?",
+      "expected_answer": "Şirket ve çalışan birlikte karşılar; masraf formu ile talep edilir. Şirket fatura tutarının yarısını, en fazla 3.000 TL'ye kadar öder.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "3. Ekipman ve Bilgi Güvenliği", "page": 3, "evidence": "Şirket ve çalışan" }
+      ]
+    },
+    {
+      "id": "uc-011",
+      "type": "table",
+      "question": "İkinci bir monitör istersem kimin onayı gerekir?",
+      "expected_answer": "Yönetici onayı; monitörü şirket karşılar.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "3. Ekipman ve Bilgi Güvenliği", "page": 3, "evidence": "İkinci monitör" }
+      ]
+    },
+    {
+      "id": "uc-012",
+      "type": "exact_term",
+      "question": "Uzaktan çalışanlara ödenen aylık internet desteği ne kadardır?",
+      "expected_answer": "Her ay 750 TL; o ay hiç uzaktan çalışılmamışsa ödenmez.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "4. Masraflar ve Destekler", "page": 4, "evidence": "her ay 750 TL internet desteği ödenir" }
+      ]
+    },
+    {
+      "id": "uc-013",
+      "type": "paraphrase",
+      "question": "Şirket telefonum yok; kendi hattımdan yaptığım iş aramalarının parasını ne kadarına kadar geri alabilirim?",
+      "expected_answer": "Aylık 300 TL'ye kadar, masraf formu ile; sınırı aşan tutarlar için birim yöneticisinin gerekçeli onayı gerekir.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "4. Masraflar ve Destekler", "page": 4, "evidence": "Bu harcamalar için aylık üst sınır 300 TL'dir" }
+      ]
+    },
+    {
+      "id": "uc-014",
+      "type": "direct",
+      "question": "Uzaktan çalışma onayı sona eren çalışan kendisine verilen ekipmanı ne zaman teslim eder?",
+      "expected_answer": "Beş iş günü içinde Bilgi İşlem'e teslim eder.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "3. Ekipman ve Bilgi Güvenliği", "page": 3, "evidence": "kendisine verilen ekipmanı beş iş günü içinde Bilgi İşlem'e teslim eder." }
+      ]
+    },
+    {
+      "id": "uc-015",
+      "type": "multi_section",
+      "question": "Uzaktan çalışırken iş kazası geçirirsem ya da şirket bilgisayarım çalınırsa kime, ne kadar sürede bildirmeliyim?",
+      "expected_answer": "İş kazası en geç yirmi dört saat içinde birim yöneticisine ve İnsan Kaynakları'na; çalınan cihaz en geç iki saat içinde Bilgi İşlem Destek Hattı'na bildirilir.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "4. Masraflar ve Destekler > 4.1 İş Sağlığı ve Güvenliği", "page": 5, "evidence": "en geç yirmi dört saat içinde birim yöneticisine ve İnsan Kaynakları'na bildirilir." },
+        { "document": "uzaktan-calisma-politikasi", "section": "3. Ekipman ve Bilgi Güvenliği", "page": 3, "evidence": "Uzaktan çalışma sırasında kaybolan ya da çalınan şirket cihazı" }
+      ]
+    },
+    {
+      "id": "uc-016",
+      "type": "unanswerable",
+      "question": "Yurt dışından uzaktan çalışabilir miyim?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "uc-017",
+      "type": "unanswerable",
+      "question": "İkinci monitör için şirketin ayırdığı bütçe en fazla ne kadardır?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "uc-018",
+      "type": "direct",
+      "question": "Evden çalışma hangi günlerde yapılabilir?",
+      "expected_answer": "Haftada en fazla üç gün; günler birim yöneticisiyle birlikte belirlenir ve pazartesi seçilemez.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "1. Uygunluk ve Başvuru", "page": 1, "evidence": "Uzaktan çalışma haftada en fazla üç gün yapılabilir." }
+      ]
+    },
+    {
+      "id": "uc-019",
+      "type": "paraphrase",
+      "question": "Evden çalışacağım gün yöneticim beni ofise çağırabilir mi, ne kadar önceden haber vermesi gerekir?",
+      "expected_answer": "Evet; çağrı en az yirmi dört saat önceden yapılır, acil durumlarda bu süre aranmaz.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "2. Çalışma Düzeni > 2.2 Ofise Çağrılma", "page": 3, "evidence": "Çağrı en az yirmi dört saat önceden yapılır" }
+      ]
+    },
+    {
+      "id": "uc-020",
+      "type": "direct",
+      "question": "Uzaktan Çalışma Politikası stajyerleri kapsar mı?",
+      "expected_answer": "Hayır; stajyerler ve yüklenici personeli kapsam dışındadır.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": null, "page": 1, "evidence": "stajyerler ve yüklenici personeli kapsam dışındadır." }
+      ]
+    },
+    {
       "id": "x-001",
       "type": "cross_document",
       "question": "Hangi işlemler için birim yöneticisinin yazılı onayı gerekir?",
@@ -859,6 +1029,26 @@
       "sources": [
         { "document": "arac-kullanim-talimati", "section": "Bölüm 4: Kaza ve Cezalar", "page": 3, "evidence": "Kaza durumunda sürücü önce can güvenliğini sağlar, gerekiyorsa 112'yi arar ve en geç bir saat içinde Filo Yönetimi'ne haber verir." },
         { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 4: Acil Durumlar > 4.1 İş Kazası ve Ramak Kala", "page": 3, "evidence": "İş kazası derhal vardiya amirine bildirilir; vardiya amiri aynı gün içinde kaza bildirim formunu doldurarak İş Sağlığı ve Güvenliği Uzm.'ye iletir." }
+      ]
+    },
+    {
+      "id": "x-006",
+      "type": "cross_document",
+      "question": "Mesai saatleri ofiste ve uzaktan çalışırken nasıldır?",
+      "expected_answer": "Ofiste hafta içi 09:00 ile 18:00 arası (İK Yönetmeliği); uzaktan çalışmada mesai esnektir, ancak 10:00 ile 16:00 arası çekirdek çalışma saatleridir.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1, "evidence": "Mesai saatleri hafta içi 09:00 ile 18:00 arasındadır ve öğle arası bir saattir." },
+        { "document": "uzaktan-calisma-politikasi", "section": "2. Çalışma Düzeni", "page": 2, "evidence": "ancak 10:00 ile 16:00 arası çekirdek çalışma saatleridir" }
+      ]
+    },
+    {
+      "id": "x-007",
+      "type": "cross_document",
+      "question": "Şirket bilgisayarı kaybolursa ne kadar sürede ve nereye bildirilir?",
+      "expected_answer": "En geç iki saat içinde Bilgi İşlem Destek Hattı'na; uzaktan çalışırken de aynı kural geçerlidir.",
+      "sources": [
+        { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 2: Cihazlar > 2.1 Kayıp ve Çalıntı", "page": 1, "evidence": "Kaybolan ya da çalınan cihaz en geç iki saat içinde Bilgi İşlem Destek Hattı'na bildirilir." },
+        { "document": "uzaktan-calisma-politikasi", "section": "3. Ekipman ve Bilgi Güvenliği", "page": 3, "evidence": "Uzaktan çalışma sırasında kaybolan ya da çalınan şirket cihazı" }
       ]
     }
   ]

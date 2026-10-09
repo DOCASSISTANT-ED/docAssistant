@@ -38,14 +38,17 @@ Sorular `tests/TestData` altındaki örnek belgelerden yazılır; belgelerin yap
 
 | Kısaltma | Belge | Soru |
 |---|---|---|
-| `ik` | `ik-yonetmeligi` | 25 |
+| `ik` | `ik-yonetmeligi` | 24 |
 | `bg` | `bilgi-guvenligi-politikasi` | 19 |
 | `ak` | `arac-kullanim-talimati` | 15 |
 | `sa` | `satin-alma-proseduru` | 16 |
 | `dg` | `depo-is-guvenligi-talimati` | 16 |
-| `x` | Birden fazla belge | 5 |
+| `uc` | `uzaktan-calisma-politikasi` | 20 |
+| `x` | Birden fazla belge | 7 |
 
-Beş belge PDF ve DOCX hâlinde aynı 38 bölüme (chunk'a) ayrılır; her bölümün en az bir sorusu vardır.
+Altı belge PDF ve DOCX hâlinde aynı 47 bölüme ayrılır; her bölümün en az bir sorusu vardır. İlk beş belgede her bölüm tek chunk'tır. `uzaktan-calisma-politikasi`'nda bölümler birden çok chunk'a bölünür (DOCX'te 14, PDF'te 15 chunk); chunk boyutunun etkisi bu belgenin sorularıyla ölçülür (#47).
+
+**Silinen sorular:** `ik-024` ("Evden çalışma hangi günlerde yapılabilir?") cevabı olmayan bir soruydu; `uzaktan-calisma-politikasi` eklenince cevaplı hâle geldi ve aynı metinle `uc-018` olarak taşındı.
 
 ## Soru eklerken
 

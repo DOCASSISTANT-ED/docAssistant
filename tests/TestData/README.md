@@ -62,7 +62,7 @@ Satır sayıları PDF'teki satırlardır; DOCX'te paragraflar tek parçadır.
 | `satin-alma-proseduru` | Satın Alma Prosedürü | 8 | Tutara göre teklif ve onay (3 × 3) |
 | `depo-is-guvenligi-talimati` | Depo İş Güvenliği Talimatı | 9 | Raf katına göre yük sınırı (3 × 3) |
 
-Chunk sayıları DOCX hâli içindir (başlık olarak belgenin Başlık 1'i verildiğinde).
+Chunk sayıları DOCX hâli içindir. Başlık 1 belgenin adı sayıldığı için (#46) yüklemedeki ad ne olursa olsun aynıdır.
 
 ### Ortak yapı
 
@@ -74,3 +74,26 @@ Chunk sayıları DOCX hâli içindir (başlık olarak belgenin Başlık 1'i veri
 ### Nasıl üretildi
 
 DOCX dosyaları `ik-yonetmeligi.docx` şablon alınarak (aynı stiller, yazı tipleri ve sayfa düzeni) betikle üretildi; yazar bilgisi boştur. PDF'ler her DOCX'in Word'de açılıp "PDF olarak kaydet" ile kaydedilmesiyle alındı. PDF ve DOCX hâlleri aynı bölüm yollarını verir; PDF'te tablolar düz metin olarak gelir (#23). Bir belgenin metni değişirse iki hâli de yeniden üretilmeli ve `eval/questions.json` içindeki soruları gözden geçirilmelidir.
+
+## Uzun bölümlü belge: `uzaktan-calisma-politikasi`
+
+Yukarıdaki belgelerde her bölüm tek chunk'a sığdığı için chunk boyutunun etkisi ölçülemiyordu; bu belge bunun için eklendi (`docs/decisions.md` #47). Aynı uydurma şirkete aittir ve diğer belgelerle bilerek çakışır: kıdem şartı "en az altı ay" (Araç Kullanım Talimatı), çekirdek saatler 10:00–16:00 (İK Yönetmeliği'nde mesai 09:00–18:00), kayıp cihazın iki saat içinde bildirimi ve kişisel bilgisayar yasağı (Bilgi Güvenliği Politikası), "masraf formu ile muhasebe birimine" (İK Yönetmeliği, Araç Kullanım Talimatı).
+
+| Bölüm | Karakter | Chunk (DOCX / PDF) |
+|---|---|---|
+| Giriş | ~480 | 1 / 1 |
+| 1. Uygunluk ve Başvuru (1.1 dahil) | ~3200 | 3 / 3 |
+| 2. Çalışma Düzeni (2.1, 2.2 dahil) | ~3300 | 4 / 5 |
+| 3. Ekipman ve Bilgi Güvenliği | ~3300 | 3 / 3 |
+| 4. Masraflar ve Destekler (4.1 dahil) | ~3000 | 3 / 3 |
+
+Neyi sınamak için var:
+
+- **Bölümün birden çok chunk'a bölünmesi:** her ana bölüm 2–3 chunk'tır; bazı soruların cevabı bölümün ikinci ya da sonraki chunk'ındadır.
+- **Cümleden bölme:** "2. Çalışma Düzeni"ndeki ikinci paragraf tek başına ~1570 karakterdir (#43'teki 1500 sınırının üstünde) ve cümle sınırından bölünür.
+- **DOCX ve PDF'te farklı chunk sınırları:** aynı paragraf PDF'te 2. sayfanın sonuna denk gelir, sayfa değişiminde bölünür; bu yüzden "2. Çalışma Düzeni" PDF'te bir chunk fazladır. Soruların kanıt metinleri (#47) iki biçimde de tek bir chunk'ta kalacak şekilde seçildi.
+- **Sayfa altı bilgisi:** her sayfanın altında "UÇP-01 | Rev. 02 | Yürürlük: 01.03.2026 | Sayfa X / Y" vardır. DOCX parser sayfa altını okumaz; PDF'te bu satır metne karışır (#25).
+- **Numaralı başlıklar:** "1. Uygunluk ve Başvuru", "2.1 Ulaşılabilirlik"; Word'ün Başlık 2/3 stilleriyle yazılıdır, PDF'te yazı boyutundan tanınır.
+- **Tablo:** "3. Ekipman ve Bilgi Güvenliği"nde ekipman, karşılayan ve talep yolu (3 satır × 3 sütun, ilk satır başlık). Hücreler PDF'te satıra taşmayacak kadar kısadır.
+
+Diğer belgeler gibi `ik-yonetmeligi.docx` şablon alınarak betikle üretildi (Başlık 1/2/3 stilleri, aynı sayfa düzeni; sayfa altı bilgisi eklendi), PDF'i Word'de "PDF olarak kaydet" ile alındı.
