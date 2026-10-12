@@ -112,7 +112,7 @@ Belge yeniden yüklendiğinde eski sürümün chunk'ları silinir. Sürümleme F
 
 RLS yalnızca firma verisi tablolarında açıktır; kimlik tablolarını (`users`, `memberships`, `tenants`) yalnızca query filter korur. Şu anki firma `ITenantContext` üzerinden okunur. Uygulama veritabanına yetkileri kısıtlı ayrı bir kullanıcıyla bağlanır; süper kullanıcı RLS'ten muaf olduğu için yalnızca migration'larda kullanılır. Ayrıntılar: `docs/decisions.md` #12–15.
 
-Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 0.8+ kullanılır.
+Vektör araması soruyu firmanın kendi chunk'larıyla tek tek karşılaştırır (tam arama); bütün firmaların paylaştığı bir vektör indeksi (HNSW) kullanılmaz (`docs/decisions.md` #51).
 
 ---
 
@@ -177,7 +177,7 @@ Filtreli vektör aramanın HNSW indeksiyle verimli çalışması için pgvector 
 
 | Dide | Erva | Birlikte |
 |---|---|---|
-| PostgreSQL `turkish` full-text arama | Embedding hattı (`IEmbeddingGenerator`, bge-m3), pgvector + HNSW | Değerlendirme setini çalıştırıp sonuçları birlikte inceleme |
+| PostgreSQL `turkish` full-text arama | Embedding hattı (`IEmbeddingGenerator`, bge-m3), pgvector ile vektör araması (#51) | Değerlendirme setini çalıştırıp sonuçları birlikte inceleme |
 | Re-indexleme işi (embedding'i olmayan ya da eski modelle üretilmiş chunk'ları açılışta yeniden embed etme, `docs/decisions.md` #54) | RRF ile hibrit birleştirme | Arama hattının sözleşmesi (`docs/decisions.md` #48): ilk iş, paralel çalışmanın ön koşulu |
 | Reranker entegrasyonu | Arama giriş noktası (`IChunkRetrieval`, #48) | |
 | **Çapraz test:** Embedding hattı ve RRF testleri | **Çapraz test:** Full-text arama ve reranker testleri | |
@@ -233,7 +233,7 @@ Bu iki karar, değerlendirme setini çalıştıran araç yazılmadan önce uygul
 | Belge parsing | DOCX | PDF |
 | Arka plan işleri | Ingestion işi, durum takibi | Testleri |
 | Chunking | Pair | Pair |
-| Embedding / vektör arama | Re-indexleme işi | Embedding hattı, HNSW |
+| Embedding / vektör arama | Re-indexleme işi | Embedding hattı, vektör araması |
 | Full-text arama | Yazıyor | RRF birleştirme |
 | Reranking | Entegrasyon | Testleri |
 | LLM sohbet + prompt | Pair + backend testleri | `IChatClient` + pair |
