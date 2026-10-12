@@ -44,12 +44,10 @@ public class ChunkConfiguration : IEntityTypeConfiguration<Chunk>
         builder.HasIndex(c => c.SearchVector)
             .HasMethod("GIN");
 
-        // HNSW: a graph of neighbouring vectors, so a search visits a few of them instead
-        // of comparing the question with every chunk. Cosine distance, as the search uses
-        // (decisions #50, #51); pgvector's default build settings.
-        builder.HasIndex(c => c.Embedding)
-            .HasMethod("hnsw")
-            .HasOperators("vector_cosine_ops");
+        // No vector index on Embedding, on purpose (decisions #51): a search reads the
+        // caller's chunks through the tenant index below and compares the question with
+        // each of them, which is exact. An HNSW index knows nothing about tenants and was
+        // slower and less accurate for a tenant that holds a small share of the table.
 
         builder.Property(c => c.CreatedAt)
             .HasDefaultValueSql("now()");

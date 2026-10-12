@@ -20,7 +20,7 @@ namespace DocAssistant.IntegrationTests.Search;
 // nearest first.
 //
 // The search runs as in the app (restricted database user, the scope's tenant, query
-// filter, RLS, the real HNSW index). Only the embedding model is replaced: it gives every
+// filter, RLS). Only the embedding model is replaced: it gives every
 // question the vector the test chose, so which chunk is nearest is known beforehand.
 // Vectors differ only in their first two numbers, which makes them points on a plane:
 // (1, 0) and (0, 1) are unrelated, (1, 0) and (-1, 0) are opposites.
@@ -29,8 +29,6 @@ public class VectorChunkSearchTests(PostgresFixture database) : IAsyncLifetime
 {
     private const string Question = "Yıllık izin kaç gündür?";
     private const int Precision = 5;
-
-    private const string KnownGap = "Known gap in vector search; see the pull request that added this test.";
 
     private readonly QuestionEmbedder _model = new();
     private TenantIsolationScenario _scenario = null!;
@@ -209,13 +207,9 @@ public class VectorChunkSearchTests(PostgresFixture database) : IAsyncLifetime
         Assert.Empty(_model.Asked);
     }
 
-    // decisions #51: the HNSW index knows nothing about tenants. It collects the nearest
-    // vectors of all tenants (40 by default) and the tenant filter drops the others; with
-    // many nearer chunks elsewhere, fewer than limit would be left. This search is made
-    // to go through the index (see SearchAsync).
-    //
-    // HNSW is approximate: it may miss a few chunks, so the test asks for half of the
-    // tenant's chunks and does not say which ones must come.
+    // decisions #51: the search compares the question with the caller's own chunks only,
+    // so chunks of other tenants cannot crowd them out, however near they are. (A vector
+    // index shared by all tenants did exactly that, which is why there is none.)
     [Fact]
     public async Task EnoughChunksAreFoundAlthoughAnotherTenantHasManyNearerOnes()
     {
@@ -232,19 +226,18 @@ public class VectorChunkSearchTests(PostgresFixture database) : IAsyncLifetime
             _scenario.TenantB,
             _scenario.DocumentB1);
 
-        var results = await SearchAsync(Question, limit: 30, throughTheIndex: true);
+        var results = await SearchAsync(Question, limit: 30);
 
         Assert.Equal(30, results.Count);
         Assert.All(results, result => Assert.Contains(result.ChunkId, mine));
         Assert.Equal(results.OrderByDescending(r => r.Score).Select(r => r.ChunkId), results.Select(r => r.ChunkId));
     }
 
-    // Found while writing these tests. When one direction is stored many times (here 400
-    // chunks of another tenant; the same text embedded again and again gives this), the
-    // index visits those chunks and then stops: the search returns nothing although the
-    // caller has 60 chunks, with or without iterative scan. A search that does not go
-    // through the index finds them.
-    [Fact(Skip = KnownGap)]
+    // One direction stored many times by another tenant (the same text embedded again and
+    // again gives this). With the HNSW index the search visited those chunks and then
+    // stopped, returning nothing although the caller had 60 chunks; this test found that,
+    // and the index was removed (decisions #51).
+    [Fact]
     public async Task ChunksAreFoundAlthoughAnotherTenantStoresOneVectorManyTimes()
     {
         var random = new Random(51);
@@ -257,7 +250,7 @@ public class VectorChunkSearchTests(PostgresFixture database) : IAsyncLifetime
         await AddChunksAsync(
             Enumerable.Range(0, 400).Select(i => Vector((i % 70) + 1, 0)), _scenario.TenantB, _scenario.DocumentB1);
 
-        var results = await SearchAsync(Question, limit: 30, throughTheIndex: true);
+        var results = await SearchAsync(Question, limit: 30);
 
         Assert.Equal(30, results.Count);
         Assert.All(results, result => Assert.Contains(result.ChunkId, mine));
@@ -372,7 +365,7 @@ public class VectorChunkSearchTests(PostgresFixture database) : IAsyncLifetime
 
     // One search in its own scope with the tenant selected, as a request would have it.
     private async Task<IReadOnlyList<RankedChunk>> SearchAsync(
-        string query, int limit = 30, Guid? tenantId = null, bool selectTenant = true, bool throughTheIndex = false)
+        string query, int limit = 30, Guid? tenantId = null, bool selectTenant = true)
     {
         await using var scope = database.Api.Services.CreateAsyncScope();
 
@@ -381,24 +374,7 @@ public class VectorChunkSearchTests(PostgresFixture database) : IAsyncLifetime
             scope.ServiceProvider.GetRequiredService<ITenantSelector>().Select(tenantId ?? _scenario.TenantA);
         }
 
-        var search = CreateSearch(scope.ServiceProvider);
-
-        if (!throughTheIndex)
-        {
-            return await search.SearchAsync(query, limit, CancellationToken.None);
-        }
-
-        // The test table is small, so PostgreSQL would rather read the tenant's rows and
-        // sort them than use the HNSW index. With both switched off the index is the
-        // plan left. SET LOCAL lasts for this transaction only; the search joins it.
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await using var transaction = await db.Database.BeginTransactionAsync();
-        await db.Database.ExecuteSqlRawAsync("SET LOCAL enable_seqscan = off; SET LOCAL enable_sort = off");
-
-        var results = await search.SearchAsync(query, limit, CancellationToken.None);
-        await transaction.CommitAsync();
-
-        return results;
+        return await CreateSearch(scope.ServiceProvider).SearchAsync(query, limit, CancellationToken.None);
     }
 
     // The app's own search with only the model replaced.
