@@ -3,7 +3,7 @@
 DocAssistant'ta kullanılan teknolojiler, ne işe yaradıkları ve hangi fazda devreye girdikleri.
 Kaynak: [PLANNING.md](../PLANNING.md) ve [decisions.md](decisions.md). Buradaki bir satır o iki dosyayla çelişirse onlar geçerlidir.
 
-Durum sütunu: **Kurulu** = repoda var, **Planlı** = kararı verilmiş ama henüz eklenmemiş, **Seçilecek** = karar bekliyor.
+Durum sütunu: **Kurulu** = repoda var, **Planlı** = kararı verilmiş ama henüz eklenmemiş, **Seçilecek** = karar bekliyor, **Kullanılmıyor** = denendi ve vazgeçildi.
 
 ## Özet
 
@@ -57,7 +57,7 @@ Arayüz başlangıçta Blazor Web App olarak planlanmıştı; ekranlar yazılmad
 | Teknoloji | Sürüm | Ne için | Faz | Durum |
 |---|---|---|---|---|
 | PostgreSQL | 17 (`pgvector/pgvector:pg17` imajı) | Ana veritabanı | 0 | Kurulu |
-| pgvector | 0.8+ | Vektör saklama ve benzerlik araması; filtreli aramada HNSW indeksinin verimli çalışması için 0.8+ gerekli | 0 (eklenti), 3 (arama) | Kurulu |
+| pgvector | 0.8+ | Vektör saklama (`chunks.embedding`) ve kosinüs mesafesiyle benzerlik araması; arama firma içinde tamdır, vektör indeksi kullanılmaz (decisions.md #51) | 0 (eklenti), 3 (arama) | Kurulu |
 | Pgvector.EntityFrameworkCore | 0.3.0 | C#'taki `Vector` türünü `vector` sütununa bağlar; `chunks.embedding` (decisions.md #28) | 2 (sütun), 3 (doldurma) | Kurulu |
 | EF Core + migration | 10 (`Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3) | Veri erişimi, şema değişiklikleri, global query filter | 1 | Kurulu |
 | Row-Level Security | PostgreSQL özelliği | Tenant izolasyonunun veritabanı katmanı; `documents` ve `chunks` tablolarında açık | 1 | Kurulu |
@@ -87,7 +87,7 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 | bge-m3 | Embedding modeli (metni vektöre çevirir) | 0 (deneme), 3 (hat) | Planlı |
 | `IEmbeddingGenerator` (`Microsoft.Extensions.AI`) + OllamaSharp 5.5.0 | Embedding modelini koddan soyutlar; Ollama'ya OllamaSharp ile bağlanır. Adres ve model adı `Embedding` ayarından okunur (decisions.md #50) | 3 | Kurulu |
 | `IChatClient` | Sohbet modelini soyutlar; geliştirmede Ollama, canlıda API modeli | 4 | Planlı |
-| HNSW indeksi (pgvector) | Hızlı vektör araması: `chunks.embedding` üzerinde kosinüs mesafesiyle; filtreli aramada yinelemeli tarama açılır (decisions.md #51) | 3 | Kurulu |
+| HNSW indeksi (pgvector) | Yaklaşık vektör araması için indeks. Denendi ve kaldırıldı: firmayı bilmediği için küçük firmalarda tam aramadan yavaş ve daha az doğruydu (decisions.md #51) | 3 | Kullanılmıyor |
 | Reciprocal Rank Fusion (RRF) | Vektör ve full-text sonuçlarını tek sıralamada birleştirir; yalnızca sıraları kullanır, sabit 60 (decisions.md #48) | 3 | Kurulu |
 | bge-reranker-v2-m3 + Text Embeddings Inference (TEI) | Reranker: ilk 30 adayı soruyla birlikte okuyup en iyi 8'e indirir. Ayrı kapsayıcıda çalışır, isteğe bağlıdır; geliştirmede kapalı (decisions.md #52) | 3 | Seçildi |
 | Sohbet modeli (geliştirme) | Yerel 7–8B sınıfı bir model | 4 | Seçilecek |

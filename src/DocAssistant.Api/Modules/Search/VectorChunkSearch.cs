@@ -14,6 +14,9 @@ namespace DocAssistant.Api.Modules.Search;
 // model as the chunks, and the chunks whose vectors are closest to it (cosine distance)
 // come back, closest first.
 //
+// Exact, not approximate: the question is compared with every chunk of the caller's tenant.
+// There is no vector index; the tenant's chunks are found through the index on tenant_id.
+//
 // Written with LINQ, so the query filter limits it to the caller's tenant and RLS applies
 // underneath (decisions #14, #15).
 public sealed class VectorChunkSearch(
@@ -42,18 +45,6 @@ public sealed class VectorChunkSearch(
 
         var question = new Vector(embedding);
 
-        // The HNSW index knows nothing about tenants: it finds the nearest vectors of all
-        // tenants and the filter then drops the others, which can leave fewer than limit.
-        // With iterative scan (pgvector 0.8+) the index keeps going until the filter has
-        // let enough rows through; strict_order keeps them exactly in distance order,
-        // which fusion relies on. SET LOCAL lasts only for this transaction, so the
-        // pooled connection goes back unchanged.
-        await using var transaction = db.Database.CurrentTransaction is null
-            ? await db.Database.BeginTransactionAsync(cancellationToken)
-            : null;
-
-        await db.Database.ExecuteSqlRawAsync("SET LOCAL hnsw.iterative_scan = 'strict_order'", cancellationToken);
-
         var nearest = await db.Chunks
             // Vectors of another model are not comparable with the question's: until
             // re-indexing has replaced them, such chunks are left out rather than ranked
@@ -65,11 +56,6 @@ public sealed class VectorChunkSearch(
             .ThenBy(chunk => chunk.Id)
             .Take(limit)
             .ToListAsync(cancellationToken);
-
-        if (transaction is not null)
-        {
-            await transaction.CommitAsync(cancellationToken);
-        }
 
         // Cosine similarity: 1 for the same direction, 0 for unrelated. For reports only (#48).
         return nearest.Select(chunk => new RankedChunk(chunk.Id, 1 - chunk.Distance)).ToList();
