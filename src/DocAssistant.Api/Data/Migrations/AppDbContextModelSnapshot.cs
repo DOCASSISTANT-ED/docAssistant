@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 using Pgvector;
 
 #nullable disable
@@ -239,6 +240,13 @@ namespace DocAssistant.Api.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("page_number");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasColumnName("search_vector")
+                        .HasComputedColumnSql("to_tsvector('turkish'::regconfig, translate(content, 'Iİ', 'ıi'))", true);
+
                     b.Property<string>("SectionPath")
                         .HasColumnType("text")
                         .HasColumnName("section_path");
@@ -255,6 +263,11 @@ namespace DocAssistant.Api.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_chunks");
+
+                    b.HasIndex("SearchVector")
+                        .HasDatabaseName("ix_chunks_search_vector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
 
                     b.HasIndex("TenantId")
                         .HasDatabaseName("ix_chunks_tenant_id");
