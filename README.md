@@ -169,6 +169,7 @@ Arayüz API'ye tarayıcıdan, başka bir adresten istek gönderir. API buna yaln
 | Servisleri başlat | `docker compose up -d` |
 | Servisleri durdur (veri kalır) | `docker compose down` |
 | Servisleri sıfırla (veritabanı ve yüklenen dosyalar silinir) | `docker compose down -v` |
+| Reranker'ı başlat (isteğe bağlı; ilk açılışta ~2,3 GB model indirir, işlemcide yavaştır: [decisions.md](docs/decisions.md) #52) | `docker compose --profile reranker up -d` |
 | Testleri çalıştır | `dotnet test` |
 | Arayüz testlerini çalıştır (`src/web` içinde) | `npm test` |
 | API'yi elle dene (kayıt, giriş, `/auth/me`) | `src/DocAssistant.Api/DocAssistant.Api.http`; VS Code'da [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) eklentisiyle her isteğin üstündeki "Send Request" |
