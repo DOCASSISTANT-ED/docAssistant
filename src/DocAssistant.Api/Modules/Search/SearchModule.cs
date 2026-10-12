@@ -18,6 +18,10 @@ public static class SearchModule
         // Pure calculation without state.
         services.AddSingleton<IRankFusion, ReciprocalRankFusion>();
 
+        // The entry point for chat and evaluation. No IReranker is registered until a
+        // model is chosen; retrieval then returns the fused order (decisions #48).
+        services.AddScoped<IChunkRetrieval, ChunkRetrieval>();
+
         return services;
     }
 }
