@@ -264,6 +264,12 @@ namespace DocAssistant.Api.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_chunks");
 
+                    b.HasIndex("Embedding")
+                        .HasDatabaseName("ix_chunks_embedding");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Embedding"), "hnsw");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Embedding"), new[] { "vector_cosine_ops" });
+
                     b.HasIndex("SearchVector")
                         .HasDatabaseName("ix_chunks_search_vector");
 

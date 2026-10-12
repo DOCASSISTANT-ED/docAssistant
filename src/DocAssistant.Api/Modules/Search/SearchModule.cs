@@ -13,6 +13,10 @@ public static class SearchModule
 
         // Scoped: each search uses the request's AppDbContext and tenant.
         services.AddScoped<IKeywordChunkSearch, KeywordChunkSearch>();
+        services.AddScoped<IVectorChunkSearch, VectorChunkSearch>();
+
+        // Pure calculation without state.
+        services.AddSingleton<IRankFusion, ReciprocalRankFusion>();
 
         return services;
     }
