@@ -62,7 +62,24 @@ services:
               count: all
               capabilities: [gpu]
 
+  # Reranker (docs/decisions.md #52). İsteğe bağlı, varsayılan olarak başlamaz:
+  #   docker compose --profile reranker up -d
+  # İlk açılışta modeli (yaklaşık 2,3 GB) indirir. Bu imaj işlemcide çalışır ve yavaştır
+  # (soru başına onlarca saniye); GPU'lu sunucu imajı Faz 5'te seçilecek.
+  reranker:
+    profiles: ["reranker"]
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.9
+    container_name: docassistant-reranker
+    restart: unless-stopped
+    # --max-batch-tokens: 8 GB bellekli Docker'da varsayılan değerle servis bellekten düşüyor.
+    command: --model-id ${RERANKER_MODEL:-BAAI/bge-reranker-v2-m3} --max-batch-tokens 2048
+    ports:
+      - "${RERANKER_PORT:-8088}:80"
+    volumes:
+      - reranker-data:/data
+
 volumes:
   postgres-data:
   seaweedfs-data:
   ollama-data:
+  reranker-data:
