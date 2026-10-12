@@ -1,6 +1,7 @@
 using DocAssistant.Api.Data;
 using DocAssistant.Api.Modules.Documents;
 using DocAssistant.Api.Modules.Documents.Storage;
+using DocAssistant.Api.Modules.Embeddings;
 using DocAssistant.Api.Modules.Ingestion;
 using DocAssistant.Api.Modules.Ingestion.Parsing;
 using DocAssistant.IntegrationTests.Documents;
@@ -8,8 +9,10 @@ using DocAssistant.IntegrationTests.Infrastructure;
 using DocAssistant.IntegrationTests.TenantIsolation;
 using DocAssistant.Shared.Tenancy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace DocAssistant.IntegrationTests.Ingestion;
 
@@ -75,10 +78,6 @@ public class DocumentProcessorTests(PostgresFixture database) : IAsyncLifetime
             Assert.Equal(documentId, chunk.DocumentId);
             Assert.Equal(1, chunk.DocumentVersion);
             Assert.Equal(sourceType, chunk.SourceType);
-
-            // decisions #28: filled in phase 3.
-            Assert.Null(chunk.Embedding);
-            Assert.Null(chunk.EmbeddingModel);
         });
     }
 
@@ -389,6 +388,8 @@ public class DocumentProcessorTests(PostgresFixture database) : IAsyncLifetime
             db,
             _storage,
             parsers.Length > 0 ? parsers : services.GetServices<IDocumentParser>(),
+            new FakeEmbeddingGenerator(),
+            services.GetRequiredService<IOptions<EmbeddingOptions>>(),
             new FixedTimeProvider(Now));
 
         var handler = new DocumentIngestionHandler(
@@ -435,6 +436,27 @@ public class DocumentProcessorTests(PostgresFixture database) : IAsyncLifetime
         public DocumentSourceType SourceType => sourceType;
 
         public ParsedDocument Parse(Stream content) => new(blocks);
+    }
+
+    // Stands in for the embedding model (docs/decisions.md #50): one vector of the stored
+    // size per text, without calling Ollama.
+    private sealed class FakeEmbeddingGenerator : IEmbeddingGenerator<string, Embedding<float>>
+    {
+        public Task<GeneratedEmbeddings<Embedding<float>>> GenerateAsync(
+            IEnumerable<string> values,
+            EmbeddingGenerationOptions? options = null,
+            CancellationToken cancellationToken = default)
+        {
+            var embeddings = values.Select(_ => new Embedding<float>(new float[ChunkConfiguration.EmbeddingDimensions]));
+
+            return Task.FromResult(new GeneratedEmbeddings<Embedding<float>>(embeddings));
+        }
+
+        public object? GetService(Type serviceType, object? serviceKey = null) => null;
+
+        public void Dispose()
+        {
+        }
     }
 
     private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
