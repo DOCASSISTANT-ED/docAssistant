@@ -179,6 +179,7 @@ Arayüz API'ye tarayıcıdan, başka bir adresten istek gönderir. API buna yaln
 ## Sık karşılaşılan sorunlar
 
 - **`ollama` komutu tanınmıyor:** Terminal Ollama kurulmadan önce açılmıştır. Terminali, VS Code kullanıyorsan VS Code'u tamamen kapatıp yeniden aç.
+- **Yüklenen belge `Processing`'de kalıyor ya da API logunda Ollama'dan `500 (Internal Server Error)` görünüyor:** Ollama embedding modelini yükleyememiştir. `%LOCALAPPDATA%\Ollama\server.log` içinde `CUDA error` varsa ekran kartı bu Ollama sürümü için fazla eskidir (ör. NVIDIA MX serisi). Ollama'yı kapat ve işlemcide çalışacak şekilde başlat: PowerShell'de `$env:CUDA_VISIBLE_DEVICES = "-1"; ollama serve`. Bu ayar yalnızca o pencere için geçerlidir.
 - **`docker compose up` bağlanamıyor:** Docker Desktop çalışmıyordur; açıp motorun başlamasını bekle.
 - **Entegrasyon testleri "Docker is either not running or misconfigured" hatasıyla başarısız oluyor:** Aynı sebep; Docker Desktop'ı açıp `dotnet test`'i yeniden çalıştır. Birim testleri Docker'a ihtiyaç duymaz.
 - **Arayüzde "API'ye ulaşılamıyor" yazıyor:** API çalışmıyordur (`dotnet run --project src/DocAssistant.Api`) ya da arayüz 4200 dışında bir porttan açılmıştır; API yalnızca `Cors:AllowedOrigins` listesindeki adreslere izin verir. Tarayıcı konsolunda "CORS" hatası görürsen ikinci durumdur.
