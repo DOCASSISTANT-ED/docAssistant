@@ -25,6 +25,11 @@ public static class EmbeddingsModule
             return new OllamaApiClient(new Uri(options.BaseUrl), options.Model);
         });
 
+        // Re-indexing (decisions #54): the service runs once at startup; the reindexer is
+        // scoped because it works on one document, with that document's tenant.
+        services.AddScoped<ChunkReindexer>();
+        services.AddHostedService<ReindexService>();
+
         return services;
     }
 }

@@ -32,5 +32,10 @@ public sealed class DocAssistantApiFactory(string connectionString) : WebApplica
         // Tests that embed replace IEmbeddingGenerator.
         builder.UseSetting("Embedding:BaseUrl", "http://embedding.invalid");
         builder.UseSetting("Embedding:Model", "integration-tests");
+
+        // Re-indexing at startup (decisions #54) is off: tests leave chunks without
+        // embeddings on purpose, and every copy of the app a test starts would otherwise
+        // try to embed the chunks of all the others. Re-indexing tests run it themselves.
+        builder.UseSetting("Embedding:ReindexOnStartup", "false");
     }
 }
