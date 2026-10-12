@@ -11,6 +11,12 @@ public static class SearchModule
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        // Optional too: without a "Reranker" section the reranker is off (decisions #52).
+        services.AddOptions<RerankerOptions>()
+            .BindConfiguration(RerankerOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         // Scoped: each search uses the request's AppDbContext and tenant.
         services.AddScoped<IKeywordChunkSearch, KeywordChunkSearch>();
         services.AddScoped<IVectorChunkSearch, VectorChunkSearch>();
