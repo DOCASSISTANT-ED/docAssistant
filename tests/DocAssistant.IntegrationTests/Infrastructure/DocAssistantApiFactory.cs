@@ -27,5 +27,10 @@ public sealed class DocAssistantApiFactory(string connectionString) : WebApplica
         builder.UseSetting("Storage:AccessKey", "integration-tests");
         builder.UseSetting("Storage:SecretKey", "integration-tests");
         builder.UseSetting("Storage:Bucket", "integration-tests");
+
+        // Same for the embedding model: tests never call a real one (docs/decisions.md #50).
+        // Tests that embed replace IEmbeddingGenerator.
+        builder.UseSetting("Embedding:BaseUrl", "http://embedding.invalid");
+        builder.UseSetting("Embedding:Model", "integration-tests");
     }
 }

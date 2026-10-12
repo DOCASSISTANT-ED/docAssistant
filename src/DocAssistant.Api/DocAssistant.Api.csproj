@@ -17,6 +17,7 @@
          (testler) taşımaz; açık başvuru olmazsa onlar daha eski bir sürüm çözer ve derlenmez. -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="OllamaSharp" />
     <PackageReference Include="PdfPig" />
     <PackageReference Include="Pgvector.EntityFrameworkCore" />
   </ItemGroup>

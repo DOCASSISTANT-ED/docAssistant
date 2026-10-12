@@ -1,5 +1,6 @@
 using DocAssistant.Api.Data;
 using DocAssistant.Api.Modules.Documents;
+using DocAssistant.Api.Modules.Embeddings;
 using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
 using DocAssistant.Api.Modules.Search;
@@ -30,6 +31,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
 builder.Services.AddIdentityModule();
 builder.Services.AddTenantsModule();
 builder.Services.AddDocumentsModule();
+builder.Services.AddEmbeddingsModule();
 builder.Services.AddIngestionModule();
 builder.Services.AddSearchModule();
 
