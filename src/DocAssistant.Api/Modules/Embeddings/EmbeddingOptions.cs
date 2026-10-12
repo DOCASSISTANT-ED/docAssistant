@@ -17,4 +17,8 @@ public sealed class EmbeddingOptions
     [Required]
     [MaxLength(Ingestion.ChunkConfiguration.EmbeddingModelMaxLength)]
     public string Model { get; init; } = string.Empty;
+
+    // Whether chunks without an embedding of this model are embedded again when the app
+    // starts (decisions #54). Off in tests, where every test brings its own model.
+    public bool ReindexOnStartup { get; init; } = true;
 }

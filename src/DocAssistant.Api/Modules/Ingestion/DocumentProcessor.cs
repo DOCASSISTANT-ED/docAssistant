@@ -22,10 +22,6 @@ public sealed class DocumentProcessor(
     IOptions<EmbeddingOptions> embeddingOptions,
     TimeProvider timeProvider) : IDocumentProcessor
 {
-    // Chunks sent to the embedding model per request: a large document is embedded in
-    // several requests instead of one that could run into the HTTP timeout.
-    public const int EmbeddingBatchSize = 32;
-
     // Shown to the user through documents.failure_reason (decisions #24).
     public const string FileMissingMessage =
         "Belgenin dosyası bulunamadı. Lütfen belgeyi yeniden yükleyin.";
@@ -71,53 +67,22 @@ public sealed class DocumentProcessor(
             throw new DocumentParseException(NoTextMessage);
         }
 
-        // Before the transaction (decisions #50): the model can be slow, and no database
-        // connection or lock should be held while waiting for it.
-        var embeddings = await EmbedAsync(drafts, cancellationToken);
+        // One vector per chunk, in the same order. The embedded text is the chunk's whole
+        // content, context header included (decisions #27, #50).
+        //
+        // Before the transaction: the model can be slow, and no database connection or
+        // lock should be held while waiting for it.
+        //
+        // A model that cannot be reached or answers wrongly is not the document's fault, so
+        // this is not turned into DocumentParseException: the error is passed on, the
+        // document stays Processing and is retried up to the attempt limit (decisions #38).
+        var embeddings = await ChunkEmbedding.EmbedAsync(
+            embeddingGenerator,
+            embeddingOptions.Value.Model,
+            drafts.Select(draft => draft.Content).ToList(),
+            cancellationToken);
 
         await SaveChunksAsync(document, sourceType, drafts, embeddings, cancellationToken);
-    }
-
-    // One vector per chunk, in the same order. The embedded text is the chunk's whole
-    // content, context header included (decisions #27, #50).
-    //
-    // A model that cannot be reached or answers wrongly is not the document's fault, so
-    // nothing here throws DocumentParseException: the error is passed on, the document
-    // stays Processing and is retried up to the attempt limit (decisions #38).
-    private async Task<IReadOnlyList<Vector>> EmbedAsync(
-        IReadOnlyList<ChunkDraft> drafts,
-        CancellationToken cancellationToken)
-    {
-        var vectors = new List<Vector>(drafts.Count);
-
-        foreach (var batch in drafts.Chunk(EmbeddingBatchSize))
-        {
-            var generated = await embeddingGenerator.GenerateAsync(
-                batch.Select(draft => draft.Content),
-                cancellationToken: cancellationToken);
-
-            if (generated.Count != batch.Length)
-            {
-                throw new InvalidOperationException(
-                    $"The embedding model returned {generated.Count} vectors for {batch.Length} chunks.");
-            }
-
-            foreach (var embedding in generated)
-            {
-                // The column is vector(1024); a model of another size is a configuration
-                // mistake and should say so instead of failing inside the database.
-                if (embedding.Vector.Length != ChunkConfiguration.EmbeddingDimensions)
-                {
-                    throw new InvalidOperationException(
-                        $"The embedding model '{embeddingOptions.Value.Model}' returned a vector of " +
-                        $"{embedding.Vector.Length} dimensions; chunks store {ChunkConfiguration.EmbeddingDimensions}.");
-                }
-
-                vectors.Add(new Vector(embedding.Vector));
-            }
-        }
-
-        return vectors;
     }
 
     // decisions #35: old chunks out, new chunks in and Done, all or nothing. If anything
