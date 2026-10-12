@@ -75,6 +75,21 @@ Chunk sayıları DOCX hâli içindir. Başlık 1 belgenin adı sayıldığı iç
 
 DOCX dosyaları `ik-yonetmeligi.docx` şablon alınarak (aynı stiller, yazı tipleri ve sayfa düzeni) betikle üretildi; yazar bilgisi boştur. PDF'ler her DOCX'in Word'de açılıp "PDF olarak kaydet" ile kaydedilmesiyle alındı. PDF ve DOCX hâlleri aynı bölüm yollarını verir; PDF'te tablolar düz metin olarak gelir (#23). Bir belgenin metni değişirse iki hâli de yeniden üretilmeli ve `eval/questions.json` içindeki soruları gözden geçirilmelidir.
 
+## El kitabı: `depo-sevkiyat-el-kitabi`
+
+Önceki belgeler kısadır ve çoğunda her chunk tek bir konuyu anlatır. Gerçek belgeler uzundur ve bir paragraf birçok kuralı art arda sıralar; bu belge onun için eklendi (`docs/decisions.md` #53). "Depo ve Sevkiyat Operasyonları El Kitabı": yaklaşık 26.000 karakter, on bölüm ("Bölüm N: …", Başlık 2) ve otuz alt bölüm ("N.M …", Başlık 3); DOCX'te 43, PDF'te 42 chunk; PDF 11 sayfadır.
+
+Neyi sınamak için var:
+
+- **Çok konulu uzun paragraflar:** beş paragraf 1300–1550 karakterdir (1.1, 3.2, 4.2, 5.2, 7.2) ve her biri birbirinden bağımsız birçok kuralı sıralar. Bazı soruların cevabı böyle bir paragrafın ortasındaki ya da sonundaki tek bir cümledir; anlam araması chunk'ın bütününe bakarken o cümle kalabalıkta kaybolabilir.
+- **Cümleden bölme:** "1.1 Randevu ve Araç Kabul"deki paragraf tek başına ~1540 karakterdir ve cümle sınırından bölünür (#43).
+- **Diğer belgelerle çakışan sayılar:** "25 kilogram" burada koli ağırlığıdır, Depo İş Güvenliği Talimatı'nda elle taşıma sınırı; "160 santimetre" burada sevkiyat paleti, orada raf katı. "Otuz dakika", "on beş dakika" ve "iki iş günü" belgenin içinde birden çok yerde farklı anlamlarla geçer.
+- **Sayfa altı bilgisi cümleyi böler:** her sayfanın altında "DSK-04 | Rev. 03 | Yürürlük: 01.09.2026 | Sayfa X / Y" vardır. PDF'te bu satır metne karışır (#25) ve 10. sayfanın sonunda bir cümlenin ortasına düşer: "… görevlendirilmez; DSK-04 | … | Sayfa 10 / 11 forklift kullanamaz." O cümlenin kanıt metni bu yüzden yalnızca "forklift kullanamaz"dır.
+- **PDF'te satıra taşan tablo hücresi:** teslimat tablosundaki "Köy ve mobil dağıtım bölgeleri" hücresi PDF'te iki satıra bölünür ve araya diğer hücreler girer ("Köy ve mobil dağıtım 5 iş günü Yok bölgeleri"). O satırın kanıt metni "5 iş günü"dür.
+- **Dört tablo:** depolama alanları (5 satır × 3 sütun), teslimat süreleri (4 × 3), stok düzeltme onayları (3 × 2), göstergeler (6 × 3); hepsinin ilk satırı başlıktır.
+
+`uzaktan-calisma-politikasi.docx` şablon alınarak betikle üretildi (aynı stiller ve sayfa düzeni, sayfa altı bilgisi değiştirildi); PDF'i Word'de "PDF olarak kaydet" ile alındı.
+
 ## Uzun bölümlü belge: `uzaktan-calisma-politikasi`
 
 Yukarıdaki belgelerde her bölüm tek chunk'a sığdığı için chunk boyutunun etkisi ölçülemiyordu; bu belge bunun için eklendi (`docs/decisions.md` #47). Aynı uydurma şirkete aittir ve diğer belgelerle bilerek çakışır: kıdem şartı "en az altı ay" (Araç Kullanım Talimatı), çekirdek saatler 10:00–16:00 (İK Yönetmeliği'nde mesai 09:00–18:00), kayıp cihazın iki saat içinde bildirimi ve kişisel bilgisayar yasağı (Bilgi Güvenliği Politikası), "masraf formu ile muhasebe birimine" (İK Yönetmeliği, Araç Kullanım Talimatı).
