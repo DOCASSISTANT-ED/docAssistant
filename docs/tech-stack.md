@@ -89,7 +89,7 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 | `IChatClient` | Sohbet modelini soyutlar; geliştirmede Ollama, canlıda API modeli | 4 | Planlı |
 | HNSW indeksi (pgvector) | Hızlı vektör araması: `chunks.embedding` üzerinde kosinüs mesafesiyle; filtreli aramada yinelemeli tarama açılır (decisions.md #51) | 3 | Kurulu |
 | Reciprocal Rank Fusion (RRF) | Vektör ve full-text sonuçlarını tek sıralamada birleştirir; yalnızca sıraları kullanır, sabit 60 (decisions.md #48) | 3 | Kurulu |
-| Reranker modeli | İlk ~30 sonucu en iyi 5–8'e indirir | 3 | Seçilecek |
+| bge-reranker-v2-m3 + Text Embeddings Inference (TEI) | Reranker: ilk 30 adayı soruyla birlikte okuyup en iyi 8'e indirir. Ayrı kapsayıcıda çalışır, isteğe bağlıdır; geliştirmede kapalı (decisions.md #52) | 3 | Seçildi |
 | Sohbet modeli (geliştirme) | Yerel 7–8B sınıfı bir model | 4 | Seçilecek |
 | Sohbet modeli (canlı) | API üzerinden bir model | 4–5 | Seçilecek |
 
