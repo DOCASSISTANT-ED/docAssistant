@@ -85,7 +85,7 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 |---|---|---|---|
 | Ollama | Yerel model çalıştırma. Geliştirmede Windows'a doğrudan kurulur; compose'daki servis yalnızca `linux-gpu` profilinde çalışır | 0 | Planlı |
 | bge-m3 | Embedding modeli (metni vektöre çevirir) | 0 (deneme), 3 (hat) | Planlı |
-| `IEmbeddingGenerator` | Embedding modelini koddan soyutlar | 3 | Planlı |
+| `IEmbeddingGenerator` (`Microsoft.Extensions.AI`) + OllamaSharp 5.5.0 | Embedding modelini koddan soyutlar; Ollama'ya OllamaSharp ile bağlanır. Adres ve model adı `Embedding` ayarından okunur (decisions.md #50) | 3 | Kurulu |
 | `IChatClient` | Sohbet modelini soyutlar; geliştirmede Ollama, canlıda API modeli | 4 | Planlı |
 | HNSW indeksi (pgvector) | Hızlı vektör araması | 3 | Planlı |
 | Reciprocal Rank Fusion (RRF) | Vektör ve full-text sonuçlarını tek sıralamada birleştirir | 3 | Planlı |
