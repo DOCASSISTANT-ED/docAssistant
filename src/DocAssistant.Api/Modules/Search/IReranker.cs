@@ -3,7 +3,7 @@ namespace DocAssistant.Api.Modules.Search;
 // Re-scores the fused candidates against the question with a reranker model and keeps the
 // best (docs/decisions.md #48). Needs the chunks' text, which the searches do not carry.
 //
-// Optional until a reranker model is chosen: without one, retrieval keeps the fused order.
+// Optional (decisions #52): with the reranker switched off, retrieval keeps the fused order.
 public interface IReranker
 {
     // At most limit of the candidates, best first.
