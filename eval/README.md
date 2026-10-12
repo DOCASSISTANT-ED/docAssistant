@@ -50,6 +50,45 @@ Altı belge PDF ve DOCX hâlinde aynı 47 bölüme ayrılır; her bölümün en 
 
 **Silinen sorular:** `ik-024` ("Evden çalışma hangi günlerde yapılabilir?") cevabı olmayan bir soruydu; `uzaktan-calisma-politikasi` eklenince cevaplı hâle geldi ve aynı metinle `uc-018` olarak taşındı.
 
+## Değerlendirmeyi çalıştırmak
+
+`eval/DocAssistant.Eval` soruları gerçek arama hattına sorar ve sonucu raporlar. Docker (geçici bir PostgreSQL için) ve `bge-m3` yüklü Ollama açık olmalıdır.
+
+```bash
+dotnet run --project eval/DocAssistant.Eval
+```
+
+Başka bir Ollama adresi ya da model için: `-- --embedding-url http://localhost:11434 --embedding-model bge-m3`.
+
+Araç bir test projesi değildir; `dotnet test` ve CI onu çalıştırmaz, çünkü CI'da embedding modeli yoktur.
+
+### Ne yapar
+
+1. Geçici bir veritabanı açar ve bütün migration'ları uygular. Geliştirme veritabanına dokunmaz.
+2. API'yi bellekte başlatır: `Program.cs`, endpoint'ler, arka plan işi ve arama gerçektir. Yalnızca dosya deposu bellektedir.
+3. Her belge türü için ayrı bir firma kaydeder (`POST /auth/register`) ve `tests/TestData` altındaki o türden belgeleri yükler (`POST /documents`); belgeleri uygulamanın kendi arka plan işi işler. PDF ve DOCX ayrı firmalarda durduğu için sonuçlar türe göre ayrıdır (#27).
+4. Cevabı olan her soruyu üç yolla sorar: yalnızca anahtar kelime araması, yalnızca vektör araması ve bütün hat (`IChunkRetrieval`, sohbetin çağıracağı giriş noktası). Üçünden de hattın döndürdüğü kadar chunk istenir (`SearchOptions.Results`, 8).
+5. Her kaynak için, kanıt metnini içeren ilk chunk'ın kaçıncı sırada geldiğine bakar (#47).
+
+### Rapor nasıl okunur
+
+| Sütun | Anlamı |
+|---|---|
+| `top 1`, `top 5`, `top 8` | Kanıtı ilk 1, ilk 5 ya da dönen 8 chunk içinde bulunan kaynak sayısı. |
+| `MRR` | Ortalama karşılıklı sıra: kaynak 1. sıradaysa 1, 2. sıradaysa 1/2, bulunamadıysa 0; hepsinin ortalaması. Doğru chunk'ın ne kadar yukarıda olduğunu ölçer. |
+| Türe göre tablo | Soru türüne göre, dönen chunk'lar içinde bulunan kaynak sayısı. Bir değişikliğin hangi tür soruyu etkilediğini gösterir. |
+| `Hybrid is better / worse than vector search alone` | Faz 3'ün bitiş koşulunun karşılaştırması (MRR ile). |
+| `Sources hybrid did not find` | Hattın dönen chunk'lar içinde bulamadığı kaynakların soruları. |
+| `Evidence in no chunk of this format` | Kanıtı o türün hiçbir chunk'ında geçmeyen kaynaklar. Sorun aramada değil, parser'da ya da soru setindedir. |
+
+Cevabı olmayan sorular (`unanswerable`) ölçülmez: arama her zaman bir şey döndürür; "belgelerde bulunamadı" demek sohbet modelinin işidir (Faz 4).
+
+Her çalıştırma ayrıntılarını `eval/results/<tarih-saat>.json` dosyasına yazar: her kaynağın üç yöntemdeki sırası. İki çalıştırmayı soru soru karşılaştırmak içindir. Klasör Git'e girmez; bir karara dayanak olan sonuçlar ilgili karara ya da PR'a sayı olarak yazılır.
+
+### Sayılar çalıştırmadan çalıştırmaya biraz oynar
+
+Vektör aramasının sonuçları her çalıştırmada aynıdır. Anahtar kelime aramasında ise birçok chunk aynı puanı alır ve eşitlik chunk kimliğine göre bozulur; kimlikler her çalıştırmada yeniden üretildiği için sıra değişir. Bu, anahtar kelime ve hibrit sayılarını birkaç kaynak oynatır. Küçük farkları yorumlamadan önce aracı iki kez çalıştır.
+
 ## Soru eklerken
 
 - Cevap örnek belgelerden doğrulanabilmeli; tahmin ya da genel bilgi gerektirmemeli.
