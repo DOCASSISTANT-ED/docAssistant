@@ -32,6 +32,7 @@ Sorular `tests/TestData` altındaki örnek belgelerden yazılır; belgelerin yap
 | `table` | Cevabı bir tablo satırındadır. |
 | `multi_section` | Cevabı birden fazla bölümdedir; kaynakların hepsi bulunmalıdır. |
 | `cross_document` | Cevabı birden fazla belgededir; kaynakların hepsi bulunmalıdır. Belgelerdeki ortak ifadelerin ("yazılı onay", "üç iş günü") aramayı ne kadar şaşırttığını gösterir. |
+| `short` | Cümle değil, arama kutusuna yazılır gibi iki üç kelime ("acil sipariş ücreti", "FIFO"). Kullanıcıların çoğu böyle yazar; tam cümleyle sorulmuş sorular anlam aramasını kayırır (#53). |
 | `unanswerable` | Belgelerde cevabı yoktur; beklenen davranış "belgelerde bulunamadı" demektir (Faz 4). |
 
 ## Belgeler
@@ -44,9 +45,10 @@ Sorular `tests/TestData` altındaki örnek belgelerden yazılır; belgelerin yap
 | `sa` | `satin-alma-proseduru` | 16 |
 | `dg` | `depo-is-guvenligi-talimati` | 16 |
 | `uc` | `uzaktan-calisma-politikasi` | 20 |
-| `x` | Birden fazla belge | 7 |
+| `ds` | `depo-sevkiyat-el-kitabi` | 70 |
+| `x` | Birden fazla belge | 10 |
 
-Altı belge PDF ve DOCX hâlinde aynı 47 bölüme ayrılır; her bölümün en az bir sorusu vardır. İlk beş belgede her bölüm tek chunk'tır. `uzaktan-calisma-politikasi`'nda bölümler birden çok chunk'a bölünür (DOCX'te 14, PDF'te 15 chunk); chunk boyutunun etkisi bu belgenin sorularıyla ölçülür (#47).
+Yedi belge PDF ve DOCX hâlinde aynı 88 bölüme (95 chunk) ayrılır. `depo-sevkiyat-el-kitabi`'ndaki on ana bölümün başındaki bir iki cümlelik giriş paragrafları dışında her bölümün en az bir sorusu vardır; o girişlerde sorulacak bir bilgi yoktur. İlk beş belgede her bölüm tek chunk'tır. `uzaktan-calisma-politikasi`'nda bölümler birden çok chunk'a bölünür (DOCX'te 14, PDF'te 15 chunk); chunk boyutunun etkisi bu belgenin sorularıyla ölçülür (#47).
 
 **Silinen sorular:** `ik-024` ("Evden çalışma hangi günlerde yapılabilir?") cevabı olmayan bir soruydu; `uzaktan-calisma-politikasi` eklenince cevaplı hâle geldi ve aynı metinle `uc-018` olarak taşındı.
 

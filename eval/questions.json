@@ -979,6 +979,634 @@
       ]
     },
     {
+      "id": "ds-001",
+      "type": "direct",
+      "question": "Mal getirecek araç için randevu en geç ne zaman alınmalıdır?",
+      "expected_answer": "Bir iş günü önce saat 15:00'e kadar.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.1 Randevu ve Araç Kabul", "page": 1, "evidence": "en geç bir iş günü önce saat 15:00'e kadar randevu alınır" }
+      ]
+    },
+    {
+      "id": "ds-002",
+      "type": "paraphrase",
+      "question": "Tedarikçinin kamyonu randevusuna bir saat geç kalırsa ne olur?",
+      "expected_answer": "Kırk beş dakikadan fazla geciken araç sıranın sonuna alınır; o gün boş rampa kalmazsa ertesi iş gününe ertelenir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.1 Randevu ve Araç Kabul", "page": 1, "evidence": "Randevusuna kırk beş dakikadan fazla geciken araç sıranın sonuna alınır" }
+      ]
+    },
+    {
+      "id": "ds-003",
+      "type": "exact_term",
+      "question": "Mal kabul rampaları cumartesi günü hangi saatlerde çalışır?",
+      "expected_answer": "08:00 ile 13:00 arasında.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.1 Randevu ve Araç Kabul", "page": 1, "evidence": "cumartesi günleri 08:00 ile 13:00 arasında çalışır" }
+      ]
+    },
+    {
+      "id": "ds-004",
+      "type": "direct",
+      "question": "Soğuk zincir ürünü taşıyan aracın boşaltılmasına ne kadar sürede başlanır?",
+      "expected_answer": "En geç on beş dakika içinde; bu araçlar ilk boşalan rampaya alınır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.1 Randevu ve Araç Kabul", "page": 1, "evidence": "boşaltmaya en geç on beş dakika içinde başlanır" }
+      ]
+    },
+    {
+      "id": "ds-005",
+      "type": "direct",
+      "question": "Koli içi adet kontrolünde kolilerin ne kadarı açılır?",
+      "expected_answer": "Yüzde onu, en az beş koli.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.2 Sayım ve Kalite Kontrol", "page": 2, "evidence": "teslimattaki kolilerin yüzde onu, en az beş koli olmak üzere açılarak sayılır" }
+      ]
+    },
+    {
+      "id": "ds-006",
+      "type": "paraphrase",
+      "question": "Raf ömrünün yarısı geçmiş bir gıda ürünü depoya kabul edilir mi?",
+      "expected_answer": "Hayır; toplam raf ömrünün en az üçte ikisi kalmış olmalıdır (sözleşmede farklı bir oran yoksa).",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.2 Sayım ve Kalite Kontrol", "page": 2, "evidence": "toplam raf ömrünün en az üçte ikisi kalmamışsa ürün kabul edilmez" }
+      ]
+    },
+    {
+      "id": "ds-007",
+      "type": "direct",
+      "question": "Mal kabul DYS'de ne kadar sürede kapatılmalıdır?",
+      "expected_answer": "Aracın boşaltılmasından itibaren en geç dört saat içinde.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.2 Sayım ve Kalite Kontrol", "page": 2, "evidence": "en geç dört saat içinde DYS'de kapatılmalıdır" }
+      ]
+    },
+    {
+      "id": "ds-008",
+      "type": "paraphrase",
+      "question": "Hasarlı gelen ürün için müşterinin ne yapılacağını söylemesi ne kadar beklenir?",
+      "expected_answer": "En geç on iş günü; talimat gelmezse ürün iade için ayrılır ve on birinci günden itibaren depolama ücreti yansıtılır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.3 Uygunsuz Teslimat", "page": 2, "evidence": "müşteriden en geç on iş günü içinde talimat beklenir" }
+      ]
+    },
+    {
+      "id": "ds-009",
+      "type": "exact_term",
+      "question": "C-14-03-02 adresi neyi gösterir?",
+      "expected_answer": "C koridorunun 14. sırasındaki rafın üçüncü katının ikinci gözünü.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.1 Adresleme", "page": 2, "evidence": "C-14-03-02, C koridorunun 14. sırasındaki rafın üçüncü katının ikinci gözünü gösterir" }
+      ]
+    },
+    {
+      "id": "ds-010",
+      "type": "paraphrase",
+      "question": "Sistemin önerdiği raf gözü doluysa paleti boş bulduğum başka bir yere koyabilir miyim?",
+      "expected_answer": "Hayır; durum vardiya amirine bildirilir ve yeni adres DYS üzerinden atanır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.1 Adresleme", "page": 2, "evidence": "paleti kendi seçtiği bir adrese koyamaz" }
+      ]
+    },
+    {
+      "id": "ds-011",
+      "type": "exact_term",
+      "question": "FEFO ne demektir?",
+      "expected_answer": "\"Son kullanma tarihi en yakın olan önce çıkar\" kuralı; son kullanma tarihi olan ürünlerde uygulanır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.2 Stok Döndürme", "page": 3, "evidence": "\"son kullanma tarihi en yakın olan önce çıkar\" kuralı (FEFO)" }
+      ]
+    },
+    {
+      "id": "ds-012",
+      "type": "direct",
+      "question": "Son kullanma tarihine kaç gün kala ürün satışa kapatılır?",
+      "expected_answer": "Otuz günden az kaldığında; ürün karantina alanına taşınır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.2 Stok Döndürme", "page": 3, "evidence": "Son kullanma tarihine otuz günden az kalan ürünler satışa kapatılır" }
+      ]
+    },
+    {
+      "id": "ds-013",
+      "type": "direct",
+      "question": "Soğuk depoda sıcaklık sapması ne kadar sürerse ürünler bloke edilir?",
+      "expected_answer": "Otuz dakikayı aşarsa.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.3 Özel Depolama Alanları", "page": 3, "evidence": "Sıcaklık sapması otuz dakikayı aşarsa etkilenen ürünler bloke edilir" }
+      ]
+    },
+    {
+      "id": "ds-014",
+      "type": "direct",
+      "question": "Aynı gün sevkiyat için sipariş kesim saati kaçtır?",
+      "expected_answer": "Hafta içi 14:00, cumartesi 11:00.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 3: Sipariş Hazırlama > 3.1 Sipariş Kesim Saatleri", "page": 4, "evidence": "Hafta içi saat 14:00'e kadar DYS'ye düşen siparişler aynı gün sevk edilir" }
+      ]
+    },
+    {
+      "id": "ds-015",
+      "type": "exact_term",
+      "question": "Acil sipariş için ek hizmet bedeli kaç TL'dir?",
+      "expected_answer": "Sipariş başına 350 TL.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 3: Sipariş Hazırlama > 3.1 Sipariş Kesim Saatleri", "page": 4, "evidence": "sipariş başına 350 TL ek hizmet bedeli yansıtılır" }
+      ]
+    },
+    {
+      "id": "ds-016",
+      "type": "direct",
+      "question": "Bir toplama turuna en fazla kaç sipariş atanır?",
+      "expected_answer": "Yirmi sipariş.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 3: Sipariş Hazırlama > 3.2 Toplama", "page": 4, "evidence": "bir toplama turuna en fazla yirmi sipariş atanır" }
+      ]
+    },
+    {
+      "id": "ds-017",
+      "type": "paraphrase",
+      "question": "Toplarken ürünün barkodu okunmuyorsa kodu elle girebilir miyim?",
+      "expected_answer": "Hayır; ürün yerinde bırakılır ve vardiya amirine bildirilir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 3: Sipariş Hazırlama > 3.2 Toplama", "page": 4, "evidence": "barkodu okunmayan ürün elle girilmez" }
+      ]
+    },
+    {
+      "id": "ds-018",
+      "type": "paraphrase",
+      "question": "Hata oranı yüksek çıkan toplayıcıya ne yapılır?",
+      "expected_answer": "Vardiya amirinin gözetiminde iki vardiya boyunca yeniden eğitilir; bu sürede toplu toplama turlarına atanmaz.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 3: Sipariş Hazırlama > 3.2 Toplama", "page": 4, "evidence": "vardiya amirinin gözetiminde iki vardiya boyunca yeniden eğitilir" }
+      ]
+    },
+    {
+      "id": "ds-019",
+      "type": "direct",
+      "question": "Bir koli en fazla kaç kilogram olabilir?",
+      "expected_answer": "25 kilogram; daha ağır siparişler birden fazla koliye bölünür.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 3: Sipariş Hazırlama > 3.3 Paketleme ve Etiketleme", "page": 4, "evidence": "Bir kolinin ağırlığı 25 kilogramı geçemez" }
+      ]
+    },
+    {
+      "id": "ds-020",
+      "type": "paraphrase",
+      "question": "Sevk edilecek bir palet en fazla ne kadar yüksek olabilir?",
+      "expected_answer": "Palet dahil 160 santimetre.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 3: Sipariş Hazırlama > 3.3 Paketleme ve Etiketleme", "page": 4, "evidence": "palet dahil 160 santimetreyi geçemez" }
+      ]
+    },
+    {
+      "id": "ds-021",
+      "type": "direct",
+      "question": "Araçlar hangi sırayla yüklenir?",
+      "expected_answer": "Teslimat sırasının tersine: en son teslim edilecek sipariş ilk yüklenir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.1 Sevkiyat Planlama", "page": 5, "evidence": "en son teslim edilecek sipariş araca ilk yüklenir" }
+      ]
+    },
+    {
+      "id": "ds-022",
+      "type": "direct",
+      "question": "Soğutulmuş ürün yüklenecek araç kasası ne kadar önceden soğutulur?",
+      "expected_answer": "En az otuz dakika önceden.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.2 Yükleme", "page": 5, "evidence": "Soğutulmuş ürün yüklenecek kasa en az otuz dakika önceden soğutulur" }
+      ]
+    },
+    {
+      "id": "ds-023",
+      "type": "paraphrase",
+      "question": "Gıda ile temizlik kimyasalı aynı kamyona yüklenebilir mi?",
+      "expected_answer": "Yalnızca aralarında fiziksel bir ayırıcı varsa.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.2 Yükleme", "page": 5, "evidence": "aynı araca ancak aralarında fiziksel bir ayırıcı varsa yüklenebilir" }
+      ]
+    },
+    {
+      "id": "ds-024",
+      "type": "paraphrase",
+      "question": "Yolda aracın mührü kırılmak zorunda kalırsa sürücü ne yapar?",
+      "expected_answer": "Planlama sorumlusuna telefonla bildirir, yeni mührün numarasını irsaliyeye yazar ve teslimatta alıcıya bilgi verir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.2 Yükleme", "page": 5, "evidence": "yeni mührün numarasını irsaliyeye yazar" }
+      ]
+    },
+    {
+      "id": "ds-025",
+      "type": "paraphrase",
+      "question": "Alıcı adreste yoksa sürücü ne kadar bekler?",
+      "expected_answer": "Müşteri hizmetlerini arar ve en az on beş dakika bekler.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.3 Teslimat", "page": 5, "evidence": "en az on beş dakika bekler" }
+      ]
+    },
+    {
+      "id": "ds-026",
+      "type": "direct",
+      "question": "Hızlı teslimat hangi siparişlerde seçilebilir?",
+      "expected_answer": "Kesim saatinden önce verilen ve toplam ağırlığı 30 kilogramı geçmeyen siparişlerde.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.3 Teslimat", "page": 5, "evidence": "toplam ağırlığı 30 kilogramı geçmeyen siparişlerde seçilebilir" }
+      ]
+    },
+    {
+      "id": "ds-027",
+      "type": "direct",
+      "question": "İade edilen ürünler hangi sınıflara ayrılır?",
+      "expected_answer": "A (ambalajı açılmamış, yeniden satılabilir), B (ambalajı açılmış ama sağlam) ve C (hasarlı ya da eksik).",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 5: İadeler ve Hasar Yönetimi > 5.1 İade Kabul", "page": 6, "evidence": "Ürünler üç sınıftan birine ayrılır" }
+      ]
+    },
+    {
+      "id": "ds-028",
+      "type": "paraphrase",
+      "question": "Müşteri kutuyu açtıktan sonra fark ettiği hasarı ne zamana kadar bildirmelidir?",
+      "expected_answer": "Teslim tarihini izleyen üç gün içinde müşteri hizmetlerine.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 5: İadeler ve Hasar Yönetimi > 5.2 Hasar Tespiti ve Bildirimi", "page": 6, "evidence": "teslim tarihini izleyen üç gün içinde müşteri hizmetlerine bildirilmelidir" }
+      ]
+    },
+    {
+      "id": "ds-029",
+      "type": "exact_term",
+      "question": "Hangi tutarın üzerindeki hasarlar sigorta şirketine bildirilir?",
+      "expected_answer": "Tek bir olayda 20.000 TL'yi aşan hasarlar, en geç beş iş günü içinde.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 5: İadeler ve Hasar Yönetimi > 5.2 Hasar Tespiti ve Bildirimi", "page": 6, "evidence": "hasar tutarı 20.000 TL'yi aşarsa olay sigorta şirketine en geç beş iş günü içinde bildirilir" }
+      ]
+    },
+    {
+      "id": "ds-030",
+      "type": "direct",
+      "question": "İmha tutanakları kaç yıl saklanır?",
+      "expected_answer": "Beş yıl.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 5: İadeler ve Hasar Yönetimi > 5.3 İmha", "page": 7, "evidence": "beş yıl süreyle saklanır" }
+      ]
+    },
+    {
+      "id": "ds-031",
+      "type": "direct",
+      "question": "Tam sayım yılda kaç kez ve ne zaman yapılır?",
+      "expected_answer": "Yılda iki kez; haziran ve aralık aylarının son hafta sonunda.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 6: Stok Sayımı ve Kayıt Doğruluğu > 6.1 Sayım Türleri", "page": 7, "evidence": "yılda iki kez, haziran ve aralık aylarının son hafta sonunda yapılan sayımdır" }
+      ]
+    },
+    {
+      "id": "ds-032",
+      "type": "paraphrase",
+      "question": "Sayım yapan kişi sistemdeki miktarı görebilir mi?",
+      "expected_answer": "Hayır; sayım \"kör\" yöntemle yapılır, yalnızca saydığı miktarı girer.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 6: Stok Sayımı ve Kayıt Doğruluğu > 6.1 Sayım Türleri", "page": 7, "evidence": "DYS'deki miktarı görmez" }
+      ]
+    },
+    {
+      "id": "ds-033",
+      "type": "direct",
+      "question": "Kayıt doğruluğu hedefi yüzde kaçtır?",
+      "expected_answer": "Yüzde 99,5.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 6: Stok Sayımı ve Kayıt Doğruluğu > 6.3 Kayıt Doğruluğu", "page": 8, "evidence": "hedef yüzde 99,5'tir" }
+      ]
+    },
+    {
+      "id": "ds-034",
+      "type": "direct",
+      "question": "Çağrı merkezi hangi saatlerde hizmet verir?",
+      "expected_answer": "Hafta içi 08:30–18:30, cumartesi 09:00–14:00.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 7: Müşteri Hizmetleri ve Şikâyet Yönetimi > 7.1 Başvuru Kanalları", "page": 8, "evidence": "Çağrı merkezi hafta içi 08:30 ile 18:30, cumartesi 09:00 ile 14:00 arasında hizmet verir" }
+      ]
+    },
+    {
+      "id": "ds-035",
+      "type": "direct",
+      "question": "Birinci öncelikli başvurulara ne kadar sürede ilk yanıt verilir?",
+      "expected_answer": "Otuz dakika içinde; çözüm hedefi dört saattir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 7: Müşteri Hizmetleri ve Şikâyet Yönetimi > 7.2 Yanıt ve Çözüm Süreleri", "page": 8, "evidence": "bu başvurulara otuz dakika içinde ilk yanıt verilir ve çözüm için hedef dört saattir" }
+      ]
+    },
+    {
+      "id": "ds-036",
+      "type": "paraphrase",
+      "question": "Geç gelen bir teslimat için yaptığım şikâyet ne kadar sürede çözülür?",
+      "expected_answer": "İkinci önceliktir: ilk yanıt iki saat içinde verilir, çözüm hedefi bir iş günüdür.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 7: Müşteri Hizmetleri ve Şikâyet Yönetimi > 7.2 Yanıt ve Çözüm Süreleri", "page": 8, "evidence": "ilk yanıt iki saat içinde verilir, çözüm hedefi bir iş günüdür" }
+      ]
+    },
+    {
+      "id": "ds-037",
+      "type": "direct",
+      "question": "Hangi başvurular \"tekrarlayan\" olarak işaretlenir?",
+      "expected_answer": "Aynı sorun için otuz gün içinde ikinci kez açılan başvurular; doğrudan takım liderine atanır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 7: Müşteri Hizmetleri ve Şikâyet Yönetimi > 7.2 Yanıt ve Çözüm Süreleri", "page": 8, "evidence": "Aynı sorun için otuz gün içinde ikinci kez açılan başvuru" }
+      ]
+    },
+    {
+      "id": "ds-038",
+      "type": "direct",
+      "question": "Tazminat talebi ne zamana kadar yapılmalıdır?",
+      "expected_answer": "Olayı izleyen on dört gün içinde.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 7: Müşteri Hizmetleri ve Şikâyet Yönetimi > 7.3 Tazminat", "page": 9, "evidence": "olayı izleyen on dört gün içinde yapılmalıdır" }
+      ]
+    },
+    {
+      "id": "ds-039",
+      "type": "direct",
+      "question": "Aylık performans toplantısı ne zaman yapılır?",
+      "expected_answer": "Her ayın ilk perşembe günü.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 8: Performans Göstergeleri ve Raporlama > 8.2 Raporlar ve Toplantılar", "page": 9, "evidence": "her ayın ilk perşembe günü yapılır" }
+      ]
+    },
+    {
+      "id": "ds-040",
+      "type": "direct",
+      "question": "İç denetimde en az kaç işlem incelenir?",
+      "expected_answer": "Rastgele seçilen en az elli işlem.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 8: Performans Göstergeleri ve Raporlama > 8.3 İç Denetim", "page": 10, "evidence": "rastgele seçilen en az elli işlem üzerinden bakılır" }
+      ]
+    },
+    {
+      "id": "ds-041",
+      "type": "exact_term",
+      "question": "Merkez Depo'da vardiya saatleri nedir?",
+      "expected_answer": "06:00–14:00, 14:00–22:00 ve 22:00–06:00.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 9: Vardiya Düzeni ve Personel > 9.1 Vardiyalar", "page": 10, "evidence": "06:00–14:00, 14:00–22:00 ve 22:00–06:00" }
+      ]
+    },
+    {
+      "id": "ds-042",
+      "type": "paraphrase",
+      "question": "Bir vardiyadan çıktıktan sonra bir sonraki vardiyama kadar en az ne kadar dinlenmem gerekir?",
+      "expected_answer": "En az on bir saat.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 9: Vardiya Düzeni ve Personel > 9.1 Vardiyalar", "page": 10, "evidence": "iki vardiya arasında en az on bir saat dinlenme süresi bırakılır" }
+      ]
+    },
+    {
+      "id": "ds-043",
+      "type": "direct",
+      "question": "Yeni başlayan depo personelinin oryantasyonu kaç gün sürer?",
+      "expected_answer": "Beş iş günü: iki gün sınıf eğitimi, üç gün deneyimli bir çalışanın yanında uygulama.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 9: Vardiya Düzeni ve Personel > 9.2 Eğitim ve Yetkinlik", "page": 10, "evidence": "ilk beş iş gününü oryantasyon eğitiminde geçirir" }
+      ]
+    },
+    {
+      "id": "ds-044",
+      "type": "paraphrase",
+      "question": "Taşerondan gelen geçici işçi forklift kullanabilir mi?",
+      "expected_answer": "Hayır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 9: Vardiya Düzeni ve Personel > 9.3 Taşeron ve Geçici Personel", "page": 10, "evidence": "forklift kullanamaz" }
+      ]
+    },
+    {
+      "id": "ds-045",
+      "type": "direct",
+      "question": "Raflar ne sıklıkla kontrol edilir?",
+      "expected_answer": "Her ay depo sorumlusu tarafından gözle, yılda bir kez yetkili bir kuruluş tarafından ayrıntılı olarak.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 10: Ekipman ve Bakım > 10.2 Raf ve Zemin Kontrolleri", "page": 11, "evidence": "Raflar her ay depo sorumlusu tarafından gözle, yılda bir kez yetkili bir kuruluş tarafından ayrıntılı olarak kontrol" }
+      ]
+    },
+    {
+      "id": "ds-046",
+      "type": "direct",
+      "question": "Operasyonu durduran ekipman arızalarına ne kadar sürede müdahale edilir?",
+      "expected_answer": "Dört saat içinde; diğer arızalara iki iş günü içinde.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 10: Ekipman ve Bakım > 10.3 Bakım Kayıtları", "page": 11, "evidence": "operasyonu durduran arızalara dört saat içinde, diğerlerine iki iş günü içinde müdahale edilir" }
+      ]
+    },
+    {
+      "id": "ds-047",
+      "type": "direct",
+      "question": "Depo ve Sevkiyat Operasyonları El Kitabı hangi depolar için geçerlidir?",
+      "expected_answer": "Merkez Depo (Gebze), Ankara Aktarma Deposu ve İzmir Bölge Deposu.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": null, "page": 1, "evidence": "Merkez Depo (Gebze), Ankara Aktarma Deposu ve İzmir Bölge Deposu'nda çalışan bütün personel" }
+      ]
+    },
+    {
+      "id": "ds-048",
+      "type": "table",
+      "question": "Donuk ürünler hangi sıcaklıkta saklanır ve ne sıklıkla sayılır?",
+      "expected_answer": "−18 °C ve altında; ayda bir sayılır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.3 Özel Depolama Alanları", "page": 3, "evidence": "Donuk ürün deposu" }
+      ]
+    },
+    {
+      "id": "ds-049",
+      "type": "table",
+      "question": "Tehlikeli madde bölmesi ne sıklıkla sayılır?",
+      "expected_answer": "Üç ayda bir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.3 Özel Depolama Alanları", "page": 3, "evidence": "Üç ayda bir" }
+      ]
+    },
+    {
+      "id": "ds-050",
+      "type": "table",
+      "question": "Komşu illere standart teslimat kaç iş günüdür?",
+      "expected_answer": "2 iş günü (hızlı teslimatta 1 iş günü).",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.3 Teslimat", "page": 5, "evidence": "Komşu iller" }
+      ]
+    },
+    {
+      "id": "ds-051",
+      "type": "table",
+      "question": "Köylere hızlı teslimat yapılıyor mu?",
+      "expected_answer": "Hayır; köy ve mobil dağıtım bölgelerinde yalnızca standart teslimat vardır (5 iş günü).",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.3 Teslimat", "page": 5, "evidence": "5 iş günü" }
+      ]
+    },
+    {
+      "id": "ds-052",
+      "type": "table",
+      "question": "10.000 TL'lik bir stok farkını kim onaylar?",
+      "expected_answer": "Depo müdürü (2.500 TL – 25.000 TL arası).",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 6: Stok Sayımı ve Kayıt Doğruluğu > 6.2 Sayım Farkları", "page": 7, "evidence": "2.500 TL – 25.000 TL" }
+      ]
+    },
+    {
+      "id": "ds-053",
+      "type": "table",
+      "question": "Zamanında sevkiyat oranı hedefi yüzde kaçtır?",
+      "expected_answer": "Yüzde 98; günlük ölçülür.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 8: Performans Göstergeleri ve Raporlama > 8.1 Göstergeler", "page": 9, "evidence": "% 98" }
+      ]
+    },
+    {
+      "id": "ds-054",
+      "type": "table",
+      "question": "İlk çağrıda çözüm oranının hedefi nedir?",
+      "expected_answer": "Yüzde 75; aylık ölçülür.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 8: Performans Göstergeleri ve Raporlama > 8.1 Göstergeler", "page": 9, "evidence": "% 75" }
+      ]
+    },
+    {
+      "id": "ds-055",
+      "type": "short",
+      "question": "randevusuz araç kabul",
+      "expected_answer": "Yalnızca depo müdürünün onayıyla ve randevulu araçların işi bittikten sonra.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.1 Randevu ve Araç Kabul", "page": 1, "evidence": "Randevusuz gelen araçlar yalnızca depo müdürünün onayıyla" }
+      ]
+    },
+    {
+      "id": "ds-056",
+      "type": "short",
+      "question": "acil sipariş ücreti",
+      "expected_answer": "Sipariş başına 350 TL ek hizmet bedeli.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 3: Sipariş Hazırlama > 3.1 Sipariş Kesim Saatleri", "page": 4, "evidence": "sipariş başına 350 TL ek hizmet bedeli yansıtılır" }
+      ]
+    },
+    {
+      "id": "ds-057",
+      "type": "short",
+      "question": "gizli hasar bildirim süresi",
+      "expected_answer": "Teslim tarihini izleyen üç gün.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 5: İadeler ve Hasar Yönetimi > 5.2 Hasar Tespiti ve Bildirimi", "page": 6, "evidence": "teslim tarihini izleyen üç gün içinde müşteri hizmetlerine bildirilmelidir" }
+      ]
+    },
+    {
+      "id": "ds-058",
+      "type": "short",
+      "question": "kafes alanı giriş yetkisi",
+      "expected_answer": "Yalnızca yetki listesindeki personel girebilir; girişler kartlı geçişle kaydedilir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.3 Özel Depolama Alanları", "page": 3, "evidence": "Kafes alanına yalnızca yetki listesindeki personel girebilir" }
+      ]
+    },
+    {
+      "id": "ds-059",
+      "type": "short",
+      "question": "mühür numarası",
+      "expected_answer": "Sevk irsaliyesine yazılır; mührü yükleme sorumlusu takar, sürücü kontrol eder.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.2 Yükleme", "page": 5, "evidence": "numarası sevk irsaliyesine yazılır" }
+      ]
+    },
+    {
+      "id": "ds-060",
+      "type": "short",
+      "question": "stok düzeltme onayı",
+      "expected_answer": "Onaylanmadan DYS'de düzeltme kaydı atılamaz; onaylayan, farkın tutarına göre değişir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 6: Stok Sayımı ve Kayıt Doğruluğu > 6.2 Sayım Farkları", "page": 7, "evidence": "Onaylanmadan DYS'de düzeltme kaydı atılamaz" }
+      ]
+    },
+    {
+      "id": "ds-061",
+      "type": "short",
+      "question": "tazminat ödeme süresi",
+      "expected_answer": "Onaylanan tazminat en geç on iş günü içinde ödenir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 7: Müşteri Hizmetleri ve Şikâyet Yönetimi > 7.3 Tazminat", "page": 9, "evidence": "onaylanan tazminat en geç on iş günü içinde ödenir" }
+      ]
+    },
+    {
+      "id": "ds-062",
+      "type": "short",
+      "question": "geçici personel oranı",
+      "expected_answer": "Bir vardiyadaki toplam personelin yüzde otuzunu geçemez.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 9: Vardiya Düzeni ve Personel > 9.3 Taşeron ve Geçici Personel", "page": 10, "evidence": "personelin yüzde otuzunu geçemez" }
+      ]
+    },
+    {
+      "id": "ds-063",
+      "type": "short",
+      "question": "FIFO",
+      "expected_answer": "\"İlk giren ilk çıkar\" kuralı; son kullanma tarihi olmayan ürünlerde uygulanır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.2 Stok Döndürme", "page": 3, "evidence": "\"ilk giren ilk çıkar\" kuralı (FIFO)" }
+      ]
+    },
+    {
+      "id": "ds-064",
+      "type": "short",
+      "question": "yedek el terminali",
+      "expected_answer": "Günlük kullanılan terminal sayısının en az yüzde onu kadar.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 10: Ekipman ve Bakım > 10.1 El Terminalleri", "page": 11, "evidence": "en az yüzde onu kadar yedek terminal bulundurulur" }
+      ]
+    },
+    {
+      "id": "ds-065",
+      "type": "multi_section",
+      "question": "Soğuk zincir ürünlerinin sıcaklığı mal kabulde ve depoda nasıl izlenir?",
+      "expected_answer": "Mal kabulde araç içi sıcaklık kaydı alınır ve ürün sıcaklığı prob termometreyle ölçülür; depoda sıcaklık otomatik cihazlarla on dakikada bir kaydedilir.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.2 Sayım ve Kalite Kontrol", "page": 2, "evidence": "ürün sıcaklığı prob termometreyle ölçülür" },
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.3 Özel Depolama Alanları", "page": 3, "evidence": "otomatik kayıt cihazlarıyla on dakikada bir kaydedilir" }
+      ]
+    },
+    {
+      "id": "ds-066",
+      "type": "multi_section",
+      "question": "Hangi ürünler karantina alanına alınır?",
+      "expected_answer": "Mal kabulde hasarlı çıkan ürünler, son kullanma tarihine otuz günden az kalan ürünler ve B ile C sınıfı iadeler.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 1: Mal Kabul > 1.3 Uygunsuz Teslimat", "page": 2, "evidence": "Hasarlı ürünler karantina alanına alınır" },
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.2 Stok Döndürme", "page": 3, "evidence": "satışa kapatılır ve karantina alanına taşınır" },
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 5: İadeler ve Hasar Yönetimi > 5.1 İade Kabul", "page": 6, "evidence": "B ve C sınıfı ürünler karantina alanında bekletilir" }
+      ]
+    },
+    {
+      "id": "ds-067",
+      "type": "multi_section",
+      "question": "Tehlikeli madde sınıfındaki ürünler depoda nasıl saklanır ve hangi araçlarla taşınır?",
+      "expected_answer": "Ayrı bir bölmede, sınıflarına göre ayrılarak ve en fazla iki kat üst üste saklanır; yalnızca ADR belgeli sürücünün kullandığı uygun donanımlı araçlarla taşınır.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 2: Depolama ve Adresleme > 2.3 Özel Depolama Alanları", "page": 3, "evidence": "sınıflarına göre birbirinden ayrılarak depolanır" },
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.2 Yükleme", "page": 5, "evidence": "ADR belgeli sürücünün kullandığı, uygun donanımlı araçlarla taşınır" }
+      ]
+    },
+    {
+      "id": "ds-068",
+      "type": "unanswerable",
+      "question": "Depoda sigara içme alanı nerededir?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "ds-069",
+      "type": "unanswerable",
+      "question": "Gümrüklü ürünler nasıl depolanır?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
+      "id": "ds-070",
+      "type": "unanswerable",
+      "question": "Depo personelinin prim sistemi nasıl işler?",
+      "expected_answer": null,
+      "sources": []
+    },
+    {
       "id": "x-001",
       "type": "cross_document",
       "question": "Hangi işlemler için birim yöneticisinin yazılı onayı gerekir?",
@@ -1049,6 +1677,36 @@
       "sources": [
         { "document": "bilgi-guvenligi-politikasi", "section": "Bölüm 2: Cihazlar > 2.1 Kayıp ve Çalıntı", "page": 1, "evidence": "Kaybolan ya da çalınan cihaz en geç iki saat içinde Bilgi İşlem Destek Hattı'na bildirilir." },
         { "document": "uzaktan-calisma-politikasi", "section": "3. Ekipman ve Bilgi Güvenliği", "page": 3, "evidence": "Uzaktan çalışma sırasında kaybolan ya da çalınan şirket cihazı" }
+      ]
+    },
+    {
+      "id": "x-008",
+      "type": "cross_document",
+      "question": "Forklifti kimler kullanabilir, kimler kullanamaz?",
+      "expected_answer": "Operatör belgesi olan ve yıllık tazeleme eğitimini tamamlamış çalışanlar kullanabilir; taşerondan gelen geçici personel kullanamaz.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 2: Forklift Kullanımı", "page": 1, "evidence": "Forklifti yalnızca operatör belgesi olan ve şirketin yıllık tazeleme eğitimini tamamlamış çalışanlar kullanabilir" },
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 9: Vardiya Düzeni ve Personel > 9.3 Taşeron ve Geçici Personel", "page": 10, "evidence": "forklift kullanamaz" }
+      ]
+    },
+    {
+      "id": "x-009",
+      "type": "cross_document",
+      "question": "25 kilogram sınırı hangi kurallarda geçer?",
+      "expected_answer": "Elle taşımada tek kişinin kaldırabileceği en fazla yük ve bir kolinin en fazla ağırlığı.",
+      "sources": [
+        { "document": "depo-is-guvenligi-talimati", "section": "Bölüm 3: İstifleme ve Raflar", "page": 1, "evidence": "tek kişinin kaldırabileceği yük en fazla 25 kg'dır" },
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 3: Sipariş Hazırlama > 3.3 Paketleme ve Etiketleme", "page": 4, "evidence": "Bir kolinin ağırlığı 25 kilogramı geçemez" }
+      ]
+    },
+    {
+      "id": "x-010",
+      "type": "cross_document",
+      "question": "Vardiya çizelgeleri ne zaman duyurulur ve iki vardiya arasında ne kadar dinlenme süresi olmalıdır?",
+      "expected_answer": "Çizelge her ayın son haftasında bir sonraki ay için duyurulur; iki vardiya arasında en az on bir saat dinlenme süresi bırakılır.",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 1: Çalışma Saatleri", "page": 1, "evidence": "vardiya çizelgesi her ayın son haftasında bir sonraki ay için birim yöneticisi tarafından duyurulur" },
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 9: Vardiya Düzeni ve Personel > 9.1 Vardiyalar", "page": 10, "evidence": "iki vardiya arasında en az on bir saat dinlenme süresi bırakılır" }
       ]
     }
   ]
