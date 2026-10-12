@@ -4,3 +4,6 @@ obj/
 .vs/
 .idea/
 *.user
+
+# Değerlendirme çalıştırmalarının ayrıntı dosyaları (eval/README.md)
+eval/results/

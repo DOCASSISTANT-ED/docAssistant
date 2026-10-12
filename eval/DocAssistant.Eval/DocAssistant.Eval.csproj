@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Test projesi değil, konsol uygulaması: `dotnet test` (ve CI) bunu çalıştırmaz, çünkü
+       gerçek embedding modeline (Ollama) ihtiyaç duyar. Çalıştırma: eval/README.md. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DocAssistant.Api\DocAssistant.Api.csproj" />
+  </ItemGroup>
+
+</Project>
