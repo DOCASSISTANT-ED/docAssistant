@@ -95,7 +95,7 @@ public class DocumentEmbeddingTests(PostgresFixture database) : IAsyncLifetime
         await HandleAsync(documentId);
 
         var chunks = await ReadChunksAsync(documentId);
-        Assert.Equal(SampleChunkCount, chunks.Select(chunk => chunk.Embedding!.ToArray()[0]).Distinct().Count());
+        Assert.Equal(SampleChunkCount, chunks.Select(chunk => chunk.Embedding!.ToString()).Distinct().Count());
         Assert.All(chunks, chunk => Assert.Equal(_model.VectorOf(chunk.Content), chunk.Embedding!.ToArray()));
     }
 
@@ -373,9 +373,9 @@ public class DocumentEmbeddingTests(PostgresFixture database) : IAsyncLifetime
         public ParsedDocument Parse(Stream content) => new(blocks);
     }
 
-    // Stands in for the embedding model. Every distinct text gets its own vector (the
-    // first number tells them apart), so a test can check which vector ended up on which
-    // chunk. The settings below make it answer as a broken or wrong model would.
+    // Stands in for the embedding model. Every distinct text gets its own vector, so a
+    // test can check which vector ended up on which chunk. The settings below make it
+    // answer as a broken or wrong model would.
     private sealed class RecordingEmbeddingGenerator : IEmbeddingGenerator<string, Embedding<float>>
     {
         private readonly Dictionary<string, float[]> _vectors = [];
@@ -433,12 +433,20 @@ public class DocumentEmbeddingTests(PostgresFixture database) : IAsyncLifetime
         {
         }
 
+        // Random directions, as real embeddings have. Vectors that all point the same way
+        // would pile up in one spot of the shared HNSW index and disturb the vector
+        // search tests (see VectorChunkSearchTests).
         private float[] VectorFor(string text)
         {
             if (!_vectors.TryGetValue(text, out var vector))
             {
                 vector = new float[Dimensions];
-                vector[0] = _vectors.Count + 1;
+
+                for (var i = 0; i < Math.Min(16, vector.Length); i++)
+                {
+                    vector[i] = Random.Shared.NextSingle() - 0.5f;
+                }
+
                 _vectors[text] = vector;
             }
 
