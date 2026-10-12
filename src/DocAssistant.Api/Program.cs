@@ -2,6 +2,7 @@ using DocAssistant.Api.Data;
 using DocAssistant.Api.Modules.Documents;
 using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
+using DocAssistant.Api.Modules.Search;
 using DocAssistant.Api.Modules.Tenants;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,7 @@ builder.Services.AddIdentityModule();
 builder.Services.AddTenantsModule();
 builder.Services.AddDocumentsModule();
 builder.Services.AddIngestionModule();
+builder.Services.AddSearchModule();
 
 // The Angular app is served from another origin (docs/decisions.md #41). Browsers only let
 // it call this API from the origins listed here; with none configured, none are allowed.

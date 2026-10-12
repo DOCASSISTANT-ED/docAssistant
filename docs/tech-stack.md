@@ -61,7 +61,7 @@ Arayüz başlangıçta Blazor Web App olarak planlanmıştı; ekranlar yazılmad
 | Pgvector.EntityFrameworkCore | 0.3.0 | C#'taki `Vector` türünü `vector` sütununa bağlar; `chunks.embedding` (decisions.md #28) | 2 (sütun), 3 (doldurma) | Kurulu |
 | EF Core + migration | 10 (`Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3) | Veri erişimi, şema değişiklikleri, global query filter | 1 | Kurulu |
 | Row-Level Security | PostgreSQL özelliği | Tenant izolasyonunun veritabanı katmanı; `documents` ve `chunks` tablolarında açık | 1 | Kurulu |
-| Full-text arama (`turkish`) | PostgreSQL özelliği | Anahtar kelime araması | 3 | Planlı |
+| Full-text arama (`turkish`) | PostgreSQL özelliği | Anahtar kelime araması: `chunks.search_vector` (hesaplanan sütun, GIN indeksi), kelimelerden herhangi biri eşleşir, `ts_rank_cd` ile sıralanır (decisions.md #49) | 3 | Kurulu |
 | SeaweedFS | 4.48 (`chrislusf/seaweedfs`, `mini` modu) | Yüklenen dosyaların S3 API'si üzerinden saklanması (geliştirme). MinIO yerine, bkz. decisions.md #9 | 0 (compose), 2 (kullanım) | Kurulu |
 | AWSSDK.S3 | 4.0.104 | Depolamaya S3 API'siyle erişim; `IFileStorage` arkasında, kod SeaweedFS'e özel değil (decisions.md #33) | 2 | Kurulu |
 | S3 uyumlu depolama | — | Dosya saklama (canlı) | 5 | Planlı |
