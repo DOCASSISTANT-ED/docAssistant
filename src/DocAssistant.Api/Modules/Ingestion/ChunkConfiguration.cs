@@ -44,6 +44,13 @@ public class ChunkConfiguration : IEntityTypeConfiguration<Chunk>
         builder.HasIndex(c => c.SearchVector)
             .HasMethod("GIN");
 
+        // HNSW: a graph of neighbouring vectors, so a search visits a few of them instead
+        // of comparing the question with every chunk. Cosine distance, as the search uses
+        // (decisions #50, #51); pgvector's default build settings.
+        builder.HasIndex(c => c.Embedding)
+            .HasMethod("hnsw")
+            .HasOperators("vector_cosine_ops");
+
         builder.Property(c => c.CreatedAt)
             .HasDefaultValueSql("now()");
 

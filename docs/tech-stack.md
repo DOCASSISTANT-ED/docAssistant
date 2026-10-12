@@ -87,8 +87,8 @@ Taranmış PDF için OCR bilinçli olarak MVP dışında.
 | bge-m3 | Embedding modeli (metni vektöre çevirir) | 0 (deneme), 3 (hat) | Planlı |
 | `IEmbeddingGenerator` (`Microsoft.Extensions.AI`) + OllamaSharp 5.5.0 | Embedding modelini koddan soyutlar; Ollama'ya OllamaSharp ile bağlanır. Adres ve model adı `Embedding` ayarından okunur (decisions.md #50) | 3 | Kurulu |
 | `IChatClient` | Sohbet modelini soyutlar; geliştirmede Ollama, canlıda API modeli | 4 | Planlı |
-| HNSW indeksi (pgvector) | Hızlı vektör araması | 3 | Planlı |
-| Reciprocal Rank Fusion (RRF) | Vektör ve full-text sonuçlarını tek sıralamada birleştirir | 3 | Planlı |
+| HNSW indeksi (pgvector) | Hızlı vektör araması: `chunks.embedding` üzerinde kosinüs mesafesiyle; filtreli aramada yinelemeli tarama açılır (decisions.md #51) | 3 | Kurulu |
+| Reciprocal Rank Fusion (RRF) | Vektör ve full-text sonuçlarını tek sıralamada birleştirir; yalnızca sıraları kullanır, sabit 60 (decisions.md #48) | 3 | Kurulu |
 | Reranker modeli | İlk ~30 sonucu en iyi 5–8'e indirir | 3 | Seçilecek |
 | Sohbet modeli (geliştirme) | Yerel 7–8B sınıfı bir model | 4 | Seçilecek |
 | Sohbet modeli (canlı) | API üzerinden bir model | 4–5 | Seçilecek |
