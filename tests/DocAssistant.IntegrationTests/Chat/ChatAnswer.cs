@@ -1,4 +1,5 @@
 using System.Net.ServerSentEvents;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using DocAssistant.Api.Modules.Chat;
 
@@ -37,17 +38,32 @@ internal sealed class ChatAnswer
 
     public static async Task<ChatAnswer> ReadAsync(HttpResponseMessage response)
     {
-        await using var body = await response.Content.ReadAsStreamAsync();
-
         var events = new List<ChatEvent>();
 
-        await foreach (var item in SseParser.Create(body).EnumerateAsync())
+        await foreach (var chatEvent in StreamAsync(response))
         {
-            events.Add(new ChatEvent(item.EventType, item.Data));
+            events.Add(chatEvent);
         }
 
         return new ChatAnswer(events);
     }
+
+    // The events one at a time, each as soon as it arrives: for tests about what has been
+    // sent while the answer is still being written.
+    public static async IAsyncEnumerable<ChatEvent> StreamAsync(
+        HttpResponseMessage response,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await using var body = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+        await foreach (var item in SseParser.Create(body).EnumerateAsync(cancellationToken))
+        {
+            yield return new ChatEvent(item.EventType, item.Data);
+        }
+    }
+
+    // The data of an event as raw JSON, for tests about the exact field names.
+    public static JsonElement Json(ChatEvent chatEvent) => JsonDocument.Parse(chatEvent.Data).RootElement;
 
     // The API writes JSON the web way (camelCase), as every other endpoint does.
     private static T Read<T>(ChatEvent chatEvent) =>

@@ -17,6 +17,10 @@ internal sealed class FakeChatModel : IChatClient
 
     public int FailAfterPieces { get; set; }
 
+    // Called before each piece is written, with the piece's index. A test can wait in
+    // here to hold the model back and look at what has been sent so far.
+    public Func<int, CancellationToken, Task>? BeforePiece { get; set; }
+
     // Every request the endpoint made, oldest first.
     public IReadOnlyList<ModelCall> Calls => _calls;
 
@@ -51,6 +55,12 @@ internal sealed class FakeChatModel : IChatClient
             // Lets the endpoint send the previous piece before the next one is produced,
             // as a real model's pauses do.
             await Task.Yield();
+
+            if (BeforePiece is not null)
+            {
+                await BeforePiece(written, cancellationToken);
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
 
             written++;
