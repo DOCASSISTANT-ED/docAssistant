@@ -1,3 +1,5 @@
+/* Shared by the login and register screens: the heading, the fields, the main button. */
+
 .title {
   margin: 0 0 0.5rem;
   font: var(--mat-sys-headline-medium);
@@ -111,4 +113,26 @@
     animation: none;
     transition: none;
   }
+}
+
+/* The way to the other screen (login <-> register), under the form. */
+.switch {
+  margin: 1.75rem 0 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+}
+
+.switch a {
+  color: var(--mat-sys-primary);
+  font-weight: 500;
+  text-decoration: none;
+  background: linear-gradient(var(--brand-amber), var(--brand-amber)) no-repeat left bottom / 0 2px;
+  padding-bottom: 2px;
+  transition: background-size 0.25s ease;
+}
+
+.switch a:hover,
+.switch a:focus-visible {
+  background-size: 100% 2px;
 }

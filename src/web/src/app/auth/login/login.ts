@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { identityLimits } from '../../api/identity';
 import { AuthLayout } from '../auth-layout/auth-layout';
 import { Session } from '../session';
@@ -18,9 +18,10 @@ import { Session } from '../session';
     MatInputModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
+    RouterLink,
   ],
   selector: 'app-login',
-  styleUrl: './login.css',
+  styleUrl: '../auth-form.css',
   templateUrl: './login.html',
 })
 export class Login {
