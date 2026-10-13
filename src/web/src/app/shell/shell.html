@@ -1,21 +1,61 @@
-<header class="bar">
+<!-- Narrow screens only: a slim bar with the button that opens the panel. -->
+<header class="topbar">
+  <button
+    class="menu-button"
+    type="button"
+    aria-label="Sohbet listesini aç"
+    [attr.aria-expanded]="panelOpen()"
+    (click)="panelOpen.set(true)"
+  >
+    <span class="menu-lines" aria-hidden="true"></span>
+  </button>
+  <span class="topbar-name">DocAssistant</span>
+</header>
+
+@if (panelOpen()) {
+  <div class="backdrop" (click)="panelOpen.set(false)"></div>
+}
+
+<aside class="panel" [class.open]="panelOpen()">
   <a class="brand" routerLink="/" aria-label="DocAssistant ana sayfa">
     <span class="brand-mark" aria-hidden="true">D</span>
-    <span class="brand-name">DocAssistant</span>
+    <span>DocAssistant</span>
   </a>
 
+  <a class="new-chat" routerLink="/">
+    <span class="plus" aria-hidden="true">+</span>
+    Yeni sohbet
+  </a>
+
+  <nav class="history" aria-label="Sohbet geçmişi">
+    @for (group of groups(); track group.label) {
+      <h2 class="group-label">{{ group.label }}</h2>
+      <ul class="group">
+        @for (conversation of group.conversations; track conversation.id; let index = $index) {
+          <li [style.--i]="index">
+            <a
+              class="conversation"
+              [routerLink]="['/c', conversation.id]"
+              routerLinkActive="active"
+              [title]="conversation.title"
+            >
+              {{ conversation.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    } @empty {
+      <p class="history-empty">Sohbetleriniz burada listelenecek.</p>
+    }
+  </nav>
+
   @if (user(); as user) {
-    <button
-      class="account"
-      type="button"
-      [matMenuTriggerFor]="accountMenu"
-      aria-label="Hesap menüsü"
-    >
-      <span class="account-email">{{ user.email }}</span>
+    <button class="account" type="button" [matMenuTriggerFor]="accountMenu" aria-label="Hesap menüsü">
       <span class="avatar" aria-hidden="true">{{ initial() }}</span>
+      <span class="account-email">{{ user.email }}</span>
     </button>
 
-    <mat-menu #accountMenu="matMenu" xPosition="before" class="account-menu">
+    <mat-menu #accountMenu="matMenu" yPosition="above" class="account-menu">
       <div class="account-card">
         <span class="avatar large" aria-hidden="true">{{ initial() }}</span>
         <div class="account-lines">
@@ -29,7 +69,7 @@
       </button>
     </mat-menu>
   }
-</header>
+</aside>
 
 <div class="screen">
   <router-outlet />

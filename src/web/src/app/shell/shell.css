@@ -1,31 +1,30 @@
 :host {
   display: grid;
-  grid-template-rows: auto 1fr;
-  min-height: 100vh;
+  grid-template-columns: 17.5rem minmax(0, 1fr);
+  height: 100vh;
 }
 
-/* The same forest card as on the login screen, here as a floating bar. */
-.bar {
-  position: sticky;
-  top: 0.75rem;
-  z-index: 10;
+/* ---- The side panel: the same floating forest card as on the login screen. ---- */
+
+.panel {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin: 0.75rem 0.75rem 0;
-  padding: 0.6rem 0.75rem 0.6rem 1.25rem;
-  border-radius: 1.25rem;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-height: 0;
+  margin: 0.75rem 0 0.75rem 0.75rem;
+  padding: 1.1rem 0.75rem 0.75rem;
+  border-radius: 1.5rem;
   background: var(--brand-forest);
   color: var(--brand-on-forest);
   box-shadow: 0 0.75rem 2rem rgb(15 61 62 / 0.18);
-  animation: drop 0.6s both cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation: slide-in 0.6s both cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  padding: 0 0.5rem 0.35rem;
   color: inherit;
   text-decoration: none;
   font-size: 1.0625rem;
@@ -49,40 +48,131 @@
   transform: rotate(-8deg) scale(1.08);
 }
 
-/* The account button: the email and a round initial, as one pill. */
+.new-chat {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.9rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 0.4rem 1rem rgb(232 163 61 / 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.new-chat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.7rem 1.5rem rgb(232 163 61 / 0.35);
+}
+
+.new-chat:active {
+  transform: scale(0.985);
+}
+
+.plus {
+  display: inline-block;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.new-chat:hover .plus {
+  transform: rotate(90deg);
+}
+
+/* The history takes the room that is left and scrolls on its own. */
+.history {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin-inline: -0.25rem;
+  padding-inline: 0.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.22) transparent;
+}
+
+.group-label {
+  margin: 0.9rem 0 0.3rem;
+  padding-inline: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--brand-on-forest-muted);
+}
+
+.group {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.group li {
+  animation: fade-up 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation-delay: calc(min(var(--i), 12) * 35ms + 0.2s);
+}
+
+.conversation {
+  display: block;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.75rem;
+  color: var(--brand-on-forest-muted);
+  font-size: 0.9375rem;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.15s ease, color 0.15s ease, padding 0.2s ease;
+}
+
+.conversation:hover {
+  background: rgb(255 255 255 / 0.07);
+  color: var(--brand-on-forest);
+  padding-inline-start: 0.95rem;
+}
+
+.conversation.active {
+  background: rgb(255 255 255 / 0.13);
+  color: var(--brand-on-forest);
+}
+
+.history-empty {
+  margin: 1.25rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--brand-on-forest-muted);
+}
+
+/* The account button, at the bottom of the panel. */
 .account {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.3rem 0.3rem 0.3rem 1rem;
-  border: 1px solid rgb(255 255 255 / 0.14);
-  border-radius: 2rem;
-  background: rgb(255 255 255 / 0.07);
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.06);
   color: inherit;
   font: inherit;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  text-align: start;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .account:hover,
 .account[aria-expanded='true'] {
-  background: rgb(255 255 255 / 0.14);
-  border-color: rgb(255 255 255 / 0.28);
-}
-
-.account:active {
-  transform: scale(0.98);
-}
-
-.brand:focus-visible,
-.account:focus-visible {
-  outline: 2px solid var(--brand-amber);
-  outline-offset: 3px;
+  background: rgb(255 255 255 / 0.13);
+  border-color: rgb(255 255 255 / 0.26);
 }
 
 .account-email {
-  max-width: 16rem;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -107,7 +197,20 @@
   font-size: 1.125rem;
 }
 
-/* Inside the menu (rendered outside this component, hence the global class in styles.scss). */
+.brand:focus-visible,
+.new-chat:focus-visible,
+.conversation:focus-visible,
+.account:focus-visible,
+.menu-button:focus-visible {
+  outline: 2px solid var(--brand-amber);
+  outline-offset: 2px;
+}
+
+.new-chat:focus-visible {
+  outline-color: var(--brand-on-forest);
+}
+
+/* Inside the account menu. */
 .account-card {
   display: flex;
   align-items: center;
@@ -140,33 +243,116 @@
   font: var(--mat-sys-label-medium);
 }
 
+/* ---- The screen next to the panel ---- */
+
 .screen {
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
-@keyframes drop {
+/* ---- Narrow screens: the panel becomes a drawer. ---- */
+
+.topbar,
+.backdrop {
+  display: none;
+}
+
+@media (max-width: 52rem) {
+  :host {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.6rem 0.6rem 0;
+    padding: 0.45rem 0.6rem;
+    border-radius: 1rem;
+    background: var(--brand-forest);
+    color: var(--brand-on-forest);
+    font-weight: 500;
+  }
+
+  .menu-button {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 0;
+    border-radius: 0.75rem;
+    background: rgb(255 255 255 / 0.1);
+    color: inherit;
+    cursor: pointer;
+  }
+
+  /* Three lines drawn with one element and its shadows. */
+  .menu-lines {
+    width: 1.1rem;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    box-shadow: 0 -6px 0 currentColor, 0 6px 0 currentColor;
+  }
+
+  .panel {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 30;
+    width: min(18.5rem, 86vw);
+    margin: 0.6rem;
+    transform: translateX(calc(-100% - 1.5rem));
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+    animation: none;
+  }
+
+  .panel.open {
+    transform: translateX(0);
+  }
+
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgb(10 30 30 / 0.45);
+    animation: fade 0.25s both;
+  }
+}
+
+/* ---- Motion ---- */
+
+@keyframes slide-in {
   from {
     opacity: 0;
-    transform: translateY(-1rem);
+    transform: translateX(-1.5rem);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bar,
+  .panel,
+  .group li,
+  .backdrop,
   .brand-mark,
-  .account {
+  .new-chat,
+  .plus,
+  .conversation {
     animation: none;
     transition: none;
-  }
-}
-
-/* Narrow screens: the initial alone says who is signed in; the menu has the rest. */
-@media (max-width: 36rem) {
-  .account {
-    padding: 0.3rem;
-  }
-
-  .account-email {
-    display: none;
   }
 }

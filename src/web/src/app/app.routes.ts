@@ -18,15 +18,22 @@ export const routes: Routes = [
     title: 'Firma kaydı · DocAssistant',
   },
 
-  // Everything a signed-in user sees is shown inside the shell (top bar, account menu).
+  // Everything a signed-in user sees is shown inside the shell (side panel, account menu).
   {
     path: '',
     loadComponent: () => import('./shell/shell').then((m) => m.Shell),
     canActivate: [signedInOnly],
     children: [
+      // A new conversation, and one from the history (its id is in the address, so a
+      // conversation can be reloaded, bookmarked and reached with the back button).
       {
         path: '',
         pathMatch: 'full',
+        loadComponent: () => import('./home/home').then((m) => m.Home),
+        title: 'DocAssistant',
+      },
+      {
+        path: 'c/:id',
         loadComponent: () => import('./home/home').then((m) => m.Home),
         title: 'DocAssistant',
       },

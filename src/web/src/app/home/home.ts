@@ -19,7 +19,9 @@ import { Component } from '@angular/core';
     .home {
       display: grid;
       place-items: center;
-      min-height: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      overflow: auto;
       padding: 3rem 1.5rem;
     }
 
