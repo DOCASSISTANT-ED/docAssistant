@@ -17,7 +17,7 @@ internal static class Report
 
         output.WriteLine();
         output.WriteLine($"Question set v{questions.Version}: {questions.Questions.Count} questions, "
-            + $"{unanswerable} without an answer in the documents (not measured: search always returns something).");
+            + $"{unanswerable} without an answer in the documents (search always returns something; --answers measures them).");
         output.WriteLine($"Embedding model: {embeddingModel}");
 
         foreach (var format in formats)
@@ -71,12 +71,100 @@ internal static class Report
         }
     }
 
+    // docs/decisions.md #62. The two phase 4 exit criteria (PLANNING.md) are the first
+    // block and the "with a source number" line.
+    public static void PrintAnswers(TextWriter output, AnswerRun run)
+    {
+        var all = run.Results;
+        var withoutAnswer = all.Where(result => !result.HasAnswerInDocuments).ToList();
+        var shown = all.Where(result => result.HasAnswerInDocuments && result.EvidenceShown).ToList();
+        var notShown = all.Where(result => result.HasAnswerInDocuments && !result.EvidenceShown).ToList();
+        var answered = shown.Where(result => result.Answered).ToList();
+        var saidNotFound = $"said \"{AnswerScoring.RefusalPhrase}\"";
+
+        output.WriteLine();
+        output.WriteLine($"== Answers ({run.Format.ToUpperInvariant()}, chat model {run.ChatModel}): {all.Count} questions ==");
+
+        output.WriteLine();
+        output.WriteLine($"  Without an answer in the documents: {withoutAnswer.Count}");
+        Line(output, 4, saidNotFound, withoutAnswer.Where(result => result.Refused));
+        Line(output, 4, "answered anyway", withoutAnswer.Where(result => result.Answered), listIds: true);
+        Line(output, 4, "failed", withoutAnswer.Where(result => result.Failed), listIds: true);
+
+        output.WriteLine();
+        output.WriteLine($"  With an answer, and search returned the evidence: {shown.Count}");
+        Line(output, 4, "answered", answered);
+        Line(output, 6, "with a source number", answered.Where(result => result.Score.Cited.Count > 0));
+        Line(output, 6, "a number points at the evidence", answered.Where(result => result.Score.CitesEvidence));
+        Line(output, 4, saidNotFound, shown.Where(result => result.Refused), listIds: true);
+        Line(output, 4, "failed", shown.Where(result => result.Failed), listIds: true);
+
+        // The model was never shown the answer; refusing is the right thing to do here.
+        output.WriteLine();
+        output.WriteLine($"  With an answer, but search did not return the evidence: {notShown.Count}");
+        Line(output, 4, saidNotFound, notShown.Where(result => result.Refused));
+        Line(output, 4, "answered anyway", notShown.Where(result => result.Answered), listIds: true);
+
+        output.WriteLine();
+        output.WriteLine("  Form of the source numbers, over all answers:");
+        Line(output, 4, "a number that is not in the list", all.Where(result => result.Score.NumberNotInList), listIds: true);
+        Line(output, 4, "several numbers in one bracket, [1, 3]", all.Where(result => result.Score.ListInOneBracket), listIds: true);
+        Line(output, 4, "an answer and \"bulunamadı\" together", all.Where(result => result.Score.AnswersAndRefuses), listIds: true);
+
+        output.WriteLine();
+        output.WriteLine("  Questions whose evidence search returned, by type:");
+        output.WriteLine($"  {"type",-16}{"questions",10}{"answered",10}{"numbered",10}{"evidence",10}{"refused",9}");
+
+        foreach (var type in shown.GroupBy(result => result.Type))
+        {
+            var typeAnswered = type.Where(result => result.Answered).ToList();
+
+            output.WriteLine($"  {type.Key,-16}{type.Count(),10}{typeAnswered.Count,10}"
+                + $"{typeAnswered.Count(result => result.Score.Cited.Count > 0),10}"
+                + $"{typeAnswered.Count(result => result.Score.CitesEvidence),10}"
+                + $"{type.Count(result => result.Refused),9}");
+        }
+
+        var mismatched = all.Where(result => !result.SourcesMatchSearch).ToList();
+        if (mismatched.Count > 0)
+        {
+            output.WriteLine();
+            output.WriteLine($"  WARNING: the chat's sources differed from the search run here for {mismatched.Count} questions; "
+                + $"their source numbers were matched against other chunks: {string.Join(", ", mismatched.Select(result => result.QuestionId))}");
+        }
+
+        output.WriteLine();
+        output.WriteLine($"  Median time per question: {Median(all.Select(result => result.Seconds)).ToString("F1", CultureInfo.InvariantCulture)} s.");
+        output.WriteLine("  Not measured: whether an answer is correct. The details file has every answer next to the expected one.");
+    }
+
+    private static void Line(TextWriter output, int indent, string label, IEnumerable<AnswerResult> results, bool listIds = false)
+    {
+        var list = results.ToList();
+        var ids = listIds && list.Count > 0 ? "   " + string.Join(", ", list.Select(result => result.QuestionId)) : string.Empty;
+
+        output.WriteLine($"{new string(' ', indent)}{label.PadRight(44 - indent)}{list.Count,5}{ids}");
+    }
+
+    private static double Median(IEnumerable<double> values)
+    {
+        var sorted = values.Order().ToList();
+
+        return sorted.Count == 0 ? 0 : sorted[sorted.Count / 2];
+    }
+
     // A question with several sources is listed once.
     private static string QuestionIds(IEnumerable<SourceResult> sources) =>
         string.Join(", ", sources.Select(source => source.QuestionId).Distinct());
 
     // Everything needed to compare two runs question by question.
-    public static string Save(RepoPaths paths, QuestionSet questions, string embeddingModel, DateTimeOffset ranAt, IReadOnlyList<FormatResult> formats)
+    public static string Save(
+        RepoPaths paths,
+        QuestionSet questions,
+        string embeddingModel,
+        DateTimeOffset ranAt,
+        IReadOnlyList<FormatResult> formats,
+        AnswerRun? answers)
     {
         Directory.CreateDirectory(paths.Results);
         var path = Path.Combine(paths.Results, $"{ranAt:yyyyMMdd-HHmmss}.json");
@@ -101,6 +189,10 @@ internal static class Report
                 }),
                 format.Sources,
             }),
+
+            // Present only when the run measured answers (--answers): every answer next
+            // to the expected one, to be read by a person.
+            Answers = answers,
         };
 
         File.WriteAllText(path, JsonSerializer.Serialize(document, Json));

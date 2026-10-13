@@ -10,8 +10,14 @@ namespace DocAssistant.Eval;
 // The real API in memory (same Program.cs, endpoints, worker and search), so what is
 // measured is what a user gets (docs/decisions.md #48). Two things differ from a
 // deployment: uploaded files are kept in memory instead of S3, and the database is the
-// run's throwaway one. The embedding model is the real one.
-internal sealed class EvalApi(RepoPaths paths, string connectionString, string embeddingUrl, string embeddingModel)
+// run's throwaway one. The embedding model and the chat model are the real ones.
+internal sealed class EvalApi(
+    RepoPaths paths,
+    string connectionString,
+    string embeddingUrl,
+    string embeddingModel,
+    string chatUrl,
+    string chatModel)
     : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -30,10 +36,10 @@ internal sealed class EvalApi(RepoPaths paths, string connectionString, string e
         builder.UseSetting("Embedding:BaseUrl", embeddingUrl);
         builder.UseSetting("Embedding:Model", embeddingModel);
 
-        // The app refuses to start without chat settings; the run measures search only
-        // and never calls the chat model.
-        builder.UseSetting("Chat:BaseUrl", "http://chat.invalid");
-        builder.UseSetting("Chat:Model", "evaluation");
+        // Called only when answers are measured (--answers); creating the client opens
+        // no connection, so a search-only run does not need the chat model.
+        builder.UseSetting("Chat:BaseUrl", chatUrl);
+        builder.UseSetting("Chat:Model", chatModel);
 
         // The app refuses to start without storage settings; the storage itself is replaced below.
         builder.UseSetting("Storage:ServiceUrl", "http://storage.invalid");

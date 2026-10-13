@@ -10,7 +10,9 @@ namespace DocAssistant.Eval;
 //
 // PDF and DOCX get a company each (docs/decisions.md #27): uploaded together, every text
 // would be in the database twice and the two formats could not be told apart in the results.
-internal sealed record Corpus(string Format, Guid TenantId, int Documents)
+//
+// AccessToken is the admin's, for asking questions as that user (AnswerMeasurement).
+internal sealed record Corpus(string Format, Guid TenantId, int Documents, string AccessToken)
 {
     private static readonly TimeSpan ProcessingTimeout = TimeSpan.FromMinutes(10);
 
@@ -74,7 +76,7 @@ internal sealed record Corpus(string Format, Guid TenantId, int Documents)
             }
         }
 
-        return new Corpus(format, tenantId, documentIds.Count);
+        return new Corpus(format, tenantId, documentIds.Count, token.Token);
     }
 
     private static async Task<T> ReadAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
