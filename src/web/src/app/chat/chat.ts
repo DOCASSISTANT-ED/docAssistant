@@ -4,13 +4,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { questionMaxLength } from '../api/chat';
+import { Answer } from './answer';
 import { ChatStore } from './chat-store';
 
 // The chat screen: the conversation's questions and answers, and the box to ask the next
 // question. What is shown comes from ChatStore; this component turns it into a page and
 // passes the user's actions on.
 @Component({
-  imports: [FormsModule, TextFieldModule],
+  imports: [Answer, FormsModule, TextFieldModule],
   selector: 'app-chat',
   styleUrl: './chat.css',
   templateUrl: './chat.html',

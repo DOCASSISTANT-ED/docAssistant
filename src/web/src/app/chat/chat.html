@@ -6,34 +6,7 @@
           <p class="bubble">{{ entry.text }}</p>
         </div>
       } @else {
-        <article class="answer" [attr.aria-busy]="entry.state === 'waiting' || entry.state === 'streaming'">
-          <span class="mark" aria-hidden="true">D</span>
-
-          <div class="answer-body">
-            @if (entry.state === 'waiting') {
-              <p class="thinking" role="status">
-                <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span class="thinking-text">Belgelerinizde aranıyor</span>
-              </p>
-            }
-
-            @if (entry.text) {
-              <p class="text" [class.streaming]="entry.state === 'streaming'">{{ entry.text }}</p>
-            }
-
-            @if (entry.state === 'stopped') {
-              <p class="note">Cevap durduruldu.</p>
-            }
-
-            @if (entry.state === 'failed') {
-              <p class="failure" role="alert">{{ entry.failure }}</p>
-            }
-
-            @if ((entry.state === 'failed' || entry.state === 'stopped') && $last) {
-              <button class="retry" type="button" (click)="chat.retry()">Yeniden dene</button>
-            }
-          </div>
-        </article>
+        <app-answer [entry]="entry" [canRetry]="$last" (retry)="chat.retry()" />
       }
     }
   </div>

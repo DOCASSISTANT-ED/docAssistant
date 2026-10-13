@@ -21,8 +21,7 @@
   margin-inline: auto;
 }
 
-.question,
-.answer {
+.question {
   animation: rise 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
@@ -43,119 +42,6 @@
   line-height: 1.55;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-}
-
-/* An answer: plain text next to the product's mark; answers can be long. */
-.answer {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.9rem;
-  align-items: start;
-}
-
-.mark {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.6rem;
-  background: var(--brand-amber);
-  color: var(--brand-on-amber);
-  font-weight: 500;
-}
-
-.answer-body {
-  display: grid;
-  gap: 0.75rem;
-  justify-items: start;
-  min-width: 0;
-  padding-top: 0.2rem;
-}
-
-.text {
-  margin: 0;
-  font: var(--mat-sys-body-large);
-  line-height: 1.7;
-  color: var(--mat-sys-on-surface);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-/* While the answer is being written, a caret blinks after the last letter. */
-.text.streaming::after {
-  content: '';
-  display: inline-block;
-  width: 0.5em;
-  height: 1.05em;
-  margin-inline-start: 0.15em;
-  border-radius: 2px;
-  background: var(--brand-amber);
-  vertical-align: text-bottom;
-  animation: blink 1s steps(2, start) infinite;
-}
-
-/* Before the first words arrive. */
-.thinking {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0;
-  padding-top: 0.15rem;
-  font: var(--mat-sys-body-medium);
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.dots {
-  display: inline-flex;
-  gap: 0.3rem;
-}
-
-.dots i {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: var(--brand-amber);
-  animation: bounce 1.2s ease-in-out infinite;
-}
-
-.dots i:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.dots i:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-.note {
-  margin: 0;
-  font: var(--mat-sys-body-medium);
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.failure {
-  margin: 0;
-  padding: 0.75rem 1rem;
-  border-radius: 0.875rem;
-  background: var(--mat-sys-error-container);
-  color: var(--mat-sys-on-error-container);
-  font: var(--mat-sys-body-medium);
-}
-
-.retry {
-  padding: 0.45rem 1rem;
-  border: 1px solid color-mix(in srgb, var(--brand-forest) 30%, transparent);
-  border-radius: 2rem;
-  background: transparent;
-  color: var(--mat-sys-primary);
-  font: var(--mat-sys-label-large);
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-}
-
-.retry:hover {
-  background: color-mix(in srgb, var(--brand-forest) 8%, transparent);
-  border-color: var(--brand-forest);
-  transform: translateY(-1px);
 }
 
 /* ---- The question box ---- */
@@ -236,8 +122,7 @@
   cursor: default;
 }
 
-.send:focus-visible,
-.retry:focus-visible {
+.send:focus-visible {
   outline: 2px solid var(--brand-forest);
   outline-offset: 2px;
 }
@@ -259,34 +144,12 @@
   }
 }
 
-@keyframes blink {
-  to {
-    visibility: hidden;
-  }
-}
 
-@keyframes bounce {
-  0%,
-  60%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.5;
-  }
-
-  30% {
-    transform: translateY(-0.35rem);
-    opacity: 1;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .question,
-  .answer,
-  .dots i,
-  .text.streaming::after,
   .composer-box,
-  .send,
-  .retry {
+  .send {
     animation: none;
     transition: none;
   }
