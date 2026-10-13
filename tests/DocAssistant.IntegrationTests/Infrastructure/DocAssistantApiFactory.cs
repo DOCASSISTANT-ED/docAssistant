@@ -37,5 +37,9 @@ public sealed class DocAssistantApiFactory(string connectionString) : WebApplica
         // embeddings on purpose, and every copy of the app a test starts would otherwise
         // try to embed the chunks of all the others. Re-indexing tests run it themselves.
         builder.UseSetting("Embedding:ReindexOnStartup", "false");
+
+        // And for the chat model (decisions #61). Tests that ask questions replace IChatClient.
+        builder.UseSetting("Chat:BaseUrl", "http://chat.invalid");
+        builder.UseSetting("Chat:Model", "integration-tests");
     }
 }

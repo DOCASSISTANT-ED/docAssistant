@@ -30,6 +30,11 @@ internal sealed class EvalApi(RepoPaths paths, string connectionString, string e
         builder.UseSetting("Embedding:BaseUrl", embeddingUrl);
         builder.UseSetting("Embedding:Model", embeddingModel);
 
+        // The app refuses to start without chat settings; the run measures search only
+        // and never calls the chat model.
+        builder.UseSetting("Chat:BaseUrl", "http://chat.invalid");
+        builder.UseSetting("Chat:Model", "evaluation");
+
         // The app refuses to start without storage settings; the storage itself is replaced below.
         builder.UseSetting("Storage:ServiceUrl", "http://storage.invalid");
         builder.UseSetting("Storage:AccessKey", "evaluation");
