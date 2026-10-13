@@ -2,7 +2,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import { Component, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { questionMaxLength } from '../api/chat';
 import { Answer } from './answer';
 import { ChatStore } from './chat-store';
@@ -11,7 +11,7 @@ import { ChatStore } from './chat-store';
 // question. What is shown comes from ChatStore; this component turns it into a page and
 // passes the user's actions on.
 @Component({
-  imports: [Answer, FormsModule, TextFieldModule],
+  imports: [Answer, FormsModule, RouterLink, TextFieldModule],
   selector: 'app-chat',
   styleUrl: './chat.css',
   templateUrl: './chat.html',
@@ -80,7 +80,17 @@ export class Chat {
   }
 
   protected canSend(): boolean {
-    return this.draft().trim() !== '' && !this.chat.answering();
+    // Not while an answer is being written, and not before the conversation is on screen.
+    return this.draft().trim() !== '' && !this.chat.answering() && this.chat.openState() !== 'loading';
+  }
+
+  // Tries again to load the conversation in the address after it could not be loaded.
+  protected reload(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+      void this.chat.open(id);
+    }
   }
 
   protected send(): void {

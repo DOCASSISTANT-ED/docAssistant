@@ -21,14 +21,11 @@
   margin-inline: auto;
 }
 
-.question {
-  animation: rise 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
 /* A question: the user's own words, on the right. */
 .question {
   display: flex;
   justify-content: flex-end;
+  animation: rise 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .bubble {
@@ -42,6 +39,120 @@
   line-height: 1.55;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+/* ---- A conversation from the history: loading, not found, failed ---- */
+
+/* The outline appears only if loading takes a moment, so a quick load does not flash. */
+.skeleton {
+  animation: appear 0.3s 0.2s both;
+}
+
+.bone {
+  display: block;
+  height: 0.95rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.7) 50%,
+      transparent 70%
+    )
+    0 0 / 200% 100%,
+    color-mix(in srgb, var(--brand-forest) 9%, transparent);
+  animation: shimmer 1.4s linear infinite;
+}
+
+.bone.short {
+  width: 55%;
+}
+
+.bone-question {
+  justify-self: end;
+  width: 55%;
+  height: 2.9rem;
+  border-radius: 1.25rem 1.25rem 0.35rem 1.25rem;
+}
+
+.bone-question.narrow {
+  width: 35%;
+}
+
+.bone-answer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+}
+
+.bone-mark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+}
+
+.bone-lines {
+  display: grid;
+  gap: 0.7rem;
+  padding-top: 0.45rem;
+}
+
+.status {
+  min-height: 100%;
+  align-content: center;
+  justify-items: center;
+  gap: 0.6rem;
+  text-align: center;
+  animation: rise 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.status-mark {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 1.1rem;
+  background: var(--brand-forest);
+  color: var(--brand-amber);
+  font: var(--mat-sys-headline-small);
+  rotate: -6deg;
+}
+
+.status-title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+  color: var(--mat-sys-on-surface);
+}
+
+.status-text {
+  max-width: 26rem;
+  margin: 0;
+  font: var(--mat-sys-body-large);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.status-action {
+  margin-top: 0.9rem;
+  padding: 0.7rem 1.4rem;
+  border: 0;
+  border-radius: 2rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font: var(--mat-sys-label-large);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 0.35rem 0.9rem rgb(232 163 61 / 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.7rem 1.4rem rgb(232 163 61 / 0.45);
+}
+
+.status-action:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 2px;
 }
 
 /* ---- The question box ---- */
@@ -144,10 +255,28 @@
   }
 }
 
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
 
+@keyframes shimmer {
+  from {
+    background-position: 100% 0, 0 0;
+  }
+
+  to {
+    background-position: -100% 0, 0 0;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .question,
+  .skeleton,
+  .bone,
+  .status,
+  .status-action,
   .composer-box,
   .send {
     animation: none;

@@ -1,42 +1,90 @@
 <div class="conversation" #scroller (scroll)="onScroll()">
-  <div class="column">
-    @for (entry of chat.entries(); track entry.key) {
-      @if (entry.kind === 'question') {
-        <div class="question">
-          <p class="bubble">{{ entry.text }}</p>
+  @switch (chat.openState()) {
+    @case ('loading') {
+      <!-- The outline of a conversation while the real one is on its way. -->
+      <div class="column skeleton" role="status" aria-label="Sohbet yükleniyor">
+        <span class="bone bone-question"></span>
+        <div class="bone-answer">
+          <span class="bone bone-mark"></span>
+          <div class="bone-lines">
+            <span class="bone"></span>
+            <span class="bone"></span>
+            <span class="bone short"></span>
+          </div>
         </div>
-      } @else {
-        <app-answer [entry]="entry" [canRetry]="$last" (retry)="chat.retry()" />
-      }
+        <span class="bone bone-question narrow"></span>
+        <div class="bone-answer">
+          <span class="bone bone-mark"></span>
+          <div class="bone-lines">
+            <span class="bone"></span>
+            <span class="bone short"></span>
+          </div>
+        </div>
+      </div>
     }
-  </div>
+
+    @case ('notFound') {
+      <div class="column status">
+        <span class="status-mark" aria-hidden="true">?</span>
+        <h2 class="status-title">Bu sohbet bulunamadı</h2>
+        <p class="status-text">Adres yanlış olabilir ya da sohbet bu hesaba ait değil.</p>
+        <a class="status-action" routerLink="/">Yeni sohbet başlat</a>
+      </div>
+    }
+
+    @case ('failed') {
+      <div class="column status" role="alert">
+        <span class="status-mark" aria-hidden="true">!</span>
+        <h2 class="status-title">Sohbet yüklenemedi</h2>
+        <p class="status-text">Sunucuya ulaşılamadı. Bağlantınızı kontrol edip yeniden deneyin.</p>
+        <button class="status-action" type="button" (click)="reload()">Yeniden dene</button>
+      </div>
+    }
+
+    @default {
+      <div class="column">
+        @for (entry of chat.entries(); track entry.key) {
+          @if (entry.kind === 'question') {
+            <div class="question">
+              <p class="bubble">{{ entry.text }}</p>
+            </div>
+          } @else {
+            <app-answer [entry]="entry" [canRetry]="$last" (retry)="chat.retry()" />
+          }
+        }
+      </div>
+    }
+  }
 </div>
 
-<form class="composer" (ngSubmit)="send()">
-  <div class="composer-box">
-    <textarea
-      name="question"
-      class="input"
-      rows="1"
-      cdkTextareaAutosize
-      cdkAutosizeMinRows="1"
-      cdkAutosizeMaxRows="8"
-      placeholder="Belgelerinize bir soru sorun"
-      aria-label="Sorunuz"
-      [maxlength]="maxLength"
-      [ngModel]="draft()"
-      (ngModelChange)="draft.set($event)"
-      (keydown.enter)="onEnter($event)"
-    ></textarea>
+<!-- A conversation that could not be shown cannot be continued either. -->
+@if (chat.openState() !== 'notFound' && chat.openState() !== 'failed') {
+  <form class="composer" (ngSubmit)="send()">
+    <div class="composer-box">
+      <textarea
+        name="question"
+        class="input"
+        rows="1"
+        cdkTextareaAutosize
+        cdkAutosizeMinRows="1"
+        cdkAutosizeMaxRows="8"
+        placeholder="Belgelerinize bir soru sorun"
+        aria-label="Sorunuz"
+        [maxlength]="maxLength"
+        [ngModel]="draft()"
+        (ngModelChange)="draft.set($event)"
+        (keydown.enter)="onEnter($event)"
+      ></textarea>
 
-    <button class="send" type="submit" aria-label="Soruyu gönder" [disabled]="!canSend()">
-      <span aria-hidden="true">↑</span>
-    </button>
-  </div>
+      <button class="send" type="submit" aria-label="Soruyu gönder" [disabled]="!canSend()">
+        <span aria-hidden="true">↑</span>
+      </button>
+    </div>
 
-  @if (draft().length > maxLength - 200) {
-    <p class="counter">{{ draft().length }} / {{ maxLength }}</p>
-  } @else {
-    <p class="hint">Cevaplar yalnızca yüklenen belgelere dayanır.</p>
-  }
-</form>
+    @if (draft().length > maxLength - 200) {
+      <p class="counter">{{ draft().length }} / {{ maxLength }}</p>
+    } @else {
+      <p class="hint">Cevaplar yalnızca yüklenen belgelere dayanır.</p>
+    }
+  </form>
+}
