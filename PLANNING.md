@@ -198,7 +198,8 @@ Bu iki karar, değerlendirme setini çalıştıran araç yazılmadan önce uygul
 | Angular sohbet ekranı, streaming'in arayüz tarafı | `IChatClient` entegrasyonu, streaming endpoint'i | **Pair:** Prompt tasarımı ve kaynak numaralandırma |
 | Kaynağa tıklayınca belge sayfasını açma | Sohbet geçmişi | Faz başı kararları (#41): bileşen kütüphanesi (#58), API tiplerinin TypeScript'e taşınması (#59), JWT'nin tarayıcıda saklanması (#60) |
 | Giriş ve kayıt ekranları | | |
-| **Çapraz test:** Sohbet backend testleri | **Çapraz test:** Sohbet arayüzü testleri (Angular test araçları) | |
+| Oturum çerezinin sunucu tarafı (#60): çerez, çıkış endpoint'i, CSRF başlık kontrolü, CORS | | |
+| **Çapraz test:** Sohbet backend testleri | **Çapraz test:** Sohbet arayüzü testleri (Angular test araçları), oturum çerezi testleri | |
 
 > Daha dengeli olsun istenirse bu fazda backend ve arayüz yer değiştirilebilir.
 
