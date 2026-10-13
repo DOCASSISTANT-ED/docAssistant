@@ -17,7 +17,12 @@ public static partial class ChatPrompt
     // exactly this sentence, and the endpoint sends it itself when search finds nothing.
     public const string NotFoundAnswer = "Bu bilgi belgelerde bulunamadı.";
 
-    private const string Instructions =
+    // The line breaks of a raw string are those of the source file, and on Windows Git
+    // checks this file out with Windows line breaks (CR LF). They are normalized to LF so
+    // that the model reads the same instructions on every machine: with CR LF the
+    // development model answered questions with the not-found sentence that it answers
+    // correctly with LF.
+    private static readonly string Instructions =
         $"""
         Sen bir şirketin belgelerine dayanarak soru cevaplayan bir asistansın.
 
@@ -26,7 +31,7 @@ public static partial class ChatPrompt
         2. Yazdığın her bilginin sonuna, o bilgiyi aldığın kaynağın numarasını köşeli parantezle yaz. Örnek: Yıllık izin 14 gündür [2].
         3. Sorunun cevabı kaynaklarda yoksa yalnızca şu cümleyi yaz, başka hiçbir şey ekleme: {NotFoundAnswer}
         4. Türkçe, kısa ve doğrudan cevap ver.
-        """;
+        """.ReplaceLineEndings("\n");
 
     // sources: in the order search returned them; the first becomes [1].
     // history: earlier messages of the same conversation, oldest first.
