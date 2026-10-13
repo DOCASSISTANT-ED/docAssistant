@@ -79,3 +79,23 @@ Content-Type: application/pdf
 
 < ../../tests/TestData/ik-yonetmeligi.pdf
 --DocAssistantBoundary--
+
+### Ask a question (any member; the answer arrives as a stream of events)
+# Run "Log in" first. Needs Ollama with the chat model and at least one processed document.
+# @name ask
+POST {{DocAssistant.Api_HostAddress}}/chat
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "question": "Yıllık izin kaç gündür?"
+}
+
+### My conversations, newest first
+# @name conversations
+GET {{DocAssistant.Api_HostAddress}}/conversations
+Authorization: Bearer {{login.response.body.$.token}}
+
+### The newest conversation with its messages and sources
+GET {{DocAssistant.Api_HostAddress}}/conversations/{{conversations.response.body.$[0].id}}
+Authorization: Bearer {{login.response.body.$.token}}
