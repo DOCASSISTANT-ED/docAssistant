@@ -29,6 +29,9 @@ Content-Type: application/json
 GET {{DocAssistant.Api_HostAddress}}/auth/me
 Authorization: Bearer {{login.response.body.$.token}}
 
+### Log out: removes the session cookie a browser got at login (204, also when not signed in)
+POST {{DocAssistant.Api_HostAddress}}/auth/logout
+
 ### Wrong password: 401
 POST {{DocAssistant.Api_HostAddress}}/auth/login
 Content-Type: application/json

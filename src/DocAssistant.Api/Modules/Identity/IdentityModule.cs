@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 
 namespace DocAssistant.Api.Modules.Identity;
 
@@ -41,6 +42,24 @@ public static class IdentityModule
                     ClockSkew = TimeSpan.FromMinutes(1),
                     NameClaimType = ClaimNames.UserId,
                     RoleClaimType = ClaimNames.Role,
+                };
+
+                // decisions #60: a browser sends the token in the session cookie. The
+                // Authorization header comes first and is what other clients use (tests,
+                // the evaluation run); with a header present the cookie is not looked at.
+                // Either way the token is validated by the same rules above.
+                bearer.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (!context.Request.Headers.ContainsKey(HeaderNames.Authorization)
+                            && context.Request.Cookies.TryGetValue(SessionCookie.Name, out var token))
+                        {
+                            context.Token = token;
+                        }
+
+                        return Task.CompletedTask;
+                    },
                 };
             });
 

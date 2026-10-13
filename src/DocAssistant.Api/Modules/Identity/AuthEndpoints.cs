@@ -18,6 +18,9 @@ public static class AuthEndpoints
         auth.MapPost("/register", Register);
         auth.MapPost("/login", Login);
 
+        // No authorization: signing out must also work with an expired or missing token.
+        auth.MapPost("/logout", Logout);
+
         auth.MapGet("/me", GetCurrentUser)
             .RequireAuthorization();
 
@@ -27,6 +30,7 @@ public static class AuthEndpoints
     // Creates a tenant, its first user and an Admin membership, then signs the user in.
     private static async Task<Results<Created<AccessToken>, ProblemHttpResult>> Register(
         RegisterRequest request,
+        HttpContext http,
         AppDbContext db,
         IPasswordHasher<User> passwordHasher,
         JwtTokenIssuer tokenIssuer,
@@ -85,11 +89,13 @@ public static class AuthEndpoints
         }
 
         var token = tokenIssuer.Issue(user.Id, user.Email, tenant.Id, membership.Role.ToString());
+        SessionCookie.Append(http, token);
         return TypedResults.Created("/auth/me", token);
     }
 
     private static async Task<Results<Ok<AccessToken>, ProblemHttpResult>> Login(
         LoginRequest request,
+        HttpContext http,
         AppDbContext db,
         IPasswordHasher<User> passwordHasher,
         JwtTokenIssuer tokenIssuer,
@@ -139,7 +145,16 @@ public static class AuthEndpoints
         }
 
         var token = tokenIssuer.Issue(user.Id, user.Email, membership.TenantId, membership.Role.ToString());
+        SessionCookie.Append(http, token);
         return TypedResults.Ok(token);
+    }
+
+    // Page scripts cannot delete an HttpOnly cookie, so the server does it (decisions #60).
+    // The token itself stays valid until it expires; nothing is stored about it server-side.
+    private static NoContent Logout(HttpContext http)
+    {
+        SessionCookie.Delete(http);
+        return TypedResults.NoContent();
     }
 
     private static CurrentUserResponse GetCurrentUser(ClaimsPrincipal user, ITenantContext tenantContext) =>
