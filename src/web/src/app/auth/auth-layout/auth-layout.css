@@ -1,0 +1,348 @@
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* ---- The brand panel: a rounded card floating on the page, not a hard split. ---- */
+
+.brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 1rem;
+  padding: 2.5rem 3rem;
+  border-radius: 2rem;
+  overflow: hidden;
+  background: var(--brand-forest);
+  color: var(--brand-on-forest);
+  isolation: isolate;
+}
+
+.brand-name,
+.brand-message {
+  position: relative;
+  z-index: 1;
+}
+
+.brand-name {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  animation: rise 0.7s 0.05s both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.65rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font-weight: 500;
+  transition: transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.brand-name:hover .brand-mark {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.brand-message {
+  margin-block: auto;
+  max-width: 30rem;
+}
+
+.brand-tagline {
+  margin: 0 0 1.25rem;
+  font-size: clamp(2rem, 3.4vw, 3.1rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  animation: rise 0.8s 0.15s both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* An amber stroke drawn under one word once the text has arrived. */
+.underlined {
+  position: relative;
+  white-space: nowrap;
+}
+
+.underlined::after {
+  content: '';
+  position: absolute;
+  left: -0.05em;
+  right: -0.05em;
+  bottom: 0.02em;
+  height: 0.16em;
+  border-radius: 1em;
+  background: var(--brand-amber);
+  transform-origin: left center;
+  animation: draw 0.9s 0.9s both cubic-bezier(0.6, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.brand-description {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--brand-on-forest-muted);
+  animation: rise 0.8s 0.3s both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ---- Scenery: soft light that drifts, and sheets of paper that float. ---- */
+
+.scenery {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  /* A faint dot grid, like ruled paper seen from far away. */
+  background-image: radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  will-change: transform;
+}
+
+.glow-amber {
+  width: 22rem;
+  height: 22rem;
+  right: -7rem;
+  bottom: -6rem;
+  background: rgb(232 163 61 / 0.38);
+  animation: drift-a 19s ease-in-out infinite alternate;
+}
+
+.glow-mint {
+  width: 20rem;
+  height: 20rem;
+  left: -8rem;
+  top: -7rem;
+  background: rgb(120 200 185 / 0.28);
+  animation: drift-b 23s ease-in-out infinite alternate;
+}
+
+.glow-deep {
+  width: 18rem;
+  height: 18rem;
+  left: 35%;
+  top: 45%;
+  background: rgb(4 28 30 / 0.55);
+  animation: drift-c 27s ease-in-out infinite alternate;
+}
+
+.sheet {
+  position: absolute;
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  width: 11.5rem;
+  padding: 1.25rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  background: rgb(255 255 255 / 0.07);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 1.25rem 2.5rem rgb(0 0 0 / 0.22);
+}
+
+.line {
+  display: block;
+  height: 0.45rem;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.22);
+}
+
+.line.marked {
+  background: var(--brand-amber);
+}
+
+.w-30 { width: 30%; }
+.w-40 { width: 40%; }
+.w-45 { width: 45%; }
+.w-50 { width: 50%; }
+.w-60 { width: 60%; }
+.w-65 { width: 65%; }
+.w-70 { width: 70%; }
+.w-75 { width: 75%; }
+.w-80 { width: 80%; }
+.w-85 { width: 85%; }
+.w-90 { width: 90%; }
+
+.badge {
+  position: absolute;
+  top: -0.6rem;
+  right: -0.6rem;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.55rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: 0 0.4rem 1rem rgb(0 0 0 / 0.25);
+  animation: pop 0.6s 1.5s both cubic-bezier(0.3, 1.7, 0.5, 1);
+}
+
+.sheet-back {
+  right: 9.5rem;
+  bottom: 7.5rem;
+  opacity: 0.55;
+  --tilt: -9deg;
+  animation: appear 1s 0.5s both, float 9s 1.5s ease-in-out infinite;
+}
+
+.sheet-middle {
+  right: 3rem;
+  bottom: 4.5rem;
+  opacity: 0.8;
+  --tilt: 7deg;
+  animation: appear 1s 0.65s both, float 11s 1.65s ease-in-out infinite;
+}
+
+.sheet-front {
+  right: 6.5rem;
+  bottom: 1.5rem;
+  --tilt: -3deg;
+  background: rgb(255 255 255 / 0.11);
+  animation: appear 1s 0.8s both, float 8s 1.8s ease-in-out infinite;
+}
+
+/* ---- The form side ---- */
+
+.content {
+  display: grid;
+  place-items: center;
+  padding: 3rem 2rem;
+}
+
+.content-inner {
+  width: 100%;
+  max-width: 24rem;
+  animation: rise 0.8s 0.25s both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ---- Motion ---- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+}
+
+@keyframes draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    translate: 0 2.5rem;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: rotate(var(--tilt)) translateY(0);
+  }
+
+  50% {
+    transform: rotate(calc(var(--tilt) + 2deg)) translateY(-0.9rem);
+  }
+}
+
+@keyframes drift-a {
+  to {
+    transform: translate(-6rem, -4rem) scale(1.15);
+  }
+}
+
+@keyframes drift-b {
+  to {
+    transform: translate(7rem, 5rem) scale(1.2);
+  }
+}
+
+@keyframes drift-c {
+  to {
+    transform: translate(-5rem, -6rem) scale(0.9);
+  }
+}
+
+/* Sheets rest at their tilt before and between movements. */
+.sheet {
+  transform: rotate(var(--tilt));
+}
+
+/* People who ask their system for less motion get a still picture. */
+@media (prefers-reduced-motion: reduce) {
+  .brand *,
+  .brand *::after,
+  .content-inner {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Narrow screens: the panel becomes a band on top; the sheets would crowd it. */
+@media (max-width: 52rem) {
+  .auth {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+
+  .brand {
+    gap: 1.25rem;
+    margin: 0.75rem;
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+  }
+
+  .brand-message {
+    margin-block: 0;
+  }
+
+  .brand-tagline {
+    margin: 0;
+    font-size: 1.6rem;
+  }
+
+  .brand-description,
+  .sheet {
+    display: none;
+  }
+
+  .content {
+    place-items: start center;
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* Mid-width screens: less room next to the text, so fewer sheets. */
+@media (max-width: 72rem) and (min-width: 52.01rem) {
+  .sheet-back {
+    display: none;
+  }
+}
