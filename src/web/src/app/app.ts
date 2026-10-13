@@ -1,12 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterOutlet } from '@angular/router';
 import { environment } from '../environments/environment';
 
 type ApiStatus = 'checking' | 'up' | 'down';
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [MatToolbarModule, RouterOutlet],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',

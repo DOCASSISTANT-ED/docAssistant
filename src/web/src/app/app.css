@@ -1,20 +1,20 @@
+/* By default the toolbar has the page's own background and would not stand out. */
 .app-header {
-  display: flex;
-  align-items: baseline;
+  --mat-toolbar-container-background-color: var(--mat-sys-surface-container);
+
   gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 1.25rem;
+  font: var(--mat-sys-title-large);
 }
 
 .api-status {
   margin: 0;
-  font-size: 0.875rem;
-  color: #666;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .api-status[data-status='up'] {
@@ -22,7 +22,7 @@
 }
 
 .api-status[data-status='down'] {
-  color: #b42318;
+  color: var(--mat-sys-error);
 }
 
 main {

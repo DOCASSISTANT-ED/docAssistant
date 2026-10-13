@@ -1,4 +1,4 @@
-<header class="app-header">
+<mat-toolbar class="app-header">
   <h1>{{ title }}</h1>
   <p class="api-status" [attr.data-status]="apiStatus()">
     @switch (apiStatus()) {
@@ -13,7 +13,7 @@
       }
     }
   </p>
-</header>
+</mat-toolbar>
 
 <main>
   <router-outlet />
