@@ -43,6 +43,10 @@
 
     @default {
       <div class="column">
+        @if (chat.entries().length === 0) {
+          <app-welcome />
+        }
+
         @for (entry of chat.entries(); track entry.key) {
           @if (entry.kind === 'question') {
             <div class="question">
@@ -76,9 +80,16 @@
         (keydown.enter)="onEnter($event)"
       ></textarea>
 
-      <button class="send" type="submit" aria-label="Soruyu gönder" [disabled]="!canSend()">
-        <span aria-hidden="true">↑</span>
-      </button>
+      <!-- While an answer is being written, the button stops it instead. -->
+      @if (chat.answering()) {
+        <button class="send stop" type="button" aria-label="Cevabı durdur" (click)="chat.stop()">
+          <span class="stop-square" aria-hidden="true"></span>
+        </button>
+      } @else {
+        <button class="send" type="submit" aria-label="Soruyu gönder" [disabled]="!canSend()">
+          <span aria-hidden="true">↑</span>
+        </button>
+      }
     </div>
 
     @if (draft().length > maxLength - 200) {

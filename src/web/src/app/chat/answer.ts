@@ -1,5 +1,5 @@
-import { Component, input, output, signal } from '@angular/core';
-import { ChatSource } from '../api/chat';
+import { Component, computed, input, output, signal } from '@angular/core';
+import { ChatSource, notFoundAnswer } from '../api/chat';
 import { AnswerEntry } from './chat-store';
 import { CitationsPipe, CitedSourcesPipe } from './citations';
 
@@ -19,6 +19,14 @@ export class Answer {
   readonly canRetry = input(false);
 
   readonly retry = output<void>();
+
+  // The documents had no answer. Shown differently from an answer: it is the one case
+  // where the user has to do something else (ask in other words, or upload the document).
+  protected readonly nothingFound = computed(() => {
+    const answer = this.entry();
+
+    return answer.state === 'done' && answer.text.trim() === notFoundAnswer;
+  });
 
   // The source under the pointer or the keyboard focus: its number in the text and its
   // card light up together, so it is easy to see which card a number means.

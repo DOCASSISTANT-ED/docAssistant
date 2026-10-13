@@ -188,6 +188,29 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+/* ---- Nothing in the documents ---- */
+
+.nothing {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px dashed color-mix(in srgb, var(--brand-forest) 30%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--brand-forest) 4%, transparent);
+}
+
+.nothing-title {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+  color: var(--mat-sys-on-surface);
+}
+
+.nothing-hint {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
 /* ---- Stopped and failed ---- */
 
 .note {

@@ -18,7 +18,14 @@
   gap: 1.5rem;
   width: 100%;
   max-width: 46rem;
+  min-height: 100%;
+  align-content: start;
   margin-inline: auto;
+}
+
+/* The start of a new conversation sits in the middle of the page. */
+.column:has(app-welcome) {
+  align-content: center;
 }
 
 /* A question: the user's own words, on the right. */
@@ -231,6 +238,22 @@
   color: color-mix(in srgb, var(--brand-forest) 40%, transparent);
   box-shadow: none;
   cursor: default;
+}
+
+.stop {
+  background: var(--brand-forest);
+  box-shadow: 0 0.35rem 0.9rem rgb(15 61 62 / 0.3);
+}
+
+.stop:not(:disabled):hover {
+  box-shadow: 0 0.7rem 1.4rem rgb(15 61 62 / 0.35);
+}
+
+.stop-square {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 0.2rem;
+  background: var(--brand-amber);
 }
 
 .send:focus-visible {

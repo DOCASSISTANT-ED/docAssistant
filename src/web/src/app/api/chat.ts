@@ -18,6 +18,10 @@ export interface ChatRequest {
 // The limit the server validates (ChatRequest.QuestionMaxLength).
 export const questionMaxLength = 2000;
 
+// The whole answer when the documents do not hold one (ChatPrompt.NotFoundAnswer,
+// docs/decisions.md #55, #61).
+export const notFoundAnswer = 'Bu bilgi belgelerde bulunamadı.';
+
 // Server: ChatSource. One of the numbered sources the model was given; number is what the
 // answer text uses for it: 3 for "[3]". The chunk's text is not part of it.
 export interface ChatSource {

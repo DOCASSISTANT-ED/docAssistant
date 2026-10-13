@@ -11,7 +11,14 @@
       </p>
     }
 
-    @if (answer.text) {
+    @if (nothingFound()) {
+      <div class="nothing">
+        <p class="nothing-title">{{ answer.text }}</p>
+        <p class="nothing-hint">
+          Soruyu başka sözcüklerle sormayı deneyin ya da ilgili belgenin yüklendiğinden emin olun.
+        </p>
+      </div>
+    } @else if (answer.text) {
       <p class="text" [class.streaming]="answer.state === 'streaming'">
         @for (piece of answer.text | citations: answer.sources; track $index) {
           @if (piece.kind === 'text') {

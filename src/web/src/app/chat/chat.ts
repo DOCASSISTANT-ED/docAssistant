@@ -6,12 +6,13 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { questionMaxLength } from '../api/chat';
 import { Answer } from './answer';
 import { ChatStore } from './chat-store';
+import { Welcome } from './welcome';
 
 // The chat screen: the conversation's questions and answers, and the box to ask the next
 // question. What is shown comes from ChatStore; this component turns it into a page and
 // passes the user's actions on.
 @Component({
-  imports: [Answer, FormsModule, RouterLink, TextFieldModule],
+  imports: [Answer, FormsModule, RouterLink, TextFieldModule, Welcome],
   selector: 'app-chat',
   styleUrl: './chat.css',
   templateUrl: './chat.html',
@@ -27,6 +28,7 @@ export class Chat {
   protected readonly draft = signal('');
 
   private readonly scroller = viewChild.required<ElementRef<HTMLElement>>('scroller');
+  private readonly input = viewChild<ElementRef<HTMLTextAreaElement>>('input');
 
   // While true, new text keeps the end of the conversation in view. Scrolling up to
   // read something earlier turns it off, so the page does not jump away under the reader.
@@ -101,6 +103,16 @@ export class Chat {
     const question = this.draft();
 
     this.draft.set('');
+
+    // Also emptied by hand: when the text was typed and sent within one rendering pass
+    // (pasted, then Enter), the box was never told about the text, and would not see
+    // going back to empty as a change.
+    const input = this.input()?.nativeElement;
+
+    if (input) {
+      input.value = '';
+    }
+
     this.followingEnd = true;
     void this.chat.ask(question);
   }
