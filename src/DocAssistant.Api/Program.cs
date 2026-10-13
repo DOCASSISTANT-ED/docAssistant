@@ -37,13 +37,17 @@ builder.Services.AddSearchModule();
 
 // The Angular app is served from another origin (docs/decisions.md #41). Browsers only let
 // it call this API from the origins listed here; with none configured, none are allowed.
-// No AllowCredentials: the access token travels in the Authorization header, not a cookie.
+// AllowCredentials: the browser sends the session cookie with its requests (decisions #60),
+// and only lets a page do that when the API names the page's origin and allows credentials.
+// The origins are always listed one by one; a wildcard together with credentials would
+// let any site use a signed-in user's session, and ASP.NET Core refuses to start with it.
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy
     .WithOrigins(allowedOrigins)
     .AllowAnyHeader()
-    .AllowAnyMethod()));
+    .AllowAnyMethod()
+    .AllowCredentials()));
 
 var app = builder.Build();
 
