@@ -83,9 +83,35 @@ Araç bir test projesi değildir; `dotnet test` ve CI onu çalıştırmaz, çün
 | `Sources hybrid did not find` | Hattın dönen chunk'lar içinde bulamadığı kaynakların soruları. |
 | `Evidence in no chunk of this format` | Kanıtı o türün hiçbir chunk'ında geçmeyen kaynaklar. Sorun aramada değil, parser'da ya da soru setindedir. |
 
-Cevabı olmayan sorular (`unanswerable`) ölçülmez: arama her zaman bir şey döndürür; "belgelerde bulunamadı" demek sohbet modelinin işidir (Faz 4).
+Cevabı olmayan sorular (`unanswerable`) arama ölçümüne girmez: arama her zaman bir şey döndürür; "belgelerde bulunamadı" demek sohbet modelinin işidir. Onlar cevap ölçümünde sayılır (aşağıda).
 
 Her çalıştırma ayrıntılarını `eval/results/<tarih-saat>.json` dosyasına yazar: her kaynağın üç yöntemdeki sırası. İki çalıştırmayı soru soru karşılaştırmak içindir. Klasör Git'e girmez; bir karara dayanak olan sonuçlar ilgili karara ya da PR'a sayı olarak yazılır.
+
+### Cevap ölçümü (`--answers`)
+
+Arama ölçümü "doğru chunk bulundu mu?" sorusunu cevaplar; cevap ölçümü "model o chunk'larla ne yaptı?" sorusunu (`docs/decisions.md` #62). İstenince çalışır ve Ollama'da sohbet modelinin de yüklü olmasını ister:
+
+```
+dotnet run --project eval/DocAssistant.Eval -- --answers
+dotnet run --project eval/DocAssistant.Eval -- --answers --sample 5
+```
+
+İlki 190 sorunun hepsini sorar (yaklaşık 6 dakika). İkincisi her soru türünden 5 soruyu ve cevapsız soruların tamamını sorar (yaklaşık 2,5 dakika); bir değişikliği denerken kullanılır. Bir karara ya da PR'a yazılan sayılar tam setten alınır. Başka bir model için: `--chat-model <ad>`, başka bir Ollama adresi için `--chat-url <adres>`.
+
+Araç her soruyu `POST /chat` ile sorar ve akışı okur; prompt, bağlam boyutu ve kaynak numaralandırma uygulamanın kendi kodundan gelir. Sorular DOCX belgelerinin yüklendiği firmada sorulur.
+
+| Satır | Anlamı |
+|---|---|
+| `Without an answer in the documents` | Cevapsız sorular. `said "belgelerde bulunamadı"` istenen davranıştır; `answered anyway` modelin cevap uydurduğu sorulardır. Faz 4'ün ikinci bitiş koşulu. |
+| `With an answer, and search returned the evidence` | Kanıt modele gösterildi. `answered` içinden `with a source number` Faz 4'ün ilk bitiş koşuludur; `a number points at the evidence` numaranın doğru chunk'ı gösterdiğini söyler. Buradaki `said "belgelerde bulunamadı"` gereksiz rettir. |
+| `With an answer, but search did not return the evidence` | Kanıt modele hiç gösterilmedi; burada ret doğru davranıştır, `answered anyway` ise kanıtsız verilmiş cevaptır. Sorun aramadadır. |
+| `Form of the source numbers` | Listede olmayan numara, tek parantezde birden çok numara (`[1, 3]`; beklenen `[1][3]`, #56) ve cevapla birlikte "bulunamadı" denmesi. |
+| Türe göre tablo | Kanıtı getirilen sorular, türe göre: soru, cevap, numaralı cevap, numarası kanıtı gösteren cevap, ret. |
+| `WARNING: the chat's sources differed` | Aracın kendi araması ile sohbetin bildirdiği kaynaklar uyuşmadı; o soruların numara ölçümü güvenilmez. Görülmesi beklenmez. |
+
+**Araç cevabın doğru olup olmadığına bakmaz.** Kaynak numarası taşıyan ve doğru chunk'ı gösteren bir cevap yine de yanlış olabilir (tablodan yanlış satırı okumak gibi). Sonuç dosyasındaki `answers` bölümünde her cevap beklenen cevapla (`expected_answer`) yan yana durur; doğruluk okunarak değerlendirilir. Rapordaki sayılar kötüyse sorun vardır; iyi olmaları cevapların doğru olduğunu göstermez.
+
+Bir cevap, "belgelerde bulunamadı" sözünü içeriyor ve hiçbir kaynak numarası taşımıyorsa ret sayılır.
 
 ### Sayılar çalıştırmadan çalıştırmaya biraz oynar
 
