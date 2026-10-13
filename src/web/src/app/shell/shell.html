@@ -1,0 +1,36 @@
+<header class="bar">
+  <a class="brand" routerLink="/" aria-label="DocAssistant ana sayfa">
+    <span class="brand-mark" aria-hidden="true">D</span>
+    <span class="brand-name">DocAssistant</span>
+  </a>
+
+  @if (user(); as user) {
+    <button
+      class="account"
+      type="button"
+      [matMenuTriggerFor]="accountMenu"
+      aria-label="Hesap menüsü"
+    >
+      <span class="account-email">{{ user.email }}</span>
+      <span class="avatar" aria-hidden="true">{{ initial() }}</span>
+    </button>
+
+    <mat-menu #accountMenu="matMenu" xPosition="before" class="account-menu">
+      <div class="account-card">
+        <span class="avatar large" aria-hidden="true">{{ initial() }}</span>
+        <div class="account-lines">
+          <span class="account-card-email">{{ user.email }}</span>
+          <span class="role">{{ roleLabel() }}</span>
+        </div>
+      </div>
+
+      <button mat-menu-item type="button" [disabled]="signingOut()" (click)="signOut()">
+        Çıkış yap
+      </button>
+    </mat-menu>
+  }
+</header>
+
+<div class="screen">
+  <router-outlet />
+</div>
