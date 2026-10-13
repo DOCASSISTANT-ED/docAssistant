@@ -5,9 +5,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { identityLimits } from '../../api/identity';
 import { problemOf } from '../../api/problem';
+import { safeReturnUrl } from '../auth.guards';
 import { AuthLayout } from '../auth-layout/auth-layout';
 import { Session } from '../session';
 
@@ -30,6 +31,7 @@ import { Session } from '../session';
 export class Register {
   private readonly session = inject(Session);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly limits = identityLimits;
 
@@ -67,7 +69,8 @@ export class Register {
 
     try {
       await this.session.register(this.form.getRawValue());
-      await this.router.navigateByUrl('/');
+      // Back to the screen the user was sent here from, if any (auth.guards.ts).
+      await this.router.navigateByUrl(safeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl')));
     } catch (error) {
       this.failure.set(this.explain(error));
     } finally {

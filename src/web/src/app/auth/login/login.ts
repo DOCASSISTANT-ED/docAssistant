@@ -5,8 +5,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { identityLimits } from '../../api/identity';
+import { safeReturnUrl } from '../auth.guards';
 import { AuthLayout } from '../auth-layout/auth-layout';
 import { Session } from '../session';
 
@@ -27,6 +28,7 @@ import { Session } from '../session';
 export class Login {
   private readonly session = inject(Session);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   // The same limits as the server (LoginRequest): anything longer would be rejected.
   protected readonly form = inject(NonNullableFormBuilder).group({
@@ -58,7 +60,8 @@ export class Login {
 
     try {
       await this.session.login(this.form.getRawValue());
-      await this.router.navigateByUrl('/');
+      // Back to the screen the user was sent here from, if any (auth.guards.ts).
+      await this.router.navigateByUrl(safeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl')));
     } catch (error) {
       this.failure.set(messageFor(error));
     } finally {
