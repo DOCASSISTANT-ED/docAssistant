@@ -27,6 +27,7 @@ public static class AuthEndpoints
     // Creates a tenant, its first user and an Admin membership, then signs the user in.
     private static async Task<Results<Created<AccessToken>, ProblemHttpResult>> Register(
         RegisterRequest request,
+        HttpContext http,
         AppDbContext db,
         IPasswordHasher<User> passwordHasher,
         JwtTokenIssuer tokenIssuer,
@@ -85,11 +86,13 @@ public static class AuthEndpoints
         }
 
         var token = tokenIssuer.Issue(user.Id, user.Email, tenant.Id, membership.Role.ToString());
+        SessionCookie.Append(http, token);
         return TypedResults.Created("/auth/me", token);
     }
 
     private static async Task<Results<Ok<AccessToken>, ProblemHttpResult>> Login(
         LoginRequest request,
+        HttpContext http,
         AppDbContext db,
         IPasswordHasher<User> passwordHasher,
         JwtTokenIssuer tokenIssuer,
@@ -139,6 +142,7 @@ public static class AuthEndpoints
         }
 
         var token = tokenIssuer.Issue(user.Id, user.Email, membership.TenantId, membership.Role.ToString());
+        SessionCookie.Append(http, token);
         return TypedResults.Ok(token);
     }
 
