@@ -183,7 +183,7 @@ Vektör araması soruyu firmanın kendi chunk'larıyla tek tek karşılaştırı
 | **Çapraz test:** Embedding hattı ve RRF testleri | **Çapraz test:** Full-text arama ve reranker testleri | |
 
 **Bitiş koşulu:**
-- [ ] Hibrit arama, değerlendirme setinde tek başına vektör aramadan daha iyi sonuç veriyor (ölçülmüş)
+- [x] Hibrit arama, değerlendirme setinde tek başına vektör aramadan daha iyi sonuç veriyor (ölçülmüş: reranker kapalıyken MRR DOCX'te hibrit 0,855, vektör 0,830; PDF'te hibrit 0,854, vektör 0,837; 2026-10-13'te `dotnet run --project eval/DocAssistant.Eval` ile)
 
 **Faz başında verilen kararlar** (Faz 2 sonunda değerlendirme seti gözden geçirilirken bulunan iki sorun için):
 - **Bölüm yolu uyuşmazlığı → `docs/decisions.md` #46:** Setteki bölüm yolları belgenin kendi adını taşıyan ilk başlığı içermiyordu, chunker'ın ürettikleri içeriyordu. Chunker bu başlığı artık belge adı sayıyor.
