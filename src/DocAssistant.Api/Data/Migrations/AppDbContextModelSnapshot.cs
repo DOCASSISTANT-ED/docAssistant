@@ -25,6 +25,89 @@ namespace DocAssistant.Api.Data.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "vector");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("DocAssistant.Api.Modules.Chat.Conversation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("title");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_conversations");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_conversations_tenant_id");
+
+                    b.HasIndex("UserId", "CreatedAt")
+                        .HasDatabaseName("ix_conversations_user_id_created_at");
+
+                    b.ToTable("conversations", (string)null);
+                });
+
+            modelBuilder.Entity("DocAssistant.Api.Modules.Chat.Message", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<Guid>("ConversationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("conversation_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("role");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_messages");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_messages_tenant_id");
+
+                    b.HasIndex("ConversationId", "CreatedAt")
+                        .HasDatabaseName("ix_messages_conversation_id_created_at");
+
+                    b.ToTable("messages", (string)null);
+                });
+
             modelBuilder.Entity("DocAssistant.Api.Modules.Documents.Document", b =>
                 {
                     b.Property<Guid>("Id")
@@ -302,6 +385,74 @@ namespace DocAssistant.Api.Data.Migrations
                         .HasName("pk_tenants");
 
                     b.ToTable("tenants", (string)null);
+                });
+
+            modelBuilder.Entity("DocAssistant.Api.Modules.Chat.Conversation", b =>
+                {
+                    b.HasOne("DocAssistant.Api.Modules.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_conversations_tenants_tenant_id");
+
+                    b.HasOne("DocAssistant.Api.Modules.Identity.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_conversations_users_user_id");
+                });
+
+            modelBuilder.Entity("DocAssistant.Api.Modules.Chat.Message", b =>
+                {
+                    b.HasOne("DocAssistant.Api.Modules.Chat.Conversation", null)
+                        .WithMany()
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_messages_conversations_conversation_id");
+
+                    b.HasOne("DocAssistant.Api.Modules.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_messages_tenants_tenant_id");
+
+                    b.OwnsMany("DocAssistant.Api.Modules.Chat.MessageSource", "Sources", b1 =>
+                        {
+                            b1.Property<Guid>("MessageId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd();
+
+                            b1.Property<Guid>("DocumentId");
+
+                            b1.Property<string>("DocumentTitle")
+                                .IsRequired()
+                                .HasMaxLength(300);
+
+                            b1.Property<int>("Number");
+
+                            b1.Property<int?>("PageNumber");
+
+                            b1.Property<string>("SectionPath");
+
+                            b1.HasKey("MessageId", "__synthesizedOrdinal");
+
+                            b1.ToTable("messages");
+
+                            b1
+                                .ToJson("sources")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MessageId")
+                                .HasConstraintName("fk_messages_messages_message_id");
+                        });
+
+                    b.Navigation("Sources");
                 });
 
             modelBuilder.Entity("DocAssistant.Api.Modules.Documents.Document", b =>

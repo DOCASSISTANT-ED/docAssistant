@@ -1,4 +1,5 @@
 using System.Reflection;
+using DocAssistant.Api.Modules.Chat;
 using DocAssistant.Api.Modules.Documents;
 using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
@@ -20,6 +21,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
     public DbSet<Document> Documents => Set<Document>();
 
     public DbSet<Chunk> Chunks => Set<Chunk>();
+
+    public DbSet<Conversation> Conversations => Set<Conversation>();
+
+    public DbSet<Message> Messages => Set<Message>();
 
     // Query filters must read the tenant through a member of the context: EF Core then
     // re-evaluates it for every query instead of baking one value into the cached model.
