@@ -58,6 +58,10 @@ app.UseHttpsRedirection();
 // Before authentication: a browser's preflight (OPTIONS) request carries no token.
 app.UseCors();
 
+// After CORS, so that the browser can read the rejection; before authentication, so that
+// a forged request is turned away without the token being looked at (decisions #60).
+app.UseSessionCookieCsrfProtection();
+
 // Order matters: identify the caller first, then check what they may access.
 app.UseAuthentication();
 app.UseAuthorization();
