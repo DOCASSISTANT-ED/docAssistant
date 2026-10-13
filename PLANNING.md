@@ -183,7 +183,16 @@ Vektör araması soruyu firmanın kendi chunk'larıyla tek tek karşılaştırı
 | **Çapraz test:** Embedding hattı ve RRF testleri | **Çapraz test:** Full-text arama ve reranker testleri | |
 
 **Bitiş koşulu:**
-- [ ] Hibrit arama, değerlendirme setinde tek başına vektör aramadan daha iyi sonuç veriyor (ölçülmüş)
+- [x] Hibrit arama, değerlendirme setinde tek başına vektör aramadan daha iyi sonuç veriyor (ölçülmüş)
+
+Ölçüm (2026-10-13, `eval/DocAssistant.Eval`, `bge-m3`, reranker kapalı; 7 belge, 95 chunk, 199 kaynak, soru başına 8 chunk):
+
+| | Vektör: ilk 1 | Hibrit: ilk 1 | Vektör: ilk 8 | Hibrit: ilk 8 | Vektör: MRR | Hibrit: MRR |
+|---|---|---|---|---|---|---|
+| DOCX | 148 | 158 | 191 | 191 | 0,832 | 0,856 |
+| PDF | 151 | 158 | 191 | 191 | 0,840 | 0,854 |
+
+İlk ölçümde hibrit daha kötüydü (MRR: DOCX 0,772, PDF 0,788); anahtar kelime aramasının sıralaması değişince geçti (`docs/decisions.md` #49). Set küçük ve temizdir; sıralama aynı sette seçilip ölçüldü, gerçek belgelerde fark daha küçük olabilir. Reranker'ın hibritin üstüne katkısı ölçülmedi (#52).
 
 **Faz başında verilen kararlar** (Faz 2 sonunda değerlendirme seti gözden geçirilirken bulunan iki sorun için):
 - **Bölüm yolu uyuşmazlığı → `docs/decisions.md` #46:** Setteki bölüm yolları belgenin kendi adını taşıyan ilk başlığı içermiyordu, chunker'ın ürettikleri içeriyordu. Chunker bu başlığı artık belge adı sayıyor.
