@@ -1,0 +1,300 @@
+/* An answer: plain text next to the product's mark; answers can be long. */
+.answer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+  animation: rise 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font-weight: 500;
+}
+
+.body {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+  min-width: 0;
+  padding-top: 0.2rem;
+}
+
+.text {
+  margin: 0;
+  font: var(--mat-sys-body-large);
+  line-height: 1.7;
+  color: var(--mat-sys-on-surface);
+  overflow-wrap: anywhere;
+}
+
+/* The text pieces keep the answer's own line breaks; the numbers sit between them. */
+.plain {
+  white-space: pre-wrap;
+}
+
+/* While the answer is being written, a caret blinks after the last letter. */
+.text.streaming::after {
+  content: '';
+  display: inline-block;
+  width: 0.5em;
+  height: 1.05em;
+  margin-inline-start: 0.15em;
+  border-radius: 2px;
+  background: var(--brand-amber);
+  vertical-align: text-bottom;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+/* Before the first words arrive. */
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  padding-top: 0.15rem;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.dots {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.dots i {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--brand-amber);
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+.dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* ---- Sources ---- */
+
+/* A source number in the text. */
+.cite {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.45em;
+  height: 1.45em;
+  margin-inline: 0.15em;
+  padding: 0 0.3em;
+  border: 0;
+  border-radius: 0.45em;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font: inherit;
+  font-size: 0.78em;
+  font-weight: 500;
+  line-height: 1;
+  vertical-align: 0.12em;
+  cursor: pointer;
+  animation: pop 0.35s both cubic-bezier(0.3, 1.7, 0.5, 1);
+  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.2s ease;
+}
+
+.cite.lit,
+.cite:hover {
+  transform: translateY(-2px) scale(1.12);
+  box-shadow: 0 0.35rem 0.8rem rgb(232 163 61 / 0.5);
+}
+
+.sources {
+  width: 100%;
+}
+
+.sources-title {
+  margin: 0.25rem 0 0.6rem;
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.source-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.source {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--brand-forest) 14%, transparent);
+  border-radius: 1rem;
+  background: #ffffff;
+  animation: rise 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation-delay: calc(min(var(--i), 8) * 70ms);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.source.lit {
+  border-color: var(--brand-amber);
+  box-shadow: 0 0.6rem 1.5rem rgb(232 163 61 / 0.25);
+  transform: translateY(-2px);
+}
+
+.source-number {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 0.5rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font: var(--mat-sys-label-large);
+}
+
+.source-lines {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.source-title,
+.source-place {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-title {
+  font: var(--mat-sys-title-small);
+  color: var(--mat-sys-on-surface);
+}
+
+.source-place {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+/* ---- Nothing in the documents ---- */
+
+.nothing {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px dashed color-mix(in srgb, var(--brand-forest) 30%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--brand-forest) 4%, transparent);
+}
+
+.nothing-title {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+  color: var(--mat-sys-on-surface);
+}
+
+.nothing-hint {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+/* ---- Stopped and failed ---- */
+
+.note {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.failure {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.875rem;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+  font: var(--mat-sys-body-medium);
+}
+
+.retry {
+  padding: 0.45rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--brand-forest) 30%, transparent);
+  border-radius: 2rem;
+  background: transparent;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-label-large);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.retry:hover {
+  background: color-mix(in srgb, var(--brand-forest) 8%, transparent);
+  border-color: var(--brand-forest);
+  transform: translateY(-1px);
+}
+
+.cite:focus-visible,
+.retry:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 2px;
+}
+
+/* ---- Motion ---- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+@keyframes bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+
+  30% {
+    transform: translateY(-0.35rem);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .answer,
+  .dots i,
+  .text.streaming::after,
+  .cite,
+  .source,
+  .retry {
+    animation: none;
+    transition: none;
+  }
+}

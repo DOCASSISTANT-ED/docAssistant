@@ -1,0 +1,322 @@
+:host {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
+}
+
+/* ---- The conversation: scrolls on its own; the question box stays in place. ---- */
+
+.conversation {
+  overflow-y: auto;
+  padding: 2rem 1.5rem 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--brand-forest) 25%, transparent) transparent;
+}
+
+.column {
+  display: grid;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 46rem;
+  min-height: 100%;
+  align-content: start;
+  margin-inline: auto;
+}
+
+/* The start of a new conversation sits in the middle of the page. */
+.column:has(app-welcome) {
+  align-content: center;
+}
+
+/* A question: the user's own words, on the right. */
+.question {
+  display: flex;
+  justify-content: flex-end;
+  animation: rise 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.bubble {
+  max-width: 85%;
+  margin: 0;
+  padding: 0.75rem 1.1rem;
+  border-radius: 1.25rem 1.25rem 0.35rem 1.25rem;
+  background: var(--brand-forest);
+  color: var(--brand-on-forest);
+  font: var(--mat-sys-body-large);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ---- A conversation from the history: loading, not found, failed ---- */
+
+/* The outline appears only if loading takes a moment, so a quick load does not flash. */
+.skeleton {
+  animation: appear 0.3s 0.2s both;
+}
+
+.bone {
+  display: block;
+  height: 0.95rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.7) 50%,
+      transparent 70%
+    )
+    0 0 / 200% 100%,
+    color-mix(in srgb, var(--brand-forest) 9%, transparent);
+  animation: shimmer 1.4s linear infinite;
+}
+
+.bone.short {
+  width: 55%;
+}
+
+.bone-question {
+  justify-self: end;
+  width: 55%;
+  height: 2.9rem;
+  border-radius: 1.25rem 1.25rem 0.35rem 1.25rem;
+}
+
+.bone-question.narrow {
+  width: 35%;
+}
+
+.bone-answer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+}
+
+.bone-mark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+}
+
+.bone-lines {
+  display: grid;
+  gap: 0.7rem;
+  padding-top: 0.45rem;
+}
+
+.status {
+  min-height: 100%;
+  align-content: center;
+  justify-items: center;
+  gap: 0.6rem;
+  text-align: center;
+  animation: rise 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.status-mark {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 1.1rem;
+  background: var(--brand-forest);
+  color: var(--brand-amber);
+  font: var(--mat-sys-headline-small);
+  rotate: -6deg;
+}
+
+.status-title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+  color: var(--mat-sys-on-surface);
+}
+
+.status-text {
+  max-width: 26rem;
+  margin: 0;
+  font: var(--mat-sys-body-large);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.status-action {
+  margin-top: 0.9rem;
+  padding: 0.7rem 1.4rem;
+  border: 0;
+  border-radius: 2rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font: var(--mat-sys-label-large);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 0.35rem 0.9rem rgb(232 163 61 / 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.7rem 1.4rem rgb(232 163 61 / 0.45);
+}
+
+.status-action:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 2px;
+}
+
+/* ---- The question box ---- */
+
+.composer {
+  width: 100%;
+  max-width: 49rem;
+  margin-inline: auto;
+  padding: 0.5rem 1.5rem 1rem;
+  box-sizing: border-box;
+}
+
+.composer-box {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--brand-forest) 16%, transparent);
+  border-radius: 1.5rem;
+  background: #ffffff;
+  box-shadow: 0 0.6rem 1.75rem rgb(15 61 62 / 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.composer-box:focus-within {
+  border-color: color-mix(in srgb, var(--brand-forest) 55%, transparent);
+  box-shadow: 0 0.9rem 2.25rem rgb(15 61 62 / 0.14);
+  transform: translateY(-1px);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0;
+  border: 0;
+  outline: 0;
+  resize: none;
+  background: transparent;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-large);
+  line-height: 1.5;
+}
+
+.input::placeholder {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.send {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 0;
+  border-radius: 0.95rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 0.35rem 0.9rem rgb(232 163 61 / 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+}
+
+.send:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.7rem 1.4rem rgb(232 163 61 / 0.45);
+}
+
+.send:not(:disabled):active {
+  transform: scale(0.94);
+}
+
+.send:disabled {
+  background: color-mix(in srgb, var(--brand-forest) 10%, transparent);
+  color: color-mix(in srgb, var(--brand-forest) 40%, transparent);
+  box-shadow: none;
+  cursor: default;
+}
+
+.stop {
+  background: var(--brand-forest);
+  box-shadow: 0 0.35rem 0.9rem rgb(15 61 62 / 0.3);
+}
+
+.stop:not(:disabled):hover {
+  box-shadow: 0 0.7rem 1.4rem rgb(15 61 62 / 0.35);
+}
+
+.stop-square {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 0.2rem;
+  background: var(--brand-amber);
+}
+
+.send:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 2px;
+}
+
+.hint,
+.counter {
+  margin: 0.5rem 0 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+}
+
+/* ---- Motion ---- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0, 0 0;
+  }
+
+  to {
+    background-position: -100% 0, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .question,
+  .skeleton,
+  .bone,
+  .status,
+  .status-action,
+  .composer-box,
+  .send {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 36rem) {
+  .conversation {
+    padding: 1.25rem 1rem 0.75rem;
+  }
+
+  .composer {
+    padding: 0.5rem 0.75rem 0.75rem;
+  }
+
+  .bubble {
+    max-width: 92%;
+  }
+}

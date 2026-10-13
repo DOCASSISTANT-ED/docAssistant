@@ -1,0 +1,87 @@
+@let answer = entry();
+
+<article class="answer" [attr.aria-busy]="answer.state === 'waiting' || answer.state === 'streaming'">
+  <span class="mark" aria-hidden="true">D</span>
+
+  <div class="body">
+    @if (answer.state === 'waiting') {
+      <p class="thinking" role="status">
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="thinking-text">Belgelerinizde aranıyor</span>
+      </p>
+    }
+
+    @if (nothingFound()) {
+      <div class="nothing">
+        <p class="nothing-title">{{ answer.text }}</p>
+        <p class="nothing-hint">
+          Soruyu başka sözcüklerle sormayı deneyin ya da ilgili belgenin yüklendiğinden emin olun.
+        </p>
+      </div>
+    } @else if (answer.text) {
+      <p class="text" [class.streaming]="answer.state === 'streaming'">
+        @for (piece of answer.text | citations: answer.sources; track $index) {
+          @if (piece.kind === 'text') {
+            <span class="plain">{{ piece.text }}</span>
+          } @else {
+            <button
+              class="cite"
+              type="button"
+              [class.lit]="isLit(piece.source.number)"
+              [attr.aria-label]="'Kaynak ' + piece.source.number + ': ' + piece.source.documentTitle"
+              (mouseenter)="light(piece.source.number)"
+              (mouseleave)="light(null)"
+              (focus)="light(piece.source.number)"
+              (blur)="light(null)"
+              (click)="showSource(piece.source.number)"
+            >
+              {{ piece.source.number }}
+            </button>
+          }
+        }
+      </p>
+    }
+
+    <!-- The cards wait for the end of the answer: only then is it known which of the
+         sources it points at. -->
+    @if (answer.state === 'done' || answer.state === 'stopped') {
+      @let cited = answer.text | citedSources: answer.sources;
+
+      @if (cited.length > 0) {
+        <section class="sources" aria-label="Kaynaklar">
+          <h3 class="sources-title">Kaynaklar</h3>
+          <ul class="source-list">
+            @for (source of cited; track source.number; let index = $index) {
+              <li
+                class="source"
+                [id]="sourceId(source.number)"
+                [class.lit]="isLit(source.number)"
+                [style.--i]="index"
+                (mouseenter)="light(source.number)"
+                (mouseleave)="light(null)"
+              >
+                <span class="source-number" aria-hidden="true">{{ source.number }}</span>
+                <span class="source-lines">
+                  <span class="source-title">{{ source.documentTitle }}</span>
+                  <span class="source-place">{{ placeOf(source) }}</span>
+                </span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    }
+
+    @if (answer.state === 'stopped') {
+      <p class="note">Cevap durduruldu.</p>
+    }
+
+    @if (answer.state === 'failed') {
+      <p class="failure" role="alert">{{ answer.failure }}</p>
+    }
+
+    @if ((answer.state === 'failed' || answer.state === 'stopped') && canRetry()) {
+      <button class="retry" type="button" (click)="retry.emit()">Yeniden dene</button>
+    }
+  </div>
+</article>
