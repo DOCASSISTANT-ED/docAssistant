@@ -14,7 +14,12 @@ public static class SessionCookie
     public static void Append(HttpContext http, AccessToken token) =>
         http.Response.Cookies.Append(Name, token.Token, Options(http, token.ExpiresAt));
 
-    private static CookieOptions Options(HttpContext http, DateTimeOffset expiresAt) => new()
+    // The browser removes a cookie only when told so with the same name and path it was
+    // set with; Delete sends it back empty and already expired.
+    public static void Delete(HttpContext http) =>
+        http.Response.Cookies.Delete(Name, Options(http, expiresAt: null));
+
+    private static CookieOptions Options(HttpContext http, DateTimeOffset? expiresAt) => new()
     {
         HttpOnly = true,
         SameSite = SameSiteMode.Strict,
