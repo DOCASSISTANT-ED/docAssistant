@@ -24,9 +24,12 @@ namespace DocAssistant.IntegrationTests.Chat;
 internal sealed class ChatTestApi : IAsyncDisposable
 {
     private readonly WebApplicationFactory<Program> _api;
+    private readonly PostgresFixture _database;
 
     private ChatTestApi(PostgresFixture database)
     {
+        _database = database;
+
         _api = database.Api.WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
         {
             services.AddSingleton<IChatClient>(Model);
@@ -68,6 +71,48 @@ internal sealed class ChatTestApi : IAsyncDisposable
             .Content.ReadFromJsonAsync<CurrentUserResponse>();
 
         return new TestUser(token, Guid.Parse(me!.UserId!), me.TenantId!.Value);
+    }
+
+    // Adds a user to an existing organization, the way an invitation would once that
+    // exists: the user and the membership are written directly (as the superuser, setup
+    // only), and the token is one the API itself issues for that user. Without userId a
+    // new user is created; with it, an existing user becomes a member of one more
+    // organization.
+    public async Task<TestUser> AddMemberAsync(
+        Guid tenantId,
+        MembershipRole role = MembershipRole.Member,
+        Guid? userId = null)
+    {
+        var email = TestAccounts.NewEmail();
+        var id = userId ?? Guid.CreateVersion7();
+
+        await using (var db = _database.CreateOwnerDbContext())
+        {
+            if (userId is null)
+            {
+                db.Users.Add(new User
+                {
+                    Id = id,
+                    Email = email,
+                    NormalizedEmail = User.NormalizeEmail(email),
+                    PasswordHash = "not-used-in-these-tests",
+                });
+            }
+
+            db.Memberships.Add(new Membership
+            {
+                Id = Guid.CreateVersion7(),
+                UserId = id,
+                TenantId = tenantId,
+                Role = role,
+            });
+
+            await db.SaveChangesAsync();
+        }
+
+        var token = Services.GetRequiredService<JwtTokenIssuer>().Issue(id, email, tenantId, role.ToString()).Token;
+
+        return new TestUser(token, id, tenantId);
     }
 
     // POST /chat; without a token when token is null. The answer is returned as soon as
