@@ -276,6 +276,9 @@ describe('Login', () => {
     await submit();
 
     expect(router.url).toBe('/login');
-    expect(failure()).not.toBeNull();
+    expect(failure()).toBe(
+      'Giriş yapılamadı: oturum açılamadı. Tarayıcınız çerezleri engelliyor olabilir; bu siteye çerez izni verip yeniden deneyin.',
+    );
+    expect(submitButton().disabled).toBe(false);
   });
 });
