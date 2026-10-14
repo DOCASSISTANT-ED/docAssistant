@@ -262,9 +262,10 @@ public class ChatPromptTests(PostgresFixture database)
     }
 
     // Models sometimes put two numbers in one pair of brackets ("[1, 2]"); the evaluation
-    // run counts these (#62) and the web app shows them as two badges. They are not taken
-    // out of the history yet, so the model reads old numbers next to new sources.
-    [Fact(Skip = "Known gap: only single numbers such as [1] are removed from earlier answers; [1, 2] stays. To be fixed by the chat backend's author.")]
+    // run counts these (#62) and the web app shows them as two badges. They are taken out
+    // of the history like single numbers, or the model would read old numbers next to new
+    // sources.
+    [Fact]
     public async Task SourceNumbersSharingOneBracketAreNotSentAgainEither()
     {
         await using var api = ChatTestApi.Start(database);

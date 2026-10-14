@@ -66,6 +66,8 @@ public static partial class ChatPrompt
         return messages;
     }
 
-    [GeneratedRegex(@"\s*\[\d+\]")]
+    // "[3]", and also "[1, 3]": the prompt asks for one number per bracket (decisions #56),
+    // but models sometimes write two in one.
+    [GeneratedRegex(@"\s*\[\d+(\s*,\s*\d+)*\]")]
     private static partial Regex SourceNumber();
 }
