@@ -33,7 +33,7 @@
               (mouseleave)="light(null)"
               (focus)="light(piece.source.number)"
               (blur)="light(null)"
-              (click)="showSource(piece.source.number)"
+              (click)="showSource(piece.source, $event)"
             >
               {{ piece.source.number }}
             </button>
@@ -60,7 +60,7 @@
                 (mouseenter)="light(source.number)"
                 (mouseleave)="light(null)"
               >
-                <app-source-card [source]="source" [lit]="isLit(source.number)" />
+                <app-source-card [source]="source" [answerKey]="answer.key" [lit]="isLit(source.number)" />
               </li>
             }
           </ul>

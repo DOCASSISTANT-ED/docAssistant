@@ -1,6 +1,14 @@
 :host {
+  display: flex;
+  height: 100%;
+}
+
+/* The conversation and the question box; the source panel, when open, sits beside it. */
+.main {
   display: grid;
+  flex: 1;
   grid-template-rows: minmax(0, 1fr) auto;
+  min-width: 0;
   height: 100%;
 }
 

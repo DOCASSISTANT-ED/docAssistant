@@ -1,0 +1,80 @@
+@if (source(); as current) {
+  <header class="head">
+    <span class="number" aria-hidden="true">{{ current.number }}</span>
+
+    <div class="title-lines">
+      <h2 class="title">{{ current.documentTitle }}</h2>
+      @if (place(current); as where) {
+        <p class="place">{{ where }}</p>
+      }
+    </div>
+
+    <button #closeButton class="close" type="button" aria-label="Kaynağı kapat" (click)="panel.close()">
+      <span aria-hidden="true">×</span>
+    </button>
+  </header>
+
+  <div class="body" [attr.aria-busy]="textState() === 'loading'">
+    @switch (textState()) {
+      @case ('loading') {
+        <div class="skeleton" aria-label="Kaynağın metni yükleniyor" role="status">
+          <span class="bone"></span>
+          <span class="bone"></span>
+          <span class="bone"></span>
+          <span class="bone short"></span>
+        </div>
+      }
+
+      @case ('ready') {
+        <blockquote class="quote">
+          @for (paragraph of paragraphs(); track $index) {
+            <p class="paragraph" [style.--i]="$index">{{ paragraph }}</p>
+          }
+        </blockquote>
+        <p class="caption">Belgenin bu bölümündeki metin; cevap buna dayanıyor.</p>
+      }
+
+      @case ('empty') {
+        <p class="message">
+          Bu bölüm belgenin şimdiki hâlinde bulunamadı. Belge yeniden işlenmiş olabilir; aslına bakabilirsiniz.
+        </p>
+      }
+
+      @case ('gone') {
+        <p class="message">Bu belge artık bulunamıyor.</p>
+      }
+
+      @case ('failed') {
+        <p class="message" role="alert">Kaynağın metni yüklenemedi. Bağlantınızı kontrol edip yeniden deneyin.</p>
+        <button class="secondary" type="button" (click)="retry()">Yeniden dene</button>
+      }
+    }
+  </div>
+
+  @if (textState() !== 'gone') {
+    <footer class="foot">
+      @switch (fileState()) {
+        @case ('gone') {
+          <p class="file-note" role="alert">Bu belge artık bulunamıyor.</p>
+        }
+        @case ('failed') {
+          <p class="file-note" role="alert">Belge açılamadı. Bağlantınızı kontrol edip yeniden deneyin.</p>
+        }
+      }
+
+      <button
+        class="open"
+        type="button"
+        [class.opening]="fileState() === 'opening'"
+        [attr.aria-busy]="fileState() === 'opening'"
+        (click)="openFile()"
+      >
+        @if (current.pageNumber === null) {
+          Belgeyi indir <span aria-hidden="true">↓</span>
+        } @else {
+          Belgeyi aç <span aria-hidden="true">↗</span>
+        }
+      </button>
+    </footer>
+  }
+}

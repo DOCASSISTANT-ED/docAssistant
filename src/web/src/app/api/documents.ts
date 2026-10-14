@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -23,6 +23,13 @@ export interface DocumentInfo {
   processedAt: string | null;
 }
 
+// Server: PassageResponse. One piece of a source's text, in the document's own words;
+// pageNumber is null for a DOCX.
+export interface Passage {
+  pageNumber: number | null;
+  text: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DocumentsApi {
   private readonly http = inject(HttpClient);
@@ -42,6 +49,25 @@ export class DocumentsApi {
         error instanceof HttpErrorResponse && error.status === 404 ? of(false) : throwError(() => error),
       ),
     );
+  }
+
+  // The text at a source's place (decisions #63): the parts of the document with the
+  // same section path and page. A value the source does not have is left out, which
+  // the server reads as "none": no section (text before the first heading), no page
+  // (a DOCX). An empty list means the document no longer has that place; 404, that the
+  // document itself is gone.
+  passages(id: string, sectionPath: string | null, pageNumber: number | null): Observable<Passage[]> {
+    let params = new HttpParams();
+
+    if (sectionPath !== null) {
+      params = params.set('sectionPath', sectionPath);
+    }
+
+    if (pageNumber !== null) {
+      params = params.set('pageNumber', pageNumber);
+    }
+
+    return this.http.get<Passage[]>(`${this.baseUrl}/${id}/passages`, { params });
   }
 
   // The address of the uploaded file (decisions #63). The browser opens it itself, in a
