@@ -1,8 +1,9 @@
-import { Component, computed, input, output, signal } from '@angular/core';
-import { notFoundAnswer } from '../api/chat';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { ChatSource, notFoundAnswer } from '../api/chat';
 import { AnswerEntry } from './chat-store';
 import { CitationsPipe, CitedSourcesPipe } from './citations';
 import { SourceCard } from './source-card';
+import { SourcePanelStore } from './source-panel-store';
 
 // One answer in the conversation: the text with its source numbers, the cards of the
 // sources it points at, and whatever state it is in (still searching, being written,
@@ -14,6 +15,8 @@ import { SourceCard } from './source-card';
   templateUrl: './answer.html',
 })
 export class Answer {
+  private readonly panel = inject(SourcePanelStore);
+
   readonly entry = input.required<AnswerEntry>();
 
   // Only the conversation's last answer can be asked again.
@@ -46,8 +49,10 @@ export class Answer {
     return `source-${this.entry().key}-${number}`;
   }
 
-  // A click on a number in the text brings its card into view.
-  protected showSource(number: number): void {
-    document.getElementById(this.sourceId(number))?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // A click on a number in the text shows the source in the panel and brings its card
+  // into view, so the reader sees which card the panel belongs to.
+  protected showSource(source: ChatSource, event: Event): void {
+    this.panel.open(this.entry().key, source, event.currentTarget as HTMLElement);
+    document.getElementById(this.sourceId(source.number))?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 }

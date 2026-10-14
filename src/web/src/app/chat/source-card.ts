@@ -1,29 +1,29 @@
-import { Component, inject, input, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Component, computed, inject, input } from '@angular/core';
 import { ChatSource } from '../api/chat';
-import { DocumentsApi } from '../api/documents';
+import { SourcePanelStore } from './source-panel-store';
 
-// Where opening a source has got to. "gone" and "unreachable" stay on the card until
-// the next try, so the user can read why nothing opened.
-type OpenState = 'idle' | 'opening' | 'gone' | 'unreachable';
-
-// One source under an answer: which document, where in it, and a click that opens the
-// original (docs/decisions.md #63).
+// One source under an answer: which document and where in it. A click shows what the
+// source says in the panel beside the chat (docs/decisions.md #63); the original is
+// opened from there.
 @Component({
   selector: 'app-source-card',
   styleUrl: './source-card.css',
   templateUrl: './source-card.html',
-  host: { '[class.lit]': 'lit()' },
+  host: { '[class.lit]': 'lit()', '[class.selected]': 'selected()' },
 })
 export class SourceCard {
-  private readonly documents = inject(DocumentsApi);
+  private readonly panel = inject(SourcePanelStore);
 
   readonly source = input.required<ChatSource>();
+
+  // The answer the card belongs to; numbers repeat from answer to answer.
+  readonly answerKey = input.required<string>();
 
   // Set while the same number is pointed at in the answer's text.
   readonly lit = input(false);
 
-  protected readonly state = signal<OpenState>('idle');
+  // This source is the one in the panel.
+  protected readonly selected = computed(() => this.panel.isOpen(this.answerKey(), this.source().number));
 
   // "Bölüm 2: Yıllık İzin · s. 3". A DOCX has no pages and text before the first heading
   // has no section (decisions #22, #46), so either part may be missing.
@@ -35,63 +35,7 @@ export class SourceCard {
       .join(' · ');
   }
 
-  // A PDF opens in a new tab at the source's page; a DOCX is downloaded, as browsers
-  // cannot show one. The source does not say which type its document is, but only PDF
-  // sources have page numbers (decisions #22), so the page decides.
-  //
-  // The document is asked about first, so that a deleted one gives a message here
-  // instead of an error page in a new tab. The tab is opened at once, while the click
-  // is still going on: a tab opened after waiting for an answer counts as a pop-up, and
-  // browsers block those.
-  protected async open(): Promise<void> {
-    if (this.state() === 'opening') {
-      return;
-    }
-
-    const source = this.source();
-    const isPdf = source.pageNumber !== null;
-    const tab = isPdf ? this.openWaitingTab() : null;
-
-    this.state.set('opening');
-
-    try {
-      if (!(await firstValueFrom(this.documents.exists(source.documentId)))) {
-        tab?.close();
-        this.state.set('gone');
-        return;
-      }
-    } catch {
-      tab?.close();
-      this.state.set('unreachable');
-      return;
-    }
-
-    const url = this.documents.fileUrl(source.documentId, source.pageNumber);
-
-    if (!isPdf) {
-      // The server sends a DOCX as an attachment: the browser saves it and the page stays.
-      window.location.assign(url);
-    } else if (tab) {
-      tab.location.replace(url);
-    } else {
-      // The browser refused even the immediate tab; try once more with the address.
-      window.open(url, '_blank', 'noopener');
-    }
-
-    this.state.set('idle');
-  }
-
-  // An empty tab that says what it is waiting for. Its link back to this page is cut:
-  // the file has no business with the app's window.
-  private openWaitingTab(): Window | null {
-    const tab = window.open('', '_blank');
-
-    if (tab) {
-      tab.opener = null;
-      tab.document.title = 'Belge açılıyor…';
-      tab.document.body.textContent = 'Belge açılıyor…';
-    }
-
-    return tab;
+  protected open(event: Event): void {
+    this.panel.open(this.answerKey(), this.source(), event.currentTarget as HTMLElement);
   }
 }

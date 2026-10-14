@@ -1,0 +1,259 @@
+/* Beside the chat on wide screens; the chat narrows instead of being covered, so the
+   answer and its source can be read side by side. */
+:host {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(26rem, 42vw);
+  height: 100%;
+  border-left: 1px solid color-mix(in srgb, var(--brand-forest) 12%, transparent);
+  background: #ffffff;
+  box-shadow: -1.25rem 0 2.5rem rgb(15 61 62 / 0.06);
+  animation: slide-in 0.35s both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ---- Head ---- */
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 1.25rem 1rem 1rem 1.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--brand-forest) 8%, transparent);
+}
+
+.number {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 0.65rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font: var(--mat-sys-title-small);
+  rotate: -4deg;
+}
+
+.title-lines {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+  color: var(--brand-forest);
+  overflow-wrap: anywhere;
+}
+
+.place {
+  margin: 0.15rem 0 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: transparent;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, rotate 0.2s ease;
+}
+
+.close:hover {
+  background: color-mix(in srgb, var(--brand-forest) 8%, transparent);
+  color: var(--brand-forest);
+  rotate: 90deg;
+}
+
+/* ---- Body: the document's words ---- */
+
+.body {
+  display: grid;
+  align-content: start;
+  gap: 0.9rem;
+  padding: 1.25rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.quote {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid var(--brand-amber);
+  border-radius: 0 0.9rem 0.9rem 0;
+  background: var(--brand-paper);
+}
+
+.paragraph {
+  margin: 0;
+  font: var(--mat-sys-body-large);
+  line-height: 1.7;
+  color: var(--mat-sys-on-surface);
+  /* Table rows arrive as lines of their own. */
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  animation: rise 0.4s both cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation-delay: calc(min(var(--i), 8) * 60ms + 80ms);
+}
+
+.caption,
+.message {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.skeleton {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid color-mix(in srgb, var(--brand-amber) 40%, transparent);
+  animation: appear 0.3s 0.15s both;
+}
+
+.bone {
+  display: block;
+  height: 0.95rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.7) 50%, transparent 70%) 0 0 / 200% 100%,
+    color-mix(in srgb, var(--brand-forest) 9%, transparent);
+  animation: shimmer 1.4s linear infinite;
+}
+
+.bone.short {
+  width: 60%;
+}
+
+/* ---- Foot: the original ---- */
+
+.foot {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--brand-forest) 8%, transparent);
+}
+
+.file-note {
+  margin: 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-error);
+}
+
+.open,
+.secondary {
+  padding: 0.75rem 1.25rem;
+  border-radius: 2rem;
+  font: var(--mat-sys-label-large);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.open {
+  border: 0;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  box-shadow: 0 0.35rem 0.9rem rgb(232 163 61 / 0.35);
+}
+
+.open:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.7rem 1.4rem rgb(232 163 61 / 0.45);
+}
+
+.open.opening {
+  animation: breathe 0.9s ease-in-out infinite;
+}
+
+.secondary {
+  justify-self: start;
+  border: 1px solid color-mix(in srgb, var(--brand-forest) 30%, transparent);
+  background: transparent;
+  color: var(--mat-sys-primary);
+}
+
+.close:focus-visible,
+.open:focus-visible,
+.secondary:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 2px;
+}
+
+/* ---- Narrow screens: a sheet over the whole screen ---- */
+
+@media (max-width: 48rem) {
+  :host {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    width: auto;
+    border-left: 0;
+    animation-name: sheet-in;
+  }
+}
+
+/* ---- Motion ---- */
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0, 0 0;
+  }
+
+  to {
+    background-position: -100% 0, 0 0;
+  }
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host,
+  .paragraph,
+  .skeleton,
+  .bone,
+  .open,
+  .close {
+    animation: none;
+    transition: none;
+  }
+}

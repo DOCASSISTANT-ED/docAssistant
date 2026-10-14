@@ -1,24 +1,27 @@
 import { TextFieldModule } from '@angular/cdk/text-field';
-import { Component, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { questionMaxLength } from '../api/chat';
 import { Answer } from './answer';
 import { ChatStore } from './chat-store';
+import { SourcePanel } from './source-panel';
+import { SourcePanelStore } from './source-panel-store';
 import { Welcome } from './welcome';
 
 // The chat screen: the conversation's questions and answers, and the box to ask the next
 // question. What is shown comes from ChatStore; this component turns it into a page and
 // passes the user's actions on.
 @Component({
-  imports: [Answer, FormsModule, RouterLink, TextFieldModule, Welcome],
+  imports: [Answer, FormsModule, RouterLink, TextFieldModule, SourcePanel, Welcome],
   selector: 'app-chat',
   styleUrl: './chat.css',
   templateUrl: './chat.html',
 })
 export class Chat {
   protected readonly chat = inject(ChatStore);
+  protected readonly sourcePanel = inject(SourcePanelStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -35,10 +38,19 @@ export class Chat {
   private followingEnd = true;
 
   constructor() {
+    // The panel belongs to this screen; leaving it (signing out, for one) closes it.
+    inject(DestroyRef).onDestroy(() => this.sourcePanel.close());
+
     // The address decides what is shown: /c/<id> is a conversation from the history,
     // the plain address a new one.
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const id = params.get('id');
+
+      // Another conversation: its sources are not the ones in the panel. A new
+      // conversation getting its id is not another one, and keeps the panel.
+      if (id !== this.chat.conversationId()) {
+        this.sourcePanel.close();
+      }
 
       if (id) {
         void this.chat.open(id);
