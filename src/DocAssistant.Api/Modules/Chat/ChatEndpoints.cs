@@ -162,6 +162,10 @@ public static class ChatEndpoints
                 .GetStreamingResponseAsync(answer.Prompt, answer.ModelOptions, cancellationToken)
                 .GetAsyncEnumerator(cancellationToken);
 
+            // Set when the model stopped because it reached the length limit, not because
+            // its answer was complete (decisions #64).
+            var cutOff = false;
+
             while (true)
             {
                 string piece;
@@ -174,6 +178,7 @@ public static class ChatEndpoints
                     }
 
                     piece = updates.Current.Text;
+                    cutOff |= updates.Current.FinishReason == ChatFinishReason.Length;
                 }
                 catch (Exception exception) when (exception is not OperationCanceledException)
                 {
@@ -192,6 +197,17 @@ public static class ChatEndpoints
             if (!failed && text.Length == 0)
             {
                 logger.LogError("The chat model returned an empty answer in conversation {ConversationId}.", answer.ConversationId);
+                failed = true;
+            }
+
+            // An answer that ran into the limit is not a complete answer: most likely the
+            // model was repeating itself. It is treated like one that broke off: not
+            // stored, and the client is told with an error event (decisions #56, #64).
+            if (!failed && cutOff)
+            {
+                logger.LogWarning(
+                    "The chat model reached the answer length limit in conversation {ConversationId}; the answer was not stored.",
+                    answer.ConversationId);
                 failed = true;
             }
         }
@@ -251,8 +267,10 @@ public static class ChatEndpoints
 
     // Temperature 0: the same question with the same sources should give the same answer.
     // The context size is an Ollama setting (decisions #61); another provider ignores it.
+    // The answer's length limit (decisions #64) is common to all providers.
     private static ChatOptions ModelOptions(ChatModelOptions settings) =>
-        new ChatOptions { Temperature = 0 }.AddOllamaOption(OllamaOption.NumCtx, settings.ContextTokens);
+        new ChatOptions { Temperature = 0, MaxOutputTokens = settings.MaxAnswerTokens }
+            .AddOllamaOption(OllamaOption.NumCtx, settings.ContextTokens);
 
     // decisions #57: the first 80 characters of the first question.
     private static string TitleFrom(string question)

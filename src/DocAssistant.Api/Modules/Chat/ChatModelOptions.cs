@@ -22,4 +22,10 @@ public sealed class ChatModelOptions
     // question with eight sources, and what does not fit is cut off without an error.
     [Range(2048, 131072)]
     public int ContextTokens { get; init; } = 8192;
+
+    // The longest answer the model may write (decisions #64). Answers from the documents
+    // are far shorter; the limit is there to stop a model that has started to repeat
+    // itself, which would otherwise write until the user stops it.
+    [Range(64, 8192)]
+    public int MaxAnswerTokens { get; init; } = 1024;
 }
