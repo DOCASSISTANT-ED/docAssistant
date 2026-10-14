@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChatSource } from '../api/chat';
 import { Answer } from './answer';
 import { AnswerEntry } from './chat-store';
+import { SourcePanelStore } from './source-panel-store';
 
 function source(number: number, details: Partial<ChatSource> = {}): ChatSource {
   return {
@@ -31,6 +32,16 @@ function entry(details: Partial<AnswerEntry> = {}): AnswerEntry {
 describe('Answer', () => {
   let fixture: ComponentFixture<Answer>;
   let element: HTMLElement;
+
+  // jsdom lays nothing out and has no scrollIntoView; pressing a number calls it to bring
+  // the number's card into view. Tests that look at the scrolling replace it themselves.
+  beforeEach(() => {
+    Element.prototype.scrollIntoView = vi.fn();
+  });
+
+  afterEach(() => {
+    delete (Element.prototype as Partial<Element>).scrollIntoView;
+  });
 
   function show(answer: AnswerEntry, canRetry = false): void {
     fixture = TestBed.createComponent(Answer);
@@ -316,6 +327,42 @@ describe('Answer', () => {
 
       expect(card('1').id).not.toBe(first);
       expect(card('1').id).not.toBe('');
+    });
+  });
+
+  // docs/decisions.md #63: a number in the text opens its source beside the chat, like
+  // its card does.
+  describe('opening a source', () => {
+    it('opens the source of a number in the panel, with this answer', () => {
+      show(entry({ key: 'a-7' }));
+      const panel = TestBed.inject(SourcePanelStore);
+
+      element.querySelectorAll<HTMLButtonElement>('button.cite')[0].click();
+
+      expect(panel.opened()).toEqual({ answerKey: 'a-7', source: source(2) });
+    });
+
+    it('gives the focus back to the number when the panel closes', () => {
+      show(entry());
+      document.body.appendChild(element);
+      const panel = TestBed.inject(SourcePanelStore);
+      const number = element.querySelector<HTMLButtonElement>('button.cite')!;
+
+      number.click();
+      number.blur();
+      panel.close();
+
+      expect(document.activeElement).toBe(number);
+      element.remove();
+    });
+
+    it('shows each listed source as a card of this answer', () => {
+      show(entry({ key: 'a-7' }));
+
+      const panel = TestBed.inject(SourcePanelStore);
+      element.querySelector<HTMLButtonElement>('app-source-card button')!.click();
+
+      expect(panel.opened()).toEqual({ answerKey: 'a-7', source: source(1) });
     });
   });
 });
