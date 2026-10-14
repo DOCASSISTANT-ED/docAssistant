@@ -62,6 +62,8 @@ dotnet run --project eval/DocAssistant.Eval
 
 Başka bir Ollama adresi ya da model için: `-- --embedding-url http://localhost:11434 --embedding-model bge-m3`.
 
+API geliştirme için açıksa (`dotnet run --project src/DocAssistant.Api`) araç API projesini yeniden derlerken API'nin kilitlediği dosyalara takılır ("being used by another process"). O durumda ayrı bir derleme klasörü kullanan sürüm ayarıyla çalıştır: `dotnet run -c Release --project eval/DocAssistant.Eval`.
+
 Araç bir test projesi değildir; `dotnet test` ve CI onu çalıştırmaz, çünkü CI'da embedding modeli yoktur.
 
 ### Ne yapar
