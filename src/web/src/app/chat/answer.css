@@ -133,59 +133,11 @@
   list-style: none;
 }
 
+/* A card's look lives in SourceCard; the list item only brings it in. */
 .source {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
   min-width: 0;
-  padding: 0.75rem 0.9rem;
-  border: 1px solid color-mix(in srgb, var(--brand-forest) 14%, transparent);
-  border-radius: 1rem;
-  background: #ffffff;
   animation: rise 0.45s both cubic-bezier(0.2, 0.7, 0.2, 1);
   animation-delay: calc(min(var(--i), 8) * 70ms);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.source.lit {
-  border-color: var(--brand-amber);
-  box-shadow: 0 0.6rem 1.5rem rgb(232 163 61 / 0.25);
-  transform: translateY(-2px);
-}
-
-.source-number {
-  display: grid;
-  place-items: center;
-  flex: none;
-  min-width: 1.6rem;
-  height: 1.6rem;
-  border-radius: 0.5rem;
-  background: var(--brand-amber);
-  color: var(--brand-on-amber);
-  font: var(--mat-sys-label-large);
-}
-
-.source-lines {
-  display: grid;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.source-title,
-.source-place {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.source-title {
-  font: var(--mat-sys-title-small);
-  color: var(--mat-sys-on-surface);
-}
-
-.source-place {
-  font: var(--mat-sys-body-small);
-  color: var(--mat-sys-on-surface-variant);
 }
 
 /* ---- Nothing in the documents ---- */

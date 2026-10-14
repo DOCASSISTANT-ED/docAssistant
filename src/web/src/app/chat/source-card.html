@@ -1,0 +1,33 @@
+@let current = source();
+
+<button
+  class="card"
+  type="button"
+  [class.opening]="state() === 'opening'"
+  [attr.aria-busy]="state() === 'opening'"
+  [attr.aria-label]="
+    current.documentTitle + (current.pageNumber === null ? ' belgesini indir' : ' belgesini aç')
+  "
+  (click)="open()"
+>
+  <span class="source-number" aria-hidden="true">{{ current.number }}</span>
+
+  <span class="source-lines">
+    <span class="source-title">{{ current.documentTitle }}</span>
+
+    @switch (state()) {
+      @case ('gone') {
+        <span class="source-note" role="alert">Bu belge artık bulunamıyor.</span>
+      }
+      @case ('unreachable') {
+        <span class="source-note" role="alert">Belge açılamadı. Bağlantınızı kontrol edip yeniden deneyin.</span>
+      }
+      @default {
+        <span class="source-place">{{ place() }}</span>
+      }
+    }
+  </span>
+
+  <!-- What a click does: a PDF opens beside the chat, a DOCX is saved. -->
+  <span class="action" aria-hidden="true">{{ current.pageNumber === null ? '↓' : '↗' }}</span>
+</button>
