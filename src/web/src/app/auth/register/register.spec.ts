@@ -168,6 +168,67 @@ describe('Register', () => {
     });
   });
 
+  // The API created the organization and the account, but no session followed: the
+  // browser did not keep the session cookie (docs/decisions.md #60). Moving on would only
+  // bring the user back to the login screen without a word, and registering again would
+  // fail, because the email is taken now.
+  describe('an account that was created but left no session', () => {
+    const noSession =
+      'Hesabınız oluşturuldu ama oturum açılamadı. Tarayıcınız çerezleri engelliyor olabilir; bu siteye çerez izni verip giriş yapın.';
+
+    function registerWithoutSession(): void {
+      register.mockImplementationOnce(async () => {
+        // Created, but nobody is signed in afterwards.
+      });
+    }
+
+    it('stays on the screen and says the account exists but signing in failed', async () => {
+      await open();
+      registerWithoutSession();
+      fillIn();
+
+      await submit();
+
+      expect(router.url).toBe('/register');
+      expect(failure()).toBe(noSession);
+    });
+
+    it('does not follow the address it was given to return to', async () => {
+      await open('/register?returnUrl=%2Fbelgeler');
+      registerWithoutSession();
+      fillIn();
+
+      await submit();
+
+      expect(router.url).toBe('/register?returnUrl=%2Fbelgeler');
+    });
+
+    // Nothing the user typed was wrong; no field is marked.
+    it('marks no field', async () => {
+      await open();
+      registerWithoutSession();
+      fillIn();
+
+      await submit();
+
+      expect(fieldErrors()).toEqual([]);
+    });
+
+    // The way on is the login screen, with the address to return to.
+    it('leaves the button and the link to the login screen usable', async () => {
+      await open('/register?returnUrl=%2Fbelgeler');
+      registerWithoutSession();
+      fillIn();
+
+      await submit();
+
+      expect(submitButton().disabled).toBe(false);
+      expect(screen.querySelector<HTMLAnchorElement>('.switch a')!.getAttribute('href')).toBe(
+        '/login?returnUrl=%2Fbelgeler',
+      );
+    });
+  });
+
   describe('a rejected attempt', () => {
     it('says the email is taken, at the top and under the field', async () => {
       await open();
