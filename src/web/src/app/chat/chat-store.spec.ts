@@ -668,13 +668,11 @@ describe('ChatStore', () => {
       });
     });
 
-    // Known gap. An "error" event counts as "the answer has ended" in the store, so the
-    // search for the conversation is skipped. But the server saved the question and
-    // created the conversation before the model failed (decisions #56), exactly as when
-    // the connection is lost. "Try again" then starts a second conversation, and the
-    // first stays in the history with a question and no answer. Expected: the
-    // conversation is found here too. Remove ".skip" when the store does.
-    it.skip('finds it after the server reported an error too', async () => {
+    // The server saved the question and created the conversation before the model failed
+    // (decisions #56), exactly as when the connection is lost. Without finding it, "Try
+    // again" would start a second conversation, and the first would stay in the history
+    // with a question and no answer.
+    it('finds it after the server reported an error too', async () => {
       const { answer, ended } = await startAsking('Yıllık izin kaç gün?');
       list.mockReturnValueOnce(of([summary('c-new', 'Yıllık izin kaç gün?')]));
 

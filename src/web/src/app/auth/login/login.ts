@@ -60,6 +60,15 @@ export class Login {
 
     try {
       await this.session.login(this.form.getRawValue());
+
+      // The API took the password, but no session followed: the session cookie did not
+      // come back (decisions #60), most likely because the browser refused to keep it.
+      // Moving on would only bring the user back here without a word.
+      if (!this.session.isSignedIn()) {
+        this.failure.set(noSessionMessage);
+        return;
+      }
+
       // Back to the screen the user was sent here from, if any (auth.guards.ts).
       await this.router.navigateByUrl(safeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl')));
     } catch (error) {
@@ -69,6 +78,9 @@ export class Login {
     }
   }
 }
+
+const noSessionMessage =
+  'Giriş yapılamadı: oturum açılamadı. Tarayıcınız çerezleri engelliyor olabilir; bu siteye çerez izni verip yeniden deneyin.';
 
 function messageFor(error: unknown): string {
   if (error instanceof HttpErrorResponse) {

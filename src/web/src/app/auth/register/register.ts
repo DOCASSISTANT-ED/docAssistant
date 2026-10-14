@@ -69,6 +69,17 @@ export class Register {
 
     try {
       await this.session.register(this.form.getRawValue());
+
+      // The account was created, but no session followed: the session cookie did not
+      // come back (decisions #60), most likely because the browser refused to keep it.
+      // Registering again would fail (the email is taken), so the user is told so.
+      if (!this.session.isSignedIn()) {
+        this.failure.set(
+          'Hesabınız oluşturuldu ama oturum açılamadı. Tarayıcınız çerezleri engelliyor olabilir; bu siteye çerez izni verip giriş yapın.',
+        );
+        return;
+      }
+
       // Back to the screen the user was sent here from, if any (auth.guards.ts).
       await this.router.navigateByUrl(safeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl')));
     } catch (error) {

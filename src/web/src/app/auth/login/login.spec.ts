@@ -262,12 +262,11 @@ describe('Login', () => {
     expect(link.getAttribute('href')).toBe('/register?returnUrl=%2Fbelgeler');
   });
 
-  // Known gap (reported with the tests of session.ts). The API accepts the password but
-  // no session follows, for example because the browser refused to store the cookie:
-  // Session.login() ends without an error, the screen navigates, the guard sends the
-  // user straight back here, and the screen says nothing. Expected: the user is told
-  // that signing in did not work. Remove ".skip" when the screen does.
-  it.skip('tells the user when signing in left no session', async () => {
+  // The API accepts the password but no session follows, for example because the browser
+  // refused to store the cookie: Session.login() ends without an error. The screen must
+  // not move on (the guard would only send the user straight back here, without a word);
+  // it stays and tells the user that signing in did not work.
+  it('tells the user when signing in left no session', async () => {
     await open();
     login.mockImplementationOnce(async () => {
       // Accepted, but nobody is signed in afterwards.
