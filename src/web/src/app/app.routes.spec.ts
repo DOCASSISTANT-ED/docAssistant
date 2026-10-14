@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
@@ -7,6 +9,7 @@ import { CurrentUser } from './api/identity';
 import { routes } from './app.routes';
 import { Session } from './auth/session';
 import { ChatEntry, ChatStore, OpenState } from './chat/chat-store';
+import { SourcePanelStore } from './chat/source-panel-store';
 
 const admin: CurrentUser = {
   userId: 'u-1',
@@ -54,6 +57,9 @@ describe('routes', () => {
           },
         },
         { provide: ChatStore, useValue: store },
+        // The source panel asks the API for a source's text; nothing is answered here.
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ],
     });
 
@@ -130,6 +136,28 @@ describe('routes', () => {
       await settle();
 
       expect(navigate).toHaveBeenCalledExactlyOnceWith(['/c', 'c-new'], { replaceUrl: true });
+    });
+
+    // docs/decisions.md #63. Getting its id does not make it another conversation: the
+    // source opened from its first answer stays beside the chat.
+    it('keeps an open source when a new conversation gets its own address', async () => {
+      await visit('/');
+      const panel = TestBed.inject(SourcePanelStore);
+      panel.open('a-1', {
+        number: 1,
+        documentId: 'd-1',
+        documentTitle: 'İK Yönetmeliği',
+        sectionPath: null,
+        pageNumber: 1,
+      });
+      await settle();
+
+      store.conversationId.set('c-new');
+      await settle();
+
+      expect(router.url).toBe('/c/c-new');
+      expect(panel.opened()).not.toBeNull();
+      expect(page().querySelector('app-source-panel')).not.toBeNull();
     });
   });
 

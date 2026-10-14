@@ -1,9 +1,12 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Chat } from './chat';
 import { AnswerEntry, ChatEntry, ChatStore, OpenState } from './chat-store';
+import { SourcePanelStore } from './source-panel-store';
 
 @Component({ template: '' })
 class Blank {}
@@ -59,6 +62,9 @@ describe('Chat', () => {
           { path: 'login', component: Blank },
         ]),
         { provide: ChatStore, useValue: store },
+        // The source panel asks the API for a source's text; nothing is answered here.
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ],
     });
 
@@ -426,6 +432,87 @@ describe('Chat', () => {
 
       expect(stopButton()).toBeNull();
       expect(sendButton()).not.toBeNull();
+    });
+  });
+
+  // ---- The source panel (docs/decisions.md #63) ----
+
+  describe('the source panel', () => {
+    const source = {
+      number: 1,
+      documentId: 'd-1',
+      documentTitle: 'İK Yönetmeliği',
+      sectionPath: 'Bölüm 2',
+      pageNumber: 3,
+    };
+
+    const shownPanel = () => screen.querySelector('app-source-panel');
+
+    async function openPanel(): Promise<SourcePanelStore> {
+      const panel = TestBed.inject(SourcePanelStore);
+      panel.open('a-1', source);
+      await settle();
+
+      return panel;
+    }
+
+    it('is not there until a source is opened', async () => {
+      await open('/c/c-1');
+
+      expect(shownPanel()).toBeNull();
+    });
+
+    it('appears beside the chat when a source is opened', async () => {
+      await open('/c/c-1');
+
+      await openPanel();
+
+      expect(shownPanel()).not.toBeNull();
+    });
+
+    it('goes away when it is closed', async () => {
+      await open('/c/c-1');
+      const panel = await openPanel();
+
+      panel.close();
+      await settle();
+
+      expect(shownPanel()).toBeNull();
+    });
+
+    // Another conversation's sources are not the ones in the panel.
+    it('closes when the user goes to another conversation', async () => {
+      await open('/c/c-1');
+      store.conversationId.set('c-1');
+      const panel = await openPanel();
+
+      await harness.navigateByUrl('/c/c-2');
+      await settle();
+
+      expect(panel.opened()).toBeNull();
+    });
+
+    it('closes when the user starts a new conversation', async () => {
+      await open('/c/c-1');
+      store.conversationId.set('c-1');
+      const panel = await openPanel();
+
+      await harness.navigateByUrl('/');
+      await settle();
+
+      expect(panel.opened()).toBeNull();
+    });
+
+    // Leaving the screen (signing out, for one) must not leave a panel open for the
+    // next one who opens it.
+    it('closes when the chat screen goes away', async () => {
+      await open('/c/c-1');
+      const panel = await openPanel();
+
+      await harness.navigateByUrl('/login');
+      await settle();
+
+      expect(panel.opened()).toBeNull();
     });
   });
 });
