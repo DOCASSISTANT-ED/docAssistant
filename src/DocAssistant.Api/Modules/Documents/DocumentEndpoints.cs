@@ -6,6 +6,7 @@ using DocAssistant.Api.Modules.Ingestion;
 using DocAssistant.Shared.Tenancy;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 
 namespace DocAssistant.Api.Modules.Documents;
 
@@ -23,13 +24,15 @@ public static class DocumentEndpoints
             // decisions #32: admins upload, members ask questions.
             .RequireAuthorization(policy => policy.RequireRole(nameof(MembershipRole.Admin)))
             // Form endpoints expect antiforgery tokens by default. Those defend sites that
-            // authenticate with cookies, which a browser sends on its own. Our token is in
-            // the Authorization header and has to be added by code, so another site cannot
-            // make a logged-in browser call this endpoint. Revisit if the access token ever
-            // moves into a cookie (decisions #41).
+            // authenticate with cookies, which a browser sends on its own. The token does
+            // travel in a cookie in the browser (decisions #60), but every cookie-
+            // authenticated request that changes something must carry the X-Requested-With
+            // header (SessionCookieCsrfProtection). Another site cannot add that header to
+            // a form post, so it cannot make a logged-in browser call this endpoint.
             .DisableAntiforgery();
 
         documents.MapGet("/{id:guid}", GetById);
+        documents.MapGet("/{id:guid}/file", GetFile);
 
         return app;
     }
@@ -131,6 +134,65 @@ public static class DocumentEndpoints
         return document is null
             ? TypedResults.NotFound()
             : TypedResults.Ok(DocumentResponse.From(document));
+    }
+
+    // The uploaded file itself, so a source in the chat can be checked against the
+    // original (decisions #63). Any member may open it: whoever can ask about a document
+    // must be able to see what the answer rests on. As in GetById, the query filter and
+    // RLS limit the lookup to the caller's tenant; another tenant's document is "not found".
+    private static async Task<Results<FileStreamHttpResult, NotFound>> GetFile(
+        Guid id,
+        HttpContext context,
+        AppDbContext db,
+        IFileStorage storage,
+        ILoggerFactory loggerFactory,
+        CancellationToken cancellationToken)
+    {
+        var document = await db.Documents
+            .AsNoTracking()
+            .SingleOrDefaultAsync(d => d.Id == id, cancellationToken);
+
+        if (document is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        Stream content;
+
+        try
+        {
+            content = await storage.OpenReadAsync(document.StorageKey, cancellationToken);
+        }
+        catch (FileNotFoundException)
+        {
+            // A row always has a file behind it (decisions #37); if it does not, something
+            // outside the app removed it. For the user the document is gone either way.
+            loggerFactory.CreateLogger(typeof(DocumentEndpoints))
+                .LogWarning("Document {DocumentId} has no file under its storage key.", document.Id);
+
+            return TypedResults.NotFound();
+        }
+
+        var headers = context.Response.Headers;
+
+        // A PDF opens in the browser's own viewer, where the client can jump to the
+        // source's page; a browser cannot show a DOCX, so it is downloaded. The file's
+        // own name is sent in both cases, Turkish letters included (filename*).
+        var disposition = new ContentDispositionHeaderValue(
+            document.ContentType == DocumentContentTypes.Pdf ? "inline" : "attachment");
+        disposition.SetHttpFileName(document.FileName);
+        headers.ContentDisposition = disposition.ToString();
+
+        // The type is the one detected from the bytes at upload (decisions #32), and the
+        // browser must not guess another one: an uploaded file never runs as a page.
+        headers.XContentTypeOptions = "nosniff";
+
+        // Company documents may be kept by the user's own browser, never by a shared
+        // cache (a proxy on the company's network, for one).
+        headers.CacheControl = "private";
+
+        // Range requests let a PDF viewer load the page it shows first.
+        return TypedResults.File(content, document.ContentType, enableRangeProcessing: true);
     }
 
     private static async Task DeleteStoredFileAsync(IFileStorage storage, string storageKey, ILogger logger)

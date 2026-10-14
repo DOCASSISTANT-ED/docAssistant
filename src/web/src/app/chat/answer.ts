@@ -1,13 +1,14 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import { ChatSource, notFoundAnswer } from '../api/chat';
+import { notFoundAnswer } from '../api/chat';
 import { AnswerEntry } from './chat-store';
 import { CitationsPipe, CitedSourcesPipe } from './citations';
+import { SourceCard } from './source-card';
 
 // One answer in the conversation: the text with its source numbers, the cards of the
 // sources it points at, and whatever state it is in (still searching, being written,
 // stopped, failed).
 @Component({
-  imports: [CitationsPipe, CitedSourcesPipe],
+  imports: [CitationsPipe, CitedSourcesPipe, SourceCard],
   selector: 'app-answer',
   styleUrl: './answer.css',
   templateUrl: './answer.html',
@@ -48,13 +49,5 @@ export class Answer {
   // A click on a number in the text brings its card into view.
   protected showSource(number: number): void {
     document.getElementById(this.sourceId(number))?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  // "Bölüm 2: Yıllık İzin · s. 3". A DOCX has no pages and text before the first heading
-  // has no section (docs/decisions.md #22, #46), so either part may be missing.
-  protected placeOf(source: ChatSource): string {
-    return [source.sectionPath, source.pageNumber === null ? null : `s. ${source.pageNumber}`]
-      .filter((part) => part !== null && part !== '')
-      .join(' · ');
   }
 }

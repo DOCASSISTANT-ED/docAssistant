@@ -60,11 +60,7 @@
                 (mouseenter)="light(source.number)"
                 (mouseleave)="light(null)"
               >
-                <span class="source-number" aria-hidden="true">{{ source.number }}</span>
-                <span class="source-lines">
-                  <span class="source-title">{{ source.documentTitle }}</span>
-                  <span class="source-place">{{ placeOf(source) }}</span>
-                </span>
+                <app-source-card [source]="source" [lit]="isLit(source.number)" />
               </li>
             }
           </ul>
