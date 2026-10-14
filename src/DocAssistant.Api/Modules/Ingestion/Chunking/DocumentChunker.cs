@@ -16,6 +16,21 @@ public static class DocumentChunker
     // Characters of text per chunk, not counting the context header.
     public const int MaxTextLength = 1500;
 
+    // Between a chunk's context header ("Belge: İK Yönetmeliği > Bölüm 2") and its text
+    // (decisions #27). The header is one line, so the first occurrence ends it.
+    private const string HeaderSeparator = "\n\n";
+
+    // A chunk's text without its context header: what the document itself says, for
+    // showing a source to a reader (decisions #63). The header is for search and the model.
+    public static string WithoutContextHeader(string content)
+    {
+        var end = content.IndexOf(HeaderSeparator, StringComparison.Ordinal);
+
+        return content.StartsWith("Belge: ", StringComparison.Ordinal) && end >= 0
+            ? content[(end + HeaderSeparator.Length)..]
+            : content;
+    }
+
     // Compares titles the way a reader would: case-insensitive, with Turkish i/İ and ı/I.
     private static readonly StringComparer TitleComparer =
         StringComparer.Create(CultureInfo.GetCultureInfo("tr-TR"), ignoreCase: true);
@@ -240,7 +255,7 @@ public static class DocumentChunker
                 ? $"Belge: {documentTitle}"
                 : $"Belge: {documentTitle} > {sectionPath}";
 
-            Chunks.Add(new ChunkDraft(Chunks.Count, $"{header}\n\n{_text}", _pageNumber, sectionPath));
+            Chunks.Add(new ChunkDraft(Chunks.Count, $"{header}{HeaderSeparator}{_text}", _pageNumber, sectionPath));
 
             _text.Clear();
             _pageNumber = null;

@@ -3,6 +3,7 @@ using DocAssistant.Api.Data;
 using DocAssistant.Api.Modules.Documents.Storage;
 using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
+using DocAssistant.Api.Modules.Ingestion.Chunking;
 using DocAssistant.Shared.Tenancy;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,7 @@ public static class DocumentEndpoints
 
         documents.MapGet("/{id:guid}", GetById);
         documents.MapGet("/{id:guid}/file", GetFile);
+        documents.MapGet("/{id:guid}/passages", GetPassages);
 
         return app;
     }
@@ -195,6 +197,50 @@ public static class DocumentEndpoints
         return TypedResults.File(content, document.ContentType, enableRangeProcessing: true);
     }
 
+    // The text of a source, for the panel the chat opens beside an answer (decisions #63).
+    // A source names its place by section path and page (#56), not by chunk: chunks are
+    // replaced when a document is processed again (#35), its sections and pages are not.
+    // So the chunks are found by the same two values, and a missing value means "none":
+    // a source without a section is text before the first heading (#46), a source
+    // without a page is from a DOCX (#22).
+    //
+    // An empty list is a valid answer: the document exists, but no longer has that place
+    // (it was processed again and the section was renamed, for one). Any member may read,
+    // and the query filter and RLS keep the lookup inside the caller's tenant.
+    private static async Task<Results<Ok<List<PassageResponse>>, NotFound>> GetPassages(
+        Guid id,
+        string? sectionPath,
+        int? pageNumber,
+        AppDbContext db,
+        CancellationToken cancellationToken)
+    {
+        var document = await db.Documents
+            .AsNoTracking()
+            .SingleOrDefaultAsync(d => d.Id == id, cancellationToken);
+
+        if (document is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        // "?sectionPath=" with nothing after it means no section, like leaving it out.
+        var section = string.IsNullOrEmpty(sectionPath) ? null : sectionPath;
+
+        var chunks = await db.Chunks
+            .AsNoTracking()
+            .Where(c => c.DocumentId == id
+                && c.DocumentVersion == document.Version
+                && c.SectionPath == section
+                && c.PageNumber == pageNumber)
+            .OrderBy(c => c.Ordinal)
+            .Select(c => new { c.PageNumber, c.Content })
+            .ToListAsync(cancellationToken);
+
+        return TypedResults.Ok(chunks
+            .Select(c => new PassageResponse(c.PageNumber, DocumentChunker.WithoutContextHeader(c.Content)))
+            .ToList());
+    }
+
     private static async Task DeleteStoredFileAsync(IFileStorage storage, string storageKey, ILogger logger)
     {
         try
@@ -235,3 +281,7 @@ public sealed record DocumentResponse(
         document.CreatedAt,
         document.ProcessedAt);
 }
+
+// One piece of a source's text, in the document's own words (decisions #63). PageNumber
+// is null for a DOCX, which has no pages (decisions #22).
+public sealed record PassageResponse(int? PageNumber, string Text);
