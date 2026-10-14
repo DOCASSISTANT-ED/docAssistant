@@ -157,6 +157,9 @@ export class ChatStore {
     const conversationId = this.openConversationId();
     const startedAt = Date.now();
     let ended = false;
+    // Only "done" brings the conversation's id. "error" ends the answer too, but after
+    // the server has saved the question and created the conversation (decisions #56).
+    let saved = false;
 
     try {
       const events = this.chatStream.ask(
@@ -176,6 +179,7 @@ export class ChatStore {
 
           case 'done':
             ended = true;
+            saved = true;
             this.updateAnswer(answerKey, { state: 'done' });
             this.conversationSaved(event.conversationId, text);
             break;
@@ -206,10 +210,11 @@ export class ChatStore {
       }
     }
 
-    // A first question that did not reach "done" still created its conversation on the
-    // server, but its id only comes with "done". Find it, so that the next question
-    // continues it instead of starting yet another one.
-    if (!ended && conversationId === null && this.openConversationId() === null) {
+    // A first question that did not reach "done" (the model failed, the connection was
+    // lost, the user stopped it) still created its conversation on the server, but its
+    // id only comes with "done". Find it, so that the next question, or trying this one
+    // again, continues it instead of starting yet another one.
+    if (!saved && conversationId === null && this.openConversationId() === null) {
       await this.adoptConversationStartedBy(text, startedAt);
     }
   }
