@@ -93,7 +93,7 @@ describe('routes', () => {
       expect(store.open).toHaveBeenCalledExactlyOnceWith('c-1');
     });
 
-    it.each(['/c', '/c/c-1/fazlası', '/belgeler', '/belgeler/c-1', '/c-1'])(
+    it.each(['/c', '/c/c-1/fazlası', '/ayarlar', '/belgeler/c-1', '/c-1'])(
       'leads home from the unknown address %s',
       async (url) => {
         await visit(url);
@@ -191,7 +191,7 @@ describe('routes', () => {
     });
 
     it('leads from an unknown address to the login screen', async () => {
-      await visit('/belgeler', null);
+      await visit('/ayarlar', null);
 
       expect(router.url).toBe('/login');
     });

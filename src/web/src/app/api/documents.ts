@@ -30,10 +30,38 @@ export interface Passage {
   text: string;
 }
 
+// What the server accepts for upload (docs/decisions.md #32), so that the page can say so
+// before sending. The server decides by the file's content, not its name; it stays the
+// one that checks.
+export const uploadLimits = {
+  maxSizeBytes: 20 * 1024 * 1024,
+  extensions: ['.pdf', '.docx'],
+} as const;
+
 @Injectable({ providedIn: 'root' })
 export class DocumentsApi {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/documents`;
+
+  // The organization's documents, newest first (decisions #66). Any member may read it.
+  list(): Observable<DocumentInfo[]> {
+    return this.http.get<DocumentInfo[]>(this.baseUrl);
+  }
+
+  // Uploads a file; admins only (decisions #32). The answer comes before processing:
+  // the document is Pending, and list() shows how it gets on.
+  upload(file: File): Observable<DocumentInfo> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+
+    return this.http.post<DocumentInfo>(this.baseUrl, form);
+  }
+
+  // Removes a document, its text and its file; admins only (decisions #66). Fails with
+  // 409 while the document is being processed, and with 404 when it is already gone.
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 
   // Fails with 404 for an unknown document and for another organization's alike.
   get(id: string): Observable<DocumentInfo> {

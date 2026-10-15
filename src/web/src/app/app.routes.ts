@@ -47,6 +47,11 @@ export const routes: Routes = [
         loadComponent: () => import('./chat/chat').then((m) => m.Chat),
         title: 'DocAssistant',
       },
+      {
+        path: 'belgeler',
+        loadComponent: () => import('./documents/documents').then((m) => m.Documents),
+        title: 'Belgeler · DocAssistant',
+      },
     ],
   },
 

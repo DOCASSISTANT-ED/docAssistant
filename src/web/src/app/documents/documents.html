@@ -1,0 +1,122 @@
+<main class="page">
+  <header class="head">
+    <div>
+      <h1 class="title">Belgeler</h1>
+      <p class="lead">Sorularınız bu belgelerden cevaplanır.</p>
+    </div>
+
+    @if (session.isAdmin()) {
+      <label class="upload-button">
+        <input
+          #fileInput
+          class="file-input"
+          type="file"
+          multiple
+          [accept]="accept"
+          (change)="upload(fileInput)"
+        />
+        <span class="plus" aria-hidden="true">+</span>
+        Belge yükle
+      </label>
+    }
+  </header>
+
+  @if (session.isAdmin()) {
+    <p class="rules">
+      PDF ya da DOCX, en fazla 20 MB. Yüklenen belge birkaç saniye içinde aranabilir olur.
+    </p>
+  } @else {
+    <p class="rules">Belgeleri firmanızın yöneticisi yükler.</p>
+  }
+
+  @if (uploads().length > 0) {
+    <ul class="uploads" aria-label="Yüklenen dosyalar">
+      @for (upload of uploads(); track upload.key) {
+        <li class="upload" [class.failed]="upload.failure !== null">
+          <span class="upload-name">{{ upload.name }}</span>
+          @if (isUploading(upload)) {
+            <span class="upload-state" role="status">Yükleniyor…</span>
+          } @else {
+            <span class="upload-state" role="alert">{{ upload.failure }}</span>
+            <button class="link" type="button" (click)="dismissUpload(upload.key)">Kapat</button>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  @if (deleteFailure(); as message) {
+    <p class="failure" role="alert">{{ message }}</p>
+  }
+
+  @switch (listState()) {
+    @case ('loading') {
+      <p class="message" role="status">Belgeler yükleniyor…</p>
+    }
+
+    @case ('failed') {
+      <div class="message" role="alert">
+        <p>Belgeler yüklenemedi. Bağlantınızı kontrol edip yeniden deneyin.</p>
+        <button class="secondary" type="button" (click)="reload()">Yeniden dene</button>
+      </div>
+    }
+
+    @default {
+      @if (documents().length === 0) {
+        <p class="message empty">
+          Henüz belge yok.
+          @if (session.isAdmin()) {
+            "Belge yükle" ile ilk belgenizi ekleyin.
+          }
+        </p>
+      } @else {
+        <ul class="list" aria-label="Belge listesi">
+          @for (document of documents(); track document.id) {
+            <li class="document" [attr.data-status]="document.status">
+              <span class="type" aria-hidden="true">{{ typeLabel(document) }}</span>
+
+              <div class="lines">
+                <span class="name">{{ document.title }}</span>
+                <span class="details">
+                  {{ typeLabel(document) }} · {{ sizeLabel(document.sizeBytes) }} ·
+                  {{ dateLabel(document.createdAt) }}
+                </span>
+                @if (document.status === 'Failed' && document.failureReason) {
+                  <span class="reason">{{ document.failureReason }}</span>
+                }
+              </div>
+
+              <span class="status" [class]="'status status-' + document.status.toLowerCase()">
+                {{ statusLabel(document.status) }}
+              </span>
+
+              @if (session.isAdmin()) {
+                @if (confirming() === document.id) {
+                  <span
+                    class="confirm"
+                    role="group"
+                    [attr.aria-label]="document.title + ' silinsin mi?'"
+                  >
+                    <span class="confirm-text">Silinsin mi?</span>
+                    <button class="danger" type="button" (click)="delete(document)">Sil</button>
+                    <button class="link" type="button" (click)="cancelDelete()">Vazgeç</button>
+                  </span>
+                } @else {
+                  <button
+                    class="link delete"
+                    type="button"
+                    [disabled]="deleting() === document.id"
+                    [attr.aria-label]="document.title + ' belgesini sil'"
+                    (click)="askToDelete(document.id)"
+                  >
+                    {{ deleting() === document.id ? 'Siliniyor…' : 'Sil' }}
+                  </button>
+                }
+              }
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</main>

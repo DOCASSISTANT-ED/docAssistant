@@ -1,0 +1,264 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+}
+
+.page {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--mat-sys-primary);
+}
+
+.lead,
+.rules {
+  margin: 0.35rem 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.rules {
+  margin: 1rem 0 1.5rem;
+}
+
+/* The file input itself is hidden; its label is the button. */
+.upload-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 0.9rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 0.4rem 1rem rgb(232 163 61 / 0.25);
+}
+
+.upload-button:focus-within {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+.file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.plus {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.uploads,
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.uploads {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.upload {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+  font: var(--mat-sys-body-medium);
+}
+
+.upload.failed {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.upload-name {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.upload-state {
+  flex: 1;
+}
+
+.list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.document {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.type {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--brand-forest) 12%, transparent);
+  color: var(--brand-forest);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.lines {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.details {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.reason {
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}
+
+.status {
+  padding: 0.25rem 0.65rem;
+  border-radius: 1rem;
+  font: var(--mat-sys-label-medium);
+  white-space: nowrap;
+}
+
+.status-pending,
+.status-processing {
+  background: color-mix(in srgb, var(--brand-amber) 25%, transparent);
+  color: var(--brand-on-amber);
+}
+
+.status-done {
+  background: color-mix(in srgb, var(--brand-forest) 14%, transparent);
+  color: var(--brand-forest);
+}
+
+.status-failed {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.confirm-text {
+  font: var(--mat-sys-body-small);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.link {
+  padding: 0.3rem 0.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: none;
+  color: var(--mat-sys-primary);
+}
+
+.link:hover:not(:disabled) {
+  background: var(--mat-sys-surface-container-high);
+}
+
+.delete {
+  color: var(--mat-sys-error);
+}
+
+.danger {
+  padding: 0.35rem 0.8rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: var(--mat-sys-error);
+  color: var(--mat-sys-on-error);
+}
+
+.secondary {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 0.7rem;
+  background: none;
+  color: var(--mat-sys-primary);
+}
+
+.message {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.message p {
+  margin: 0;
+}
+
+.failure {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+/* Narrow screens: the status and the delete button go under the name. */
+@media (max-width: 40rem) {
+  .document {
+    grid-template-columns: auto 1fr;
+  }
+
+  .status,
+  .delete,
+  .confirm {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

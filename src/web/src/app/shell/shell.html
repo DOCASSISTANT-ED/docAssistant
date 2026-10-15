@@ -27,6 +27,9 @@
     Yeni sohbet
   </a>
 
+  <!-- decisions #66: every member sees the documents; admins also upload and delete. -->
+  <a class="documents-link" routerLink="/belgeler" routerLinkActive="active">Belgeler</a>
+
   <nav class="history" aria-label="Sohbet geçmişi">
     @for (group of groups(); track group.label) {
       <h2 class="group-label">{{ group.label }}</h2>

@@ -83,6 +83,23 @@
   transform: rotate(90deg);
 }
 
+.documents-link {
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.75rem;
+  color: var(--brand-on-forest);
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.documents-link:hover {
+  background: rgb(255 255 255 / 0.08);
+}
+
+.documents-link.active {
+  background: rgb(255 255 255 / 0.14);
+  font-weight: 500;
+}
+
 /* The history takes the room that is left and scrolls on its own. */
 .history {
   flex: 1;
