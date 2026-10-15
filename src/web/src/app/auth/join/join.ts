@@ -1,0 +1,179 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { identityLimits } from '../../api/identity';
+import { InvitationPreview, InvitationsApi, roleLabels } from '../../api/invitations';
+import { problemOf } from '../../api/problem';
+import { AuthLayout } from '../auth-layout/auth-layout';
+import { Session } from '../session';
+
+// What the screen shows: the link is being looked at, it can be used, it cannot be used
+// (unknown, used, revoked or expired: the API does not say which), or the API did not
+// answer.
+type LinkState =
+  | { kind: 'loading' }
+  | { kind: 'usable'; preview: InvitationPreview }
+  | { kind: 'unusable' }
+  | { kind: 'unreachable' };
+
+// /davet/<key>: joining an organization with an invitation link (docs/decisions.md #67).
+// The screen first shows which organization and role the link is for, then creates the
+// account with an email and a password and signs it in.
+@Component({
+  imports: [
+    AuthLayout,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    ReactiveFormsModule,
+    RouterLink,
+  ],
+  selector: 'app-join',
+  styleUrls: ['../auth-form.css', './join.css'],
+  templateUrl: './join.html',
+})
+export class Join implements OnInit {
+  private readonly api = inject(InvitationsApi);
+  private readonly session = inject(Session);
+  private readonly router = inject(Router);
+
+  // The key, from the address (the route's :token parameter).
+  private readonly token = inject(ActivatedRoute).snapshot.paramMap.get('token') ?? '';
+
+  protected readonly limits = identityLimits;
+  protected readonly roleLabels = roleLabels;
+
+  // The same rules as the server (AcceptInvitationRequest, as for registration).
+  protected readonly form = inject(NonNullableFormBuilder).group({
+    email: [
+      '',
+      [Validators.required, Validators.email, Validators.maxLength(identityLimits.emailMaxLength)],
+    ],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(identityLimits.passwordMinLength),
+        Validators.maxLength(identityLimits.passwordMaxLength),
+      ],
+    ],
+  });
+
+  protected readonly link = signal<LinkState>({ kind: 'loading' });
+
+  // The link's details while it can be used.
+  protected readonly preview = computed(() => {
+    const link = this.link();
+    return link.kind === 'usable' ? link.preview : null;
+  });
+  protected readonly submitting = signal(false);
+  protected readonly failure = signal<string | null>(null);
+  protected readonly passwordVisible = signal(false);
+
+  async ngOnInit(): Promise<void> {
+    await this.lookUp();
+  }
+
+  protected async lookUp(): Promise<void> {
+    this.link.set({ kind: 'loading' });
+
+    try {
+      const preview = await firstValueFrom(this.api.preview(this.token));
+      this.link.set({ kind: 'usable', preview });
+    } catch (error) {
+      this.link.set({
+        kind:
+          error instanceof HttpErrorResponse && error.status === 404 ? 'unusable' : 'unreachable',
+      });
+    }
+  }
+
+  protected expiry(preview: InvitationPreview): string {
+    return new Intl.DateTimeFormat('tr-TR', { dateStyle: 'long' }).format(
+      new Date(preview.expiresAt),
+    );
+  }
+
+  protected async submit(): Promise<void> {
+    if (this.submitting()) {
+      return;
+    }
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.submitting.set(true);
+    this.failure.set(null);
+
+    try {
+      await this.session.acceptInvitation(this.token, this.form.getRawValue());
+
+      // As at registration: the account exists, but the session cookie did not come back
+      // (decisions #60). The link is used up now, so joining again would not work.
+      if (!this.session.isSignedIn()) {
+        this.failure.set(
+          'Hesabınız oluşturuldu ama oturum açılamadı. Tarayıcınız çerezleri engelliyor olabilir; bu siteye çerez izni verip giriş yapın.',
+        );
+        return;
+      }
+
+      await this.router.navigateByUrl('/');
+    } catch (error) {
+      this.explain(error);
+    } finally {
+      this.submitting.set(false);
+    }
+  }
+
+  // Turns the API's answer into a message, and marks the fields the server rejected.
+  private explain(error: unknown): void {
+    if (!(error instanceof HttpErrorResponse)) {
+      this.failure.set('Katılım tamamlanamadı. Biraz sonra yeniden deneyin.');
+      return;
+    }
+
+    switch (error.status) {
+      // Used, revoked or expired while the form was being filled in.
+      case 404:
+        this.link.set({ kind: 'unusable' });
+        return;
+
+      case 409:
+        this.form.controls.email.setErrors({ taken: true });
+        this.failure.set(
+          'Bu e-posta adresiyle zaten bir hesap var. Bir kişi yalnızca bir firmaya katılabilir.',
+        );
+        return;
+
+      case 400: {
+        // The server names fields its own way ("Email"); ours start lower case.
+        for (const field of Object.keys(problemOf(error)?.errors ?? {})) {
+          const name = field.charAt(0).toLowerCase() + field.slice(1);
+
+          if (name === 'email' || name === 'password') {
+            this.form.controls[name].setErrors({ server: true });
+          }
+        }
+
+        this.failure.set('Bazı bilgiler kabul edilmedi. İşaretli alanları kontrol edin.');
+        return;
+      }
+
+      case 0:
+        this.failure.set('Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip yeniden deneyin.');
+        return;
+
+      default:
+        this.failure.set('Katılım tamamlanamadı. Biraz sonra yeniden deneyin.');
+    }
+  }
+}

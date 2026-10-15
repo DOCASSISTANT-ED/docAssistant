@@ -1,5 +1,5 @@
 import { Routes, UrlMatcher } from '@angular/router';
-import { signedInOnly, signedOutOnly } from './auth/auth.guards';
+import { adminOnly, signedInOnly, signedOutOnly } from './auth/auth.guards';
 
 // The chat screen has two addresses: the plain one for a new conversation and /c/<id>
 // for one from the history (so that a conversation can be reloaded, bookmarked and
@@ -35,6 +35,14 @@ export const routes: Routes = [
     canActivate: [signedOutOnly],
     title: 'Firma kaydı · DocAssistant',
   },
+  // Joining with an invitation link (decisions #67). A person belongs to one organization
+  // (decisions #13), so somebody signed in has no use for it either.
+  {
+    path: 'davet/:token',
+    loadComponent: () => import('./auth/join/join').then((m) => m.Join),
+    canActivate: [signedOutOnly],
+    title: 'Davete katıl · DocAssistant',
+  },
 
   // Everything a signed-in user sees is shown inside the shell (side panel, account menu).
   {
@@ -51,6 +59,12 @@ export const routes: Routes = [
         path: 'belgeler',
         loadComponent: () => import('./documents/documents').then((m) => m.Documents),
         title: 'Belgeler · DocAssistant',
+      },
+      {
+        path: 'kullanicilar',
+        loadComponent: () => import('./members/members').then((m) => m.Members),
+        canActivate: [adminOnly],
+        title: 'Kullanıcılar · DocAssistant',
       },
     ],
   },

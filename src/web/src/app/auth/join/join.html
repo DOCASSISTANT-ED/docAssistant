@@ -1,0 +1,103 @@
+<app-auth-layout>
+  @switch (link().kind) {
+    @case ('loading') {
+      <div class="state" aria-live="polite">
+        <mat-spinner diameter="32" aria-label="Davet bağlantısı kontrol ediliyor" />
+      </div>
+    }
+
+    @case ('unusable') {
+      <h1 class="title">Bu davet bağlantısı geçerli değil</h1>
+      <p class="subtitle">
+        Bağlantı kullanılmış, iptal edilmiş ya da süresi dolmuş olabilir. Firmanızın yöneticisinden
+        yeni bir bağlantı isteyin.
+      </p>
+      <p class="switch">Zaten hesabınız var mı? <a routerLink="/login">Giriş yapın</a></p>
+    }
+
+    @case ('unreachable') {
+      <h1 class="title">Davet bağlantısı açılamadı</h1>
+      <p class="failure" role="alert">
+        Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip yeniden deneyin.
+      </p>
+      <button matButton="filled" type="button" class="submit" (click)="lookUp()">
+        Yeniden dene
+      </button>
+    }
+
+    @case ('usable') {
+      @if (preview(); as preview) {
+        <h1 class="title">{{ preview.companyName }} firmasına katılın</h1>
+        <p class="subtitle">
+          <strong>{{ roleLabels[preview.role] }}</strong> olarak davet edildiniz. Hesabınızı
+          oluşturmak için e-posta adresinizi ve bir parola girin. Bağlantı
+          {{ expiry(preview) }} tarihine kadar geçerli.
+        </p>
+
+        @if (failure(); as message) {
+          <p class="failure" role="alert">{{ message }}</p>
+        }
+
+        <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>E-posta</mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              inputmode="email"
+            />
+            @if (form.controls.email.hasError('required')) {
+              <mat-error>E-posta adresinizi girin.</mat-error>
+            } @else if (form.controls.email.hasError('taken')) {
+              <mat-error>Bu adres kullanılıyor.</mat-error>
+            } @else if (form.controls.email.invalid) {
+              <mat-error>Geçerli bir e-posta adresi girin.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>Parola</mat-label>
+            <input
+              matInput
+              [type]="passwordVisible() ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="new-password"
+            />
+            <button
+              matSuffix
+              matButton
+              type="button"
+              class="reveal"
+              [attr.aria-pressed]="passwordVisible()"
+              (click)="passwordVisible.set(!passwordVisible())"
+            >
+              {{ passwordVisible() ? 'Gizle' : 'Göster' }}
+            </button>
+            <mat-hint>En az {{ limits.passwordMinLength }} karakter.</mat-hint>
+            @if (form.controls.password.hasError('required')) {
+              <mat-error>Bir parola belirleyin.</mat-error>
+            } @else if (form.controls.password.hasError('minlength')) {
+              <mat-error>Parola en az {{ limits.passwordMinLength }} karakter olmalı.</mat-error>
+            } @else if (form.controls.password.hasError('maxlength')) {
+              <mat-error>Parola en çok {{ limits.passwordMaxLength }} karakter olabilir.</mat-error>
+            } @else if (form.controls.password.invalid) {
+              <mat-error>Bu parola kabul edilmedi.</mat-error>
+            }
+          </mat-form-field>
+
+          <button matButton="filled" type="submit" class="submit" [disabled]="submitting()">
+            @if (submitting()) {
+              <mat-spinner diameter="20" aria-label="Katılım tamamlanıyor" />
+            } @else {
+              Katıl <span class="arrow" aria-hidden="true">→</span>
+            }
+          </button>
+        </form>
+
+        <p class="switch">Zaten hesabınız var mı? <a routerLink="/login">Giriş yapın</a></p>
+      }
+    }
+  }
+</app-auth-layout>
