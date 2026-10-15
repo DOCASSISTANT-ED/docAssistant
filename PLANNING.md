@@ -204,8 +204,8 @@ Bu iki karar, değerlendirme setini çalıştıran araç yazılmadan önce uygul
 > Daha dengeli olsun istenirse bu fazda backend ve arayüz yer değiştirilebilir.
 
 **Bitiş koşulu:**
-- [ ] Soru sorulunca cevap akarak (streaming) geliyor, her iddiada kaynak numarası var
-- [ ] Belgede olmayan bir soruya "belgelerde bulunamadı" cevabı veriliyor
+- [x] Soru sorulunca cevap akarak (streaming) geliyor, her iddiada kaynak numarası var (#65)
+- [x] Belgede olmayan bir soruya "belgelerde bulunamadı" cevabı veriliyor (#65)
 
 ### Faz 5 — Yayın
 
