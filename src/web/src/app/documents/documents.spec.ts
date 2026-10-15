@@ -406,6 +406,164 @@ describe('Documents', () => {
     });
   });
 
+  // ---- Deleting -------------------------------------------------------------------
+
+  describe('deleting', () => {
+    const deleteButton = (title: string) => row(title).querySelector<HTMLButtonElement>('button.delete');
+    const confirmButton = (title: string) => row(title).querySelector<HTMLButtonElement>('button.danger');
+    const failure = () => textOf('p.failure[role="alert"]');
+    const deletes = () => api.match((request) => request.method === 'DELETE');
+
+    async function click(target: HTMLButtonElement | null | undefined): Promise<void> {
+      target!.click();
+      await settle();
+    }
+
+    async function confirmDelete(title: string): Promise<void> {
+      await click(deleteButton(title));
+      await click(confirmButton(title));
+    }
+
+    async function answerDelete(id: string, status = 204): Promise<void> {
+      api
+        .expectOne((request) => request.method === 'DELETE' && request.url === `${base}/${id}`)
+        .flush(null, { status, statusText: status === 204 ? 'No Content' : 'Error' });
+      await settle();
+    }
+
+    it('is offered to an admin for every document, named after it', async () => {
+      await open('admin');
+      await answerList([info('d-1'), info('d-2')]);
+
+      expect(deleteButton('Belge d-1')?.textContent?.trim()).toBe('Sil');
+      expect(deleteButton('Belge d-1')?.getAttribute('aria-label')).toBe('Belge d-1 belgesini sil');
+      expect(deleteButton('Belge d-2')).not.toBeNull();
+    });
+
+    it('is not offered to a member', async () => {
+      await open('member');
+      await answerList([info('d-1')]);
+
+      expect(deleteButton('Belge d-1')).toBeNull();
+      expect(button('Sil')).toBeUndefined();
+    });
+
+    // Deleting cannot be undone; one click must not do it.
+    it('asks first, on the document’s own line, and sends nothing yet', async () => {
+      await open();
+      await answerList([info('d-1'), info('d-2')]);
+
+      await click(deleteButton('Belge d-1'));
+
+      expect(rowText('Belge d-1', '.confirm-text')).toBe('Silinsin mi?');
+      expect(row('Belge d-1').querySelector('[role="group"]')?.getAttribute('aria-label')).toBe('Belge d-1 silinsin mi?');
+      expect(row('Belge d-2').querySelector('.confirm')).toBeNull();
+      expect(deletes()).toEqual([]);
+    });
+
+    it('does nothing when the admin changes their mind', async () => {
+      await open();
+      await answerList([info('d-1')]);
+      await click(deleteButton('Belge d-1'));
+
+      await click(button('Vazgeç'));
+
+      expect(row('Belge d-1').querySelector('.confirm')).toBeNull();
+      expect(deleteButton('Belge d-1')).not.toBeNull();
+      expect(deletes()).toEqual([]);
+    });
+
+    // Only one question at a time: asking about another document moves it there.
+    it('asks about one document at a time', async () => {
+      await open();
+      await answerList([info('d-1'), info('d-2')]);
+      await click(deleteButton('Belge d-1'));
+
+      await click(deleteButton('Belge d-2'));
+
+      expect(row('Belge d-1').querySelector('.confirm')).toBeNull();
+      expect(row('Belge d-2').querySelector('.confirm')).not.toBeNull();
+    });
+
+    it('deletes the document once confirmed and takes it off the list', async () => {
+      await open();
+      await answerList([info('d-1'), info('d-2')]);
+
+      await confirmDelete('Belge d-1');
+      await answerDelete('d-1');
+
+      expect(rows().map((item) => item.querySelector('.name')?.textContent?.trim())).toEqual(['Belge d-2']);
+      expect(failure()).toBeNull();
+    });
+
+    it('shows that the document is being deleted and cannot be pressed again', async () => {
+      await open();
+      await answerList([info('d-1')]);
+
+      await confirmDelete('Belge d-1');
+
+      expect(deleteButton('Belge d-1')?.textContent?.trim()).toBe('Siliniyor…');
+      expect(deleteButton('Belge d-1')?.disabled).toBe(true);
+
+      await answerDelete('d-1');
+    });
+
+    // One deletion at a time: a second one waits for the first to end.
+    it('does not start a second deletion while one is on its way', async () => {
+      await open();
+      await answerList([info('d-1'), info('d-2')]);
+      await confirmDelete('Belge d-1');
+
+      await confirmDelete('Belge d-2');
+
+      const pending = deletes();
+      expect(pending.map((request) => request.request.url)).toEqual([`${base}/d-1`]);
+      pending[0].flush(null, { status: 204, statusText: 'No Content' });
+      await settle();
+    });
+
+    // Someone else deleted it meanwhile: the list catches up, no error is shown.
+    it('takes the document off the list when it is already gone', async () => {
+      await open();
+      await answerList([info('d-1')]);
+
+      await confirmDelete('Belge d-1');
+      await answerDelete('d-1', 404);
+
+      expect(rows()).toEqual([]);
+      expect(failure()).toBeNull();
+    });
+
+    it.each([
+      [409, '"Belge d-1" şu an işleniyor. Birkaç saniye sonra yeniden deneyin.'],
+      [403, 'Belgeler yalnızca yöneticiler tarafından silinebilir.'],
+      [0, 'Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip yeniden deneyin.'],
+      [500, '"Belge d-1" silinemedi. Biraz sonra yeniden deneyin.'],
+    ])('keeps the document and explains a %s', async (status, message) => {
+      await open();
+      await answerList([info('d-1')]);
+
+      await confirmDelete('Belge d-1');
+      await answerDelete('d-1', status);
+
+      expect(failure()).toBe(message);
+      expect(rows().length).toBe(1);
+      expect(deleteButton('Belge d-1')?.disabled).toBe(false);
+    });
+
+    // A new attempt starts clean.
+    it('clears the last failure when the admin asks to delete again', async () => {
+      await open();
+      await answerList([info('d-1')]);
+      await confirmDelete('Belge d-1');
+      await answerDelete('d-1', 409);
+
+      await click(deleteButton('Belge d-1'));
+
+      expect(failure()).toBeNull();
+    });
+  });
+
   // ---- What each role is told -------------------------------------------------------
 
   describe('the rules above the list', () => {
