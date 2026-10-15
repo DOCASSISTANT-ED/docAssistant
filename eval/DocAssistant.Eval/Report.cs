@@ -11,7 +11,12 @@ internal static class Report
         WriteIndented = true,
     };
 
-    public static void Print(TextWriter output, QuestionSet questions, string embeddingModel, IReadOnlyList<FormatResult> formats)
+    public static void Print(
+        TextWriter output,
+        QuestionSet questions,
+        string embeddingModel,
+        IReadOnlyDictionary<string, string>? typos,
+        IReadOnlyList<FormatResult> formats)
     {
         var unanswerable = questions.Questions.Count(question => question.Sources.Count == 0);
 
@@ -19,6 +24,11 @@ internal static class Report
         output.WriteLine($"Question set v{questions.Version}: {questions.Questions.Count} questions, "
             + $"{unanswerable} without an answer in the documents (search always returns something; --answers measures them).");
         output.WriteLine($"Embedding model: {embeddingModel}");
+
+        if (typos is not null)
+        {
+            output.WriteLine($"Typos: {typos.Count} of {questions.Questions.Count} questions asked with a spelling mistake (--typos).");
+        }
 
         foreach (var format in formats)
         {
@@ -162,6 +172,7 @@ internal static class Report
         RepoPaths paths,
         QuestionSet questions,
         string embeddingModel,
+        IReadOnlyDictionary<string, string>? typos,
         DateTimeOffset ranAt,
         IReadOnlyList<FormatResult> formats,
         AnswerRun? answers)
@@ -174,7 +185,11 @@ internal static class Report
             RanAt = ranAt,
             QuestionSetVersion = questions.Version,
             EmbeddingModel = embeddingModel,
-            Formats = formats.Select(format => new
+
+            // Present only when the run asked with spelling mistakes (--typos): the changed
+            // questions by id, as they were asked.
+            Typos = typos,
+            Formats =formats.Select(format => new
             {
                 format.Format,
                 format.Documents,

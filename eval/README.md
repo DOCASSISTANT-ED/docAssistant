@@ -115,6 +115,19 @@ Araç her soruyu `POST /chat` ile sorar ve akışı okur; prompt, bağlam boyutu
 
 Bir cevap, "belgelerde bulunamadı" sözünü içeriyor ve hiçbir kaynak numarası taşımıyorsa ret sayılır.
 
+### Yazım hatalı sorular (`--typos`)
+
+Kullanıcılar soruyu yanlış yazabilir. `--typos` her soruya bir yazım hatası koyar; aynı ölçümün seçeneksiz hâliyle karşılaştırılınca bir yazım hatasının aramaya neye mal olduğu görülür:
+
+```
+dotnet run --project eval/DocAssistant.Eval
+dotnet run --project eval/DocAssistant.Eval -- --typos
+```
+
+Hata sorunun en uzun kelimesine, ortadaki harfe konur; yalnızca harften oluşan, en az beş harfli kelimeler sayılır (`1.500` gibi sayılara dokunulmaz, böyle kelimesi olmayan soru değişmez). Üç tür hata soru kimliğine göre sırayla dağıtılır: harf eksik (`sevkiyat` → `sevkiyt`), iki harf yer değiştirmiş (`limitler` → `limtiler`), harf iki kez yazılmış (`kullanım` → `kullaanım`). Aynı soru her çalıştırmada aynı hatayı alır.
+
+Raporun başında kaç sorunun değiştiği yazar; sonuç dosyasındaki `typos` alanında değişen soruların sorulan hâli durur. `--answers` ile birlikte verilirse cevaplar da hatalı sorularla ölçülür.
+
 ### Sayılar çalıştırmadan çalıştırmaya biraz oynar
 
 Vektör aramasının sonuçları her çalıştırmada aynıdır. Anahtar kelime aramasında ise birçok chunk aynı puanı alır ve eşitlik chunk kimliğine göre bozulur; kimlikler her çalıştırmada yeniden üretildiği için sıra değişir. Bu, anahtar kelime ve hibrit sayılarını birkaç kaynak oynatır. Küçük farkları yorumlamadan önce aracı iki kez çalıştır.

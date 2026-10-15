@@ -9,6 +9,7 @@ namespace DocAssistant.Eval;
 //   dotnet run --project eval/DocAssistant.Eval -- --answers                 every question, about 11 minutes
 //   dotnet run --project eval/DocAssistant.Eval -- --answers --sample 5      5 per question type, about 3 minutes
 //   dotnet run --project eval/DocAssistant.Eval -- --answers --chat-model llama3.1:8b --chat-url http://localhost:11434
+//   dotnet run --project eval/DocAssistant.Eval -- --typos                   one spelling mistake per question (Typos)
 //
 // A class with Main instead of top-level statements: those would create a type named
 // Program, which is also the name of the API's entry point that EvalApi hosts.
@@ -40,6 +41,13 @@ internal static class EvalRunner
 
         var paths = RepoPaths.Find();
         var questions = QuestionSet.Load(paths.Questions);
+        var typos = args.Contains("--typos") ? Typos.Make(questions) : null;
+
+        if (typos is not null)
+        {
+            questions = Typos.Apply(questions, typos);
+        }
+
         var ranAt = DateTimeOffset.Now;
 
         Console.WriteLine("Starting a throwaway database...");
@@ -66,14 +74,14 @@ internal static class EvalRunner
             }
         }
 
-        Report.Print(Console.Out, questions, embeddingModel, results);
+        Report.Print(Console.Out, questions, embeddingModel, typos, results);
 
         if (answers is not null)
         {
             Report.PrintAnswers(Console.Out, answers);
         }
 
-        var saved = Report.Save(paths, questions, embeddingModel, ranAt, results, answers);
+        var saved = Report.Save(paths, questions, embeddingModel, typos, ranAt, results, answers);
         Console.WriteLine();
         Console.WriteLine($"Details: {Path.GetRelativePath(paths.Root, saved)}");
     }
