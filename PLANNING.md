@@ -214,7 +214,8 @@ Bu iki karar, değerlendirme setini çalıştıran araç yazılmadan önce uygul
 | Entegrasyon testlerini genişletme (Testcontainers altyapısı Faz 1'de kuruldu) | Angular belge yönetimi sayfası | `v0.1.0` release |
 | Docker ile canlı ortama deploy | Değerlendirme setini genişletme (100+ soru) | 2–3 pilot firma ile deneme |
 | | Tenant bazlı token kotası ve rate limiting | |
-| **Çapraz test:** Belge yönetimi ve kota testleri | **Çapraz test:** Deploy sonrası smoke testleri | |
+| | Kullanıcı daveti ve üyelik yönetimi (#67): davet bağlantısı, kullanıcılar sayfası, firmadan çıkarma | |
+| **Çapraz test:** Belge yönetimi, kota, davet ve üyelik testleri | **Çapraz test:** Deploy sonrası smoke testleri | |
 
 **Bitiş koşulu:**
 - [ ] Uygulama canlı ortamda HTTPS üzerinden erişilebilir
