@@ -33,7 +33,7 @@ public class DocumentStatusTests(PostgresFixture database)
         var admin = await api.RegisterAdminAsync();
         var uploaded = await UploadAsync(api, admin);
 
-        var response = await api.GetDocumentAsync(api.MemberToken(admin.TenantId), uploaded.Id);
+        var response = await api.GetDocumentAsync(await api.MemberTokenAsync(admin.TenantId), uploaded.Id);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }

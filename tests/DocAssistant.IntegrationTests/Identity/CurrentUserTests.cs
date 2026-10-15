@@ -27,19 +27,21 @@ public class CurrentUserTests(PostgresFixture database)
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
+    // The person must really be a member (decisions #67), so the token is for one.
     [Fact]
     public async Task WithValidTokenReturnsTheClaimsInTheToken()
     {
         using var client = database.Api.CreateClient();
-        var token = ApiIssuer().Issue(UserId, "ayse@example.com", TenantId, "Member").Token;
+        var tenantId = await TestAccounts.RegisterCompanyAsync(client);
+        var member = await TestAccounts.AddMemberAsync(database, tenantId, MembershipRole.Member);
 
-        var response = await TestAccounts.GetCurrentUserAsync(client, token);
+        var response = await TestAccounts.GetCurrentUserAsync(client, member.Token);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var me = await response.Content.ReadFromJsonAsync<CurrentUserResponse>();
-        Assert.Equal(UserId.ToString(), me!.UserId);
-        Assert.Equal("ayse@example.com", me.Email);
-        Assert.Equal(TenantId, me.TenantId);
+        Assert.Equal(member.UserId.ToString(), me!.UserId);
+        Assert.Equal(member.Email, me.Email);
+        Assert.Equal(tenantId, me.TenantId);
         Assert.Equal("Member", me.Role);
     }
 

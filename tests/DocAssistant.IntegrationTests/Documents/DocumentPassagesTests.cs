@@ -196,7 +196,7 @@ public class DocumentPassagesTests(PostgresFixture database)
         var documentId = await UploadAsync(api, admin.Token);
         await AddChunksAsync(admin.TenantId, documentId, (0, Section, 3, "Metin."));
 
-        var passages = await PassagesAsync(api, api.MemberToken(admin.TenantId), documentId, Section, 3);
+        var passages = await PassagesAsync(api, await api.MemberTokenAsync(admin.TenantId), documentId, Section, 3);
 
         Assert.Equal(["Metin."], passages.Select(p => p.Text));
     }

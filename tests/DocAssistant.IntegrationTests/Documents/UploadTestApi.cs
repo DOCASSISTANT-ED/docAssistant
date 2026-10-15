@@ -25,9 +25,11 @@ namespace DocAssistant.IntegrationTests.Documents;
 internal sealed class UploadTestApi : IAsyncDisposable
 {
     private readonly WebApplicationFactory<Program> _api;
+    private readonly PostgresFixture _database;
 
     private UploadTestApi(PostgresFixture database, InMemoryFileStorage storage, IIngestionQueue queue)
     {
+        _database = database;
         Storage = storage;
         Queue = queue;
 
@@ -85,14 +87,10 @@ internal sealed class UploadTestApi : IAsyncDisposable
         return new TestAdmin(token, Guid.Parse(me!.UserId!), me.TenantId!.Value);
     }
 
-    // A token the API itself would issue, for a user who is a Member of tenantId.
-    public string MemberToken(Guid tenantId, Guid? userId = null) =>
-        IssueToken(tenantId, userId ?? Guid.NewGuid(), nameof(MembershipRole.Member));
-
-    public string IssueToken(Guid tenantId, Guid userId, string role) =>
-        Services.GetRequiredService<JwtTokenIssuer>()
-            .Issue(userId, TestAccounts.NewEmail(), tenantId, role)
-            .Token;
+    // The token of a new Member of tenantId. The member is real (in the database): the
+    // API rejects tokens whose membership does not exist (decisions #67).
+    public async Task<string> MemberTokenAsync(Guid tenantId) =>
+        (await TestAccounts.AddMemberAsync(_database, tenantId, MembershipRole.Member)).Token;
 
     // POST /documents with the file in the "file" form field; without a token when token is null.
     public Task<HttpResponseMessage> UploadAsync(string? token, byte[] content, string fileName)

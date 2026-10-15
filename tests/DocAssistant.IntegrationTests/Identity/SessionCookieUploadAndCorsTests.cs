@@ -59,7 +59,7 @@ public class SessionCookieUploadAndCorsTests(PostgresFixture database)
         var admin = await api.RegisterAdminAsync();
 
         var response = await api.Client.SendAsync(
-            Upload(cookie: api.MemberToken(admin.TenantId), requestedWith: true));
+            Upload(cookie: await api.MemberTokenAsync(admin.TenantId), requestedWith: true));
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Empty(api.Storage.Files);

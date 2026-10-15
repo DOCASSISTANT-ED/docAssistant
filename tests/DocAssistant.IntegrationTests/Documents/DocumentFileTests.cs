@@ -35,7 +35,7 @@ public class DocumentFileTests(PostgresFixture database)
         var admin = await api.RegisterAdminAsync();
         var document = await UploadAsync(api, admin.Token, UploadFiles.Pdf(), "ik.pdf");
 
-        var response = await GetFileAsync(api, api.MemberToken(admin.TenantId), document.Id);
+        var response = await GetFileAsync(api, await api.MemberTokenAsync(admin.TenantId), document.Id);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -62,7 +62,9 @@ public class DocumentFileTests(PostgresFixture database)
         var owner = await api.RegisterAdminAsync();
         var document = await UploadAsync(api, owner.Token, UploadFiles.Pdf(), "ik.pdf");
 
-        var response = await GetFileAsync(api, api.MemberToken(Guid.NewGuid()), document.Id);
+        var otherCompany = await api.RegisterAdminAsync();
+
+        var response = await GetFileAsync(api, await api.MemberTokenAsync(otherCompany.TenantId), document.Id);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
