@@ -13,6 +13,10 @@ internal sealed class InMemoryFileStorage : IFileStorage
     // When true, SaveAsync throws as an unreachable storage server would.
     public bool FailSaves { get; init; }
 
+    // When true, DeleteAsync throws as an unreachable storage server would, after
+    // recording the key it was asked to delete.
+    public bool FailDeletes { get; init; }
+
     public IReadOnlyDictionary<string, StoredFile> Files => _files;
 
     public IReadOnlyCollection<string> DeletedKeys => _deletedKeys;
@@ -38,6 +42,12 @@ internal sealed class InMemoryFileStorage : IFileStorage
     public Task DeleteAsync(string key, CancellationToken cancellationToken = default)
     {
         _deletedKeys.Enqueue(key);
+
+        if (FailDeletes)
+        {
+            throw new IOException("Simulated storage failure.");
+        }
+
         _files.TryRemove(key, out _);
 
         return Task.CompletedTask;
