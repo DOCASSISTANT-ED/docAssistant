@@ -18,6 +18,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
 
     public DbSet<Membership> Memberships => Set<Membership>();
 
+    public DbSet<Invitation> Invitations => Set<Invitation>();
+
     public DbSet<Document> Documents => Set<Document>();
 
     public DbSet<Chunk> Chunks => Set<Chunk>();
@@ -73,6 +75,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
 
         modelBuilder.Entity<Membership>()
             .HasQueryFilter(membership => membership.TenantId == CurrentTenantId);
+
+        // decisions #67: an organization's admins see its own invitations. Opening a link
+        // happens without a tenant and uses IgnoreQueryFilters(), as login does.
+        modelBuilder.Entity<Invitation>()
+            .HasQueryFilter(invitation => invitation.TenantId == CurrentTenantId);
 
         // users has no tenant column (decisions #12): a user is visible to the tenants
         // they are a member of.
