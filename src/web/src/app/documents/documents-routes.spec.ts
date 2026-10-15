@@ -81,7 +81,7 @@ describe('the documents page in the app', () => {
   });
 
   const page = () => harness.fixture.nativeElement as HTMLElement;
-  const link = () => page().querySelector<HTMLAnchorElement>('a.documents-link');
+  const link = () => page().querySelector<HTMLAnchorElement>('a.page-link[href="/belgeler"]');
 
   it.each([
     ['an admin', admin],
