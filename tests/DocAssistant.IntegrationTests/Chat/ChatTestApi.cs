@@ -1,8 +1,10 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using DocAssistant.Api.Modules.Documents.Storage;
 using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
 using DocAssistant.Api.Modules.Search;
+using DocAssistant.IntegrationTests.Documents;
 using DocAssistant.IntegrationTests.Identity;
 using DocAssistant.IntegrationTests.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -14,7 +16,8 @@ using Microsoft.Extensions.Hosting;
 namespace DocAssistant.IntegrationTests.Chat;
 
 // A copy of the API for chat tests (docs/testing.md rule 4): the model and search are
-// stand-ins the test controls, everything else is the real app on the real test database.
+// stand-ins the test controls and file storage is kept in memory; everything else is the
+// real app on the real test database.
 // A test says what search finds and what the model writes, asks over HTTP, and then looks
 // at the stream, at what was stored, and at what the model was given.
 //
@@ -33,6 +36,7 @@ internal sealed class ChatTestApi : IAsyncDisposable
         _api = database.Api.WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
         {
             services.AddSingleton<IChatClient>(Model);
+            services.AddSingleton<IFileStorage>(Storage);
             services.AddScoped<IChunkRetrieval>(_ => Retrieval);
 
             var ingestionServices = services
@@ -55,6 +59,10 @@ internal sealed class ChatTestApi : IAsyncDisposable
     public FakeChatModel Model { get; } = new();
 
     public FakeChunkRetrieval Retrieval { get; } = new();
+
+    // Documents' files, kept in memory as in the upload tests; for tests that open or
+    // delete the documents a source points at.
+    public InMemoryFileStorage Storage { get; } = new();
 
     public IServiceProvider Services => _api.Services;
 
