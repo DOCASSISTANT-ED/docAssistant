@@ -28,7 +28,12 @@
   </a>
 
   <!-- decisions #66: every member sees the documents; admins also upload and delete. -->
-  <a class="documents-link" routerLink="/belgeler" routerLinkActive="active">Belgeler</a>
+  <a class="page-link" routerLink="/belgeler" routerLinkActive="active">Belgeler</a>
+
+  <!-- decisions #67: admins invite people and remove them. -->
+  @if (isAdmin()) {
+    <a class="page-link" routerLink="/kullanicilar" routerLinkActive="active">Kullanıcılar</a>
+  }
 
   <nav class="history" aria-label="Sohbet geçmişi">
     @for (group of groups(); track group.label) {

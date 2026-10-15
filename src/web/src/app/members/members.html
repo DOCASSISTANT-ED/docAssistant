@@ -1,0 +1,167 @@
+<main class="page">
+  <header class="head">
+    <h1 class="title">Kullanıcılar</h1>
+    <p class="lead">Firmanıza yeni kişileri davet edin, katılanları görün.</p>
+  </header>
+
+  @if (failure(); as message) {
+    <p class="failure" role="alert">{{ message }}</p>
+  }
+
+  <section class="card" aria-labelledby="invite-title">
+    <h2 id="invite-title" class="section-title">Davet et</h2>
+    <p class="hint">
+      Bir bağlantı oluşturun ve davet etmek istediğiniz kişiye gönderin. Bağlantı bir kez
+      kullanılabilir ve 7 gün geçerlidir.
+    </p>
+
+    <div class="invite">
+      <fieldset class="roles">
+        <legend class="roles-legend">Rol</legend>
+        @for (role of roles; track role) {
+          <label class="role-option">
+            <input
+              type="radio"
+              name="invite-role"
+              [value]="role"
+              [checked]="inviteRole() === role"
+              (change)="inviteRole.set(role)"
+            />
+            {{ roleLabels[role] }}
+          </label>
+        }
+      </fieldset>
+
+      <button class="primary" type="button" [disabled]="creating()" (click)="createInvitation()">
+        {{ creating() ? 'Oluşturuluyor…' : 'Davet bağlantısı oluştur' }}
+      </button>
+    </div>
+
+    @if (created(); as created) {
+      <div class="created" role="status">
+        <p class="created-text">
+          <strong>{{ roleLabels[created.invitation.role] }}</strong> daveti hazır. Bağlantıyı şimdi
+          kopyalayın: güvenlik için bir daha gösterilmez.
+        </p>
+        <div class="created-link">
+          <input
+            #linkInput
+            class="link-box"
+            type="text"
+            readonly
+            aria-label="Davet bağlantısı"
+            [value]="created.url"
+            (focus)="linkInput.select()"
+          />
+          <button class="primary" type="button" (click)="copyLink(created.url)">
+            {{ copied() ? 'Kopyalandı' : 'Kopyala' }}
+          </button>
+          <button class="link" type="button" (click)="closeCreated()">Kapat</button>
+        </div>
+      </div>
+    }
+  </section>
+
+  @switch (listState()) {
+    @case ('loading') {
+      <p class="message" role="status">Kullanıcılar yükleniyor…</p>
+    }
+
+    @case ('failed') {
+      <div class="message" role="alert">
+        <p>Kullanıcılar yüklenemedi. Bağlantınızı kontrol edip yeniden deneyin.</p>
+        <button class="secondary" type="button" (click)="reload()">Yeniden dene</button>
+      </div>
+    }
+
+    @default {
+      <section aria-labelledby="pending-title">
+        <h2 id="pending-title" class="section-title">Bekleyen davetler</h2>
+
+        @if (invitations().length === 0) {
+          <p class="empty">Kullanılmayı bekleyen davet yok.</p>
+        } @else {
+          <ul class="list" aria-label="Bekleyen davetler">
+            @for (invitation of invitations(); track invitation.id) {
+              <li class="row">
+                <div class="lines">
+                  <span class="name">{{ roleLabels[invitation.role] }} daveti</span>
+                  <span class="details">
+                    {{ dateLabel(invitation.createdAt) }} tarihinde oluşturuldu ·
+                    {{ dateLabel(invitation.expiresAt) }} tarihine kadar geçerli
+                  </span>
+                </div>
+                <button
+                  class="link danger-text"
+                  type="button"
+                  [disabled]="revoking() === invitation.id"
+                  [attr.aria-label]="roleLabels[invitation.role] + ' davetini iptal et'"
+                  (click)="revoke(invitation)"
+                >
+                  {{ revoking() === invitation.id ? 'İptal ediliyor…' : 'İptal et' }}
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section aria-labelledby="members-title">
+        <h2 id="members-title" class="section-title">Üyeler</h2>
+
+        <ul class="list" aria-label="Üyeler">
+          @for (member of members(); track member.userId) {
+            <li class="row">
+              <span class="avatar" aria-hidden="true">{{
+                member.email.charAt(0).toLocaleUpperCase('tr')
+              }}</span>
+
+              <div class="lines">
+                <span class="name">
+                  {{ member.email }}
+                  @if (isSelf(member)) {
+                    <span class="you">(siz)</span>
+                  }
+                </span>
+                <span class="details">{{ dateLabel(member.joinedAt) }} tarihinde katıldı</span>
+              </div>
+
+              <span class="role" [class.admin]="member.role === 'Admin'">
+                {{ roleLabels[member.role] }}
+              </span>
+
+              @if (!isSelf(member)) {
+                @if (confirming() === member.userId) {
+                  <span
+                    class="confirm"
+                    role="group"
+                    [attr.aria-label]="member.email + ' çıkarılsın mı?'"
+                  >
+                    <span class="confirm-text">Firmadan çıkarılsın mı?</span>
+                    <button class="danger" type="button" (click)="remove(member)">Çıkar</button>
+                    <button class="link" type="button" (click)="cancelRemove()">Vazgeç</button>
+                  </span>
+                } @else {
+                  <button
+                    class="link danger-text"
+                    type="button"
+                    [disabled]="removing() === member.userId"
+                    [attr.aria-label]="member.email + ' kişisini firmadan çıkar'"
+                    (click)="askToRemove(member.userId)"
+                  >
+                    {{ removing() === member.userId ? 'Çıkarılıyor…' : 'Çıkar' }}
+                  </button>
+                }
+              } @else {
+                <span></span>
+              }
+            </li>
+          }
+        </ul>
+        <p class="hint">
+          Çıkarılan kişi firmaya bir daha erişemez; hesabı ve geçmiş sohbetleri silinmez.
+        </p>
+      </section>
+    }
+  }
+</main>

@@ -1,0 +1,275 @@
+/* Laid out like the documents page (documents.css). */
+
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+}
+
+.page {
+  display: grid;
+  gap: 2rem;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--mat-sys-primary);
+}
+
+.lead,
+.hint,
+.empty {
+  margin: 0.35rem 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.section-title {
+  margin: 0 0 0.75rem;
+  font: var(--mat-sys-title-medium);
+  color: var(--mat-sys-on-surface);
+}
+
+.card {
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.card .section-title {
+  margin-bottom: 0.25rem;
+}
+
+.invite {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.roles {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.roles-legend {
+  float: left;
+  margin-right: 0.25rem;
+  padding: 0;
+  font-weight: 500;
+}
+
+.role-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.created {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--brand-forest) 10%, transparent);
+}
+
+.created-text {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.created-link {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.link-box {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.6rem;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-small);
+  font-family: ui-monospace, monospace;
+}
+
+.list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+/* Invitations have no avatar. */
+.row:not(:has(.avatar)) {
+  grid-template-columns: 1fr auto;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--brand-forest) 12%, transparent);
+  color: var(--brand-forest);
+  font-weight: 600;
+}
+
+.lines {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.you {
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 400;
+}
+
+.details {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.role {
+  padding: 0.25rem 0.65rem;
+  border-radius: 1rem;
+  background: var(--mat-sys-surface-container-high);
+  font: var(--mat-sys-label-medium);
+  white-space: nowrap;
+}
+
+.role.admin {
+  background: color-mix(in srgb, var(--brand-amber) 25%, transparent);
+  color: var(--brand-on-amber);
+}
+
+.confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.confirm-text {
+  font: var(--mat-sys-body-small);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.primary {
+  padding: 0.6rem 1.05rem;
+  border: none;
+  border-radius: 0.8rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font-weight: 500;
+}
+
+.link {
+  padding: 0.3rem 0.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: none;
+  color: var(--mat-sys-primary);
+}
+
+.link:hover:not(:disabled) {
+  background: var(--mat-sys-surface-container-high);
+}
+
+.danger-text {
+  color: var(--mat-sys-error);
+}
+
+.danger {
+  padding: 0.35rem 0.8rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: var(--mat-sys-error);
+  color: var(--mat-sys-on-error);
+}
+
+.secondary {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 0.7rem;
+  background: none;
+  color: var(--mat-sys-primary);
+}
+
+.message {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.message p {
+  margin: 0;
+}
+
+.failure {
+  margin: 0;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+/* Narrow screens: the role and the button go under the email. */
+@media (max-width: 40rem) {
+  .row {
+    grid-template-columns: auto 1fr;
+  }
+
+  .row > .role,
+  .row > button,
+  .row > .confirm {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

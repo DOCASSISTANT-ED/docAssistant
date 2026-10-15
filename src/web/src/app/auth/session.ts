@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { CurrentUser, IdentityApi, LoginRequest, RegisterRequest } from '../api/identity';
+import { AcceptInvitationRequest, InvitationsApi } from '../api/invitations';
 
 // 'unknown' lasts only until the first answer from the API at startup.
 export type SessionStatus = 'unknown' | 'signedIn' | 'signedOut';
@@ -14,6 +15,7 @@ export type SessionStatus = 'unknown' | 'signedIn' | 'signedOut';
 @Injectable({ providedIn: 'root' })
 export class Session {
   private readonly api = inject(IdentityApi);
+  private readonly invitations = inject(InvitationsApi);
 
   private readonly currentUser = signal<CurrentUser | null>(null);
   private readonly currentStatus = signal<SessionStatus>('unknown');
@@ -48,6 +50,13 @@ export class Session {
 
   async register(request: RegisterRequest): Promise<void> {
     await firstValueFrom(this.api.register(request));
+    await this.load();
+  }
+
+  // Joins an organization with an invitation link (decisions #67); the API signs the new
+  // user in, as registration does.
+  async acceptInvitation(token: string, request: AcceptInvitationRequest): Promise<void> {
+    await firstValueFrom(this.invitations.accept(token, request));
     await this.load();
   }
 

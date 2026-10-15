@@ -1,0 +1,7 @@
+/* The rest comes from auth-form.css, shared with the login and register screens. */
+
+.state {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+}

@@ -31,6 +31,7 @@ export class Shell {
   // The letter shown in the round account button.
   protected readonly initial = computed(() => this.user()?.email.charAt(0).toLocaleUpperCase('tr') ?? '');
 
+  protected readonly isAdmin = this.session.isAdmin;
   protected readonly roleLabel = computed(() => (this.session.isAdmin() ? 'Yönetici' : 'Üye'));
 
   // The history, newest first, under headings by age.
