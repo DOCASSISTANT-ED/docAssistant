@@ -25,6 +25,11 @@ export const signedInOnly: CanActivateFn = (_route, state) => {
 export const signedOutOnly: CanActivateFn = () =>
   inject(Session).isSignedIn() ? inject(Router).createUrlTree(['/']) : true;
 
+// For screens only admins use (the users screen, decisions #67). Others go home: the
+// screen would only show them what the API refuses.
+export const adminOnly: CanActivateFn = () =>
+  inject(Session).isAdmin() ? true : inject(Router).createUrlTree(['/']);
+
 // Where to go after signing in: the address the login screen was given, if it is one of
 // the app's own. Anything else (another site, a protocol-relative "//host") is ignored,
 // so a crafted link cannot use the login screen to send people elsewhere.

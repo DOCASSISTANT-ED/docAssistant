@@ -107,3 +107,44 @@ Authorization: Bearer {{login.response.body.$.token}}
 ### The newest conversation with its messages and sources
 GET {{DocAssistant.Api_HostAddress}}/conversations/{{conversations.response.body.$[0].id}}
 Authorization: Bearer {{login.response.body.$.token}}
+
+### Invite someone (admins only; role "Member" or "Admin", Member when left out)
+# The token is the key for the link (/davet/<token>); it is shown only in this answer.
+# @name invite
+POST {{DocAssistant.Api_HostAddress}}/invitations
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "role": "Member"
+}
+
+### Invitations that can still be used, newest first (admins only)
+GET {{DocAssistant.Api_HostAddress}}/invitations
+Authorization: Bearer {{login.response.body.$.token}}
+
+### What the link above is for, without signing in (404 when used, revoked or expired)
+GET {{DocAssistant.Api_HostAddress}}/invitations/{{invite.response.body.$.token}}
+
+### Join with the link above (returns a token; 409 when the email is already registered)
+POST {{DocAssistant.Api_HostAddress}}/invitations/{{invite.response.body.$.token}}/accept
+Content-Type: application/json
+
+{
+  "email": "yeni.calisan@example.com",
+  "password": "Gizli123!"
+}
+
+### Revoke the invitation above (admins only; 404 once it has been used)
+DELETE {{DocAssistant.Api_HostAddress}}/invitations/{{invite.response.body.$.id}}
+Authorization: Bearer {{login.response.body.$.token}}
+
+### People in the organization, in the order they joined (admins only)
+# @name members
+GET {{DocAssistant.Api_HostAddress}}/members
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Remove the newest person from the organization (admins only; not yourself, not the last admin)
+# Their account stays; their token stops working at once.
+DELETE {{DocAssistant.Api_HostAddress}}/members/{{members.response.body.$[-1:].userId}}
+Authorization: Bearer {{login.response.body.$.token}}

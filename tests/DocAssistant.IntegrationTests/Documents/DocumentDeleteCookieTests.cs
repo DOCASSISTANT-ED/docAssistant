@@ -58,7 +58,7 @@ public class DocumentDeleteCookieTests(PostgresFixture database)
         var document = await ManagedDocuments.PrepareAsync(api, database, admin, DocumentStatus.Done);
 
         using var response = await api.Client.SendAsync(
-            Delete(document.Id, cookie: api.MemberToken(admin.TenantId), requestedWith: true));
+            Delete(document.Id, cookie: await api.MemberTokenAsync(admin.TenantId), requestedWith: true));
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.True(await ManagedDocuments.RowExistsAsync(database, document.Id));

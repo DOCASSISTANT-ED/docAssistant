@@ -59,7 +59,7 @@ public class DocumentListTests(PostgresFixture database)
         var admin = await api.RegisterAdminAsync();
         var document = await ManagedDocuments.UploadAsync(api, admin.Token);
 
-        var listed = await ManagedDocuments.ListedAsync(api, api.MemberToken(admin.TenantId));
+        var listed = await ManagedDocuments.ListedAsync(api, await api.MemberTokenAsync(admin.TenantId));
 
         Assert.Equal([document.Id], listed.Select(d => d.Id));
     }

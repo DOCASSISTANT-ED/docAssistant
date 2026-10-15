@@ -60,6 +60,13 @@ public static class IdentityModule
 
                         return Task.CompletedTask;
                     },
+
+                    // decisions #67: the organization and the role in the token are taken
+                    // at their word only while the membership they name still exists with
+                    // that role. Otherwise someone removed from the organization, or an
+                    // admin made a member, would keep their old rights until the token
+                    // expires (60 minutes, #60).
+                    OnTokenValidated = MembershipCheck.ValidateAsync,
                 };
             });
 

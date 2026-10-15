@@ -74,6 +74,8 @@ app.UseAuthorization();
 
 app.MapHealthChecks("/health");
 app.MapAuthEndpoints();
+app.MapInvitationEndpoints();
+app.MapMemberEndpoints();
 app.MapDocumentEndpoints();
 app.MapChatEndpoints();
 app.MapConversationEndpoints();
