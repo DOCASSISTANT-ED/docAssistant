@@ -182,13 +182,15 @@ public class SessionCookieTests(PostgresFixture database)
     public async Task TheHeaderWinsWhenBothAreSent()
     {
         using var client = CreateClient();
-        var headerToken = ApiIssuer().Issue(Guid.NewGuid(), "header@example.com", Guid.NewGuid(), "Member").Token;
-        var cookieToken = ApiIssuer().Issue(Guid.NewGuid(), "cookie@example.com", Guid.NewGuid(), "Admin").Token;
+        var tenantId = await TestAccounts.RegisterCompanyAsync(client);
+        var headerMember = await TestAccounts.AddMemberAsync(database, tenantId, MembershipRole.Member);
+        var cookieMember = await TestAccounts.AddMemberAsync(database, tenantId, MembershipRole.Admin);
 
-        var response = await client.SendAsync(Request(HttpMethod.Get, "/auth/me", cookie: cookieToken, bearer: headerToken));
+        var response = await client.SendAsync(
+            Request(HttpMethod.Get, "/auth/me", cookie: cookieMember.Token, bearer: headerMember.Token));
 
         var me = await response.Content.ReadFromJsonAsync<CurrentUserResponse>();
-        Assert.Equal("header@example.com", me!.Email);
+        Assert.Equal(headerMember.Email, me!.Email);
         Assert.Equal("Member", me.Role);
     }
 
@@ -299,8 +301,10 @@ public class SessionCookieTests(PostgresFixture database)
     public async Task AReadingRequestDoesNotNeedTheHeader()
     {
         using var client = CreateClient();
+        var member = await TestAccounts.AddMemberAsync(
+            database, await TestAccounts.RegisterCompanyAsync(client), MembershipRole.Member);
 
-        var response = await client.SendAsync(Request(HttpMethod.Get, "/auth/me", cookie: ValidToken()));
+        var response = await client.SendAsync(Request(HttpMethod.Get, "/auth/me", cookie: member.Token));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }

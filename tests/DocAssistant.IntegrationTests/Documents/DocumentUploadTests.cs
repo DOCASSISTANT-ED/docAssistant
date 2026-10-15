@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using DocAssistant.Api.Modules.Documents;
-using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
 using DocAssistant.IntegrationTests.Infrastructure;
 using DocAssistant.IntegrationTests.Ingestion;
@@ -35,7 +34,7 @@ public class DocumentUploadTests(PostgresFixture database)
         await using var api = UploadTestApi.Start(database);
         var admin = await api.RegisterAdminAsync();
 
-        var response = await api.UploadAsync(api.MemberToken(admin.TenantId), UploadFiles.Pdf(), "ik.pdf");
+        var response = await api.UploadAsync(await api.MemberTokenAsync(admin.TenantId), UploadFiles.Pdf(), "ik.pdf");
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Empty(api.Storage.Files);
@@ -264,16 +263,25 @@ public class DocumentUploadTests(PostgresFixture database)
         Assert.Empty(api.QueuedItems);
     }
 
-    // The row cannot be written when the uploader in the token is not a real user (the
-    // foreign key to users rejects it): a natural way to make the second step fail.
+    // The database refuses this organization's document rows (a trigger the test adds and
+    // removes), so the second step fails after the file is stored. Before #67 a token for
+    // a user who does not exist did this through the foreign key to users, but such a
+    // token is now rejected before the endpoint runs.
     [Fact]
     public async Task WhenTheDocumentCannotBeRecordedTheStoredFileIsRemoved()
     {
         await using var api = UploadTestApi.Start(database);
         var admin = await api.RegisterAdminAsync();
-        var unknownUserToken = api.IssueToken(admin.TenantId, Guid.NewGuid(), nameof(MembershipRole.Admin));
+        await RefuseDocumentRowsAsync(admin.TenantId);
 
-        await Assert.ThrowsAsync<DbUpdateException>(() => api.UploadAsync(unknownUserToken, UploadFiles.Pdf(), "ik.pdf"));
+        try
+        {
+            await Assert.ThrowsAsync<DbUpdateException>(() => api.UploadAsync(admin.Token, UploadFiles.Pdf(), "ik.pdf"));
+        }
+        finally
+        {
+            await AcceptDocumentRowsAgainAsync();
+        }
 
         Assert.Empty(api.Storage.Files);
         Assert.StartsWith($"tenants/{admin.TenantId}/documents/", Assert.Single(api.Storage.DeletedKeys));
@@ -317,6 +325,40 @@ public class DocumentUploadTests(PostgresFixture database)
     }
 
     // Every test registers its own organization, so its tenant holds only its own documents.
+    // Only tenantId's rows are refused, so other tests' uploads are not affected.
+    private async Task RefuseDocumentRowsAsync(Guid tenantId)
+    {
+        await using var db = database.CreateOwnerDbContext();
+
+        // The id is written into the function body, where SQL parameters cannot go. A Guid
+        // is only hex digits and dashes, so nothing else can get into the SQL this way.
+        var sql = $$"""
+            CREATE FUNCTION test_refuse_documents() RETURNS trigger AS $body$
+            BEGIN
+                IF NEW.tenant_id = '{{tenantId}}' THEN
+                    RAISE EXCEPTION 'Simulated failure to record the document.';
+                END IF;
+                RETURN NEW;
+            END
+            $body$ LANGUAGE plpgsql;
+
+            CREATE TRIGGER test_refuse_documents BEFORE INSERT ON documents
+                FOR EACH ROW EXECUTE FUNCTION test_refuse_documents();
+            """;
+
+        await db.Database.ExecuteSqlRawAsync(sql);
+    }
+
+    private async Task AcceptDocumentRowsAgainAsync()
+    {
+        await using var db = database.CreateOwnerDbContext();
+
+        await db.Database.ExecuteSqlRawAsync("""
+            DROP TRIGGER test_refuse_documents ON documents;
+            DROP FUNCTION test_refuse_documents();
+            """);
+    }
+
     private async Task<int> CountDocumentsAsync(Guid tenantId)
     {
         await using var db = database.CreateOwnerDbContext();

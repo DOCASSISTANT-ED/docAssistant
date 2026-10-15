@@ -32,7 +32,7 @@ public class DocumentDeleteAccessTests(PostgresFixture database)
         var admin = await api.RegisterAdminAsync();
         var document = await ManagedDocuments.PrepareAsync(api, database, admin, DocumentStatus.Done);
 
-        using var response = await ManagedDocuments.DeleteAsync(api, api.MemberToken(admin.TenantId), document.Id);
+        using var response = await ManagedDocuments.DeleteAsync(api, await api.MemberTokenAsync(admin.TenantId), document.Id);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         await AssertUntouchedAsync(api, document);
