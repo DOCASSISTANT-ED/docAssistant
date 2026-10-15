@@ -65,6 +65,14 @@ Content-Type: application/pdf
 < ../../tests/TestData/ik-yonetmeligi.pdf
 --DocAssistantBoundary--
 
+### All documents of the organization, newest first (any member)
+GET {{DocAssistant.Api_HostAddress}}/documents
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Delete the document uploaded above (admins only; 409 while it is being processed)
+DELETE {{DocAssistant.Api_HostAddress}}/documents/{{upload.response.body.$.id}}
+Authorization: Bearer {{login.response.body.$.token}}
+
 ### Status of the document uploaded above
 GET {{DocAssistant.Api_HostAddress}}/documents/{{upload.response.body.$.id}}
 Authorization: Bearer {{login.response.body.$.token}}

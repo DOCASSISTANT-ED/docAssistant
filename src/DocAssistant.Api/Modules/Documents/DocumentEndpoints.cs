@@ -32,11 +32,78 @@ public static class DocumentEndpoints
             // a form post, so it cannot make a logged-in browser call this endpoint.
             .DisableAntiforgery();
 
+        documents.MapGet("/", List);
         documents.MapGet("/{id:guid}", GetById);
         documents.MapGet("/{id:guid}/file", GetFile);
         documents.MapGet("/{id:guid}/passages", GetPassages);
 
+        // decisions #66: admins delete, as they upload.
+        documents.MapDelete("/{id:guid}", Delete)
+            .RequireAuthorization(policy => policy.RequireRole(nameof(MembershipRole.Admin)));
+
         return app;
+    }
+
+    // The organization's documents, newest first (decisions #66). Any member may look:
+    // knowing which documents there are tells them what they can ask about. The query
+    // filter and RLS limit the list to the caller's tenant.
+    private static async Task<Ok<List<DocumentResponse>>> List(AppDbContext db, CancellationToken cancellationToken)
+    {
+        var documents = await db.Documents
+            .AsNoTracking()
+            .OrderByDescending(d => d.CreatedAt)
+            .ThenByDescending(d => d.Id)
+            .ToListAsync(cancellationToken);
+
+        return TypedResults.Ok(documents.Select(DocumentResponse.From).ToList());
+    }
+
+    // Removes a document: its row, its chunks (they go with the row, decisions #29) and
+    // its stored file (decisions #66). Old conversations keep their sources; opening one
+    // then says the document is gone (decisions #57, #63).
+    //
+    // A document that is being processed is not deleted: the background job would go on
+    // writing chunks for a row that is gone. Pending is fine, the job skips a document it
+    // cannot find. The status check and the delete are one statement, so the job cannot
+    // start in between.
+    private static async Task<Results<NoContent, NotFound, ProblemHttpResult>> Delete(
+        Guid id,
+        AppDbContext db,
+        IFileStorage storage,
+        ILoggerFactory loggerFactory,
+        CancellationToken cancellationToken)
+    {
+        // Read first for the storage key; the query filter and RLS keep another tenant's
+        // document out, so it is "not found" like one that does not exist.
+        var storageKey = await db.Documents
+            .Where(d => d.Id == id)
+            .Select(d => d.StorageKey)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (storageKey is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        var deleted = await db.Documents
+            .Where(d => d.Id == id && d.Status != DocumentStatus.Processing)
+            .ExecuteDeleteAsync(cancellationToken);
+
+        if (deleted == 0)
+        {
+            // Either it is being processed, or someone else deleted it in the meantime.
+            var stillThere = await db.Documents.AnyAsync(d => d.Id == id, cancellationToken);
+
+            return stillThere
+                ? Problem(StatusCodes.Status409Conflict, "The document is being processed. Try again in a moment.")
+                : TypedResults.NotFound();
+        }
+
+        // After the row, the reverse of the upload (decisions #37): a file left behind if
+        // this fails is only wasted space, a row without its file would be a broken document.
+        await DeleteStoredFileAsync(storage, storageKey, loggerFactory.CreateLogger(typeof(DocumentEndpoints)));
+
+        return TypedResults.NoContent();
     }
 
     // Stores the file, records the document as Pending and queues it for processing.
@@ -250,7 +317,9 @@ public static class DocumentEndpoints
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Could not remove {StorageKey} after its document row failed to save.", storageKey);
+            // Used after a failed upload and after a deletion; either way the row is gone and
+            // the file is only wasted space.
+            logger.LogError(ex, "Could not remove the stored file {StorageKey}.", storageKey);
         }
     }
 
