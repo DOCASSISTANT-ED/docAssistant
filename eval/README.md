@@ -115,6 +115,23 @@ Araç her soruyu `POST /chat` ile sorar ve akışı okur; prompt, bağlam boyutu
 
 Bir cevap, "belgelerde bulunamadı" sözünü içeriyor ve hiçbir kaynak numarası taşımıyorsa ret sayılır.
 
+**Yalnızca belirli sorular:** `--ids ik-023,uc-015` yalnızca bu soruları sohbete sorar; bir prompt değişikliğini birkaç soruda hızlıca denemek içindir. Arama ölçümü yine bütün seti kapsar, böylece sayıları diğer çalıştırmalarla karşılaştırılabilir kalır. Sette olmayan bir kimlik verilirse araç başlamadan durur.
+
+### Başka bir sağlayıcının modeliyle (`--chat-provider openai`)
+
+Ollama'da çalıştırılamayacak kadar büyük modelleri ölçmek için araç, OpenAI'ın sohbet protokolünü konuşan bir API'ye de bağlanabilir, örneğin Groq (`docs/decisions.md` #68). Uygulamanın kendisi Ollama ile çalışmaya devam eder.
+
+API anahtarı komut satırına yazılmaz (terminal geçmişinde kalır); `CHAT_API_KEY` ortam değişkeninden okunur. PowerShell'de yalnızca o pencere için:
+
+```
+$env:CHAT_API_KEY = "<anahtar>"
+dotnet run -c Release --project eval/DocAssistant.Eval -- --answers --chat-provider openai --chat-url https://api.groq.com/openai/v1 --chat-model openai/gpt-oss-120b --chat-delay 25 --ids ...
+```
+
+`--chat-delay <saniye>` her sorudan sonra bekler. Ücretsiz planların dakikalık token sınırı vardır (Groq'ta `gpt-oss-120b` için dakikada 8.000, günde 200.000 token); bir soru yaklaşık 3.000 token tuttuğu için beklemeden sorulursa API `429` döner ve o sorular `failed` sayılır. 25 saniye dakikada iki soru demektir. Günlük sınır yüzünden ücretsiz planda tam set (190 soru) bir günde sorulamaz; `--ids` ile seçilmiş sorular kullanılır.
+
+Bu sağlayıcıya örnek belgelerin parçaları gönderilir. Gerçek firma belgeleriyle kullanılmaz.
+
 ### Sayılar çalıştırmadan çalıştırmaya biraz oynar
 
 Vektör aramasının sonuçları her çalıştırmada aynıdır. Anahtar kelime aramasında ise birçok chunk aynı puanı alır ve eşitlik chunk kimliğine göre bozulur; kimlikler her çalıştırmada yeniden üretildiği için sıra değişir. Bu, anahtar kelime ve hibrit sayılarını birkaç kaynak oynatır. Küçük farkları yorumlamadan önce aracı iki kez çalıştır.

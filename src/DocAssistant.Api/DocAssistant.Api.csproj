@@ -16,6 +16,7 @@
     <!-- Design paketi private olduğu için EF Core sürümünü bu projeye başvuran projelere
          (testler) taşımaz; açık başvuru olmazsa onlar daha eski bir sürüm çözer ve derlenmez. -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="OllamaSharp" />
     <PackageReference Include="PdfPig" />

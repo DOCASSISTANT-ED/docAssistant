@@ -1,6 +1,8 @@
+using System.ClientModel;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Options;
 using OllamaSharp;
+using OpenAI;
 
 namespace DocAssistant.Api.Modules.Chat;
 
@@ -16,14 +18,23 @@ public static class ChatModule
             .ValidateOnStart();
 
         // The rest of the app sees only IChatClient (docs/decisions.md #10): text in,
-        // answer out, whichever model or provider produces it. Moving to an API model in
-        // production changes this registration only, and tests replace it with a fake.
-        // Creating the client opens no connection.
+        // answer out, whichever model or provider produces it. The provider is chosen by
+        // a setting (#68), and tests replace the client with a fake. Creating either
+        // client opens no connection.
         services.AddSingleton<IChatClient>(sp =>
         {
             var options = sp.GetRequiredService<IOptions<ChatModelOptions>>().Value;
 
-            return new OllamaApiClient(new Uri(options.BaseUrl), options.Model);
+            return options.Provider switch
+            {
+                ChatProvider.OpenAICompatible => new OpenAIClient(
+                        new ApiKeyCredential(options.ApiKey!),
+                        new OpenAIClientOptions { Endpoint = new Uri(options.BaseUrl) })
+                    .GetChatClient(options.Model)
+                    .AsIChatClient(),
+
+                _ => new OllamaApiClient(new Uri(options.BaseUrl), options.Model),
+            };
         });
 
         return services;
