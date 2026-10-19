@@ -12,6 +12,8 @@ internal sealed class RepoPaths
 
     public string Questions => Path.Combine(Root, "eval", "questions.json");
 
+    public string Conversations => Path.Combine(Root, "eval", "conversations.json");
+
     public string Results => Path.Combine(Root, "eval", "results");
 
     public string SampleDocuments => Path.Combine(Root, "tests", "TestData");

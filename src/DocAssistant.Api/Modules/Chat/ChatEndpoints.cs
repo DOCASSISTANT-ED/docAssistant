@@ -17,8 +17,9 @@ namespace DocAssistant.Api.Modules.Chat;
 
 public static class ChatEndpoints
 {
-    // docs/decisions.md #55: the model also gets the last messages of the conversation.
-    public const int HistoryMessages = 6;
+    // decisions #69: the rewritten question is one sentence; the limit leaves room for a
+    // model that thinks before it writes (gpt-oss), and stops one that does not stop.
+    private const int RewriteMaxTokens = 512;
 
     public static IEndpointRouteBuilder MapChatEndpoints(this IEndpointRouteBuilder app)
     {
@@ -70,17 +71,16 @@ public static class ChatEndpoints
                 return TypedResults.NotFound();
             }
 
-            // The newest messages, then turned back into the order they were written in.
-            history = (await db.Messages
-                    .AsNoTracking()
-                    .Where(m => m.ConversationId == conversationId)
-                    .OrderByDescending(m => m.CreatedAt)
-                    .ThenByDescending(m => m.Id)
-                    .Take(HistoryMessages)
-                    .ToListAsync(cancellationToken))
-                .AsEnumerable()
-                .Reverse()
-                .ToList();
+            // The whole conversation, oldest first; how much of it the model gets is
+            // decided by the token budget (decisions #69).
+            var all = await db.Messages
+                .AsNoTracking()
+                .Where(m => m.ConversationId == conversationId)
+                .OrderBy(m => m.CreatedAt)
+                .ThenBy(m => m.Id)
+                .ToListAsync(cancellationToken);
+
+            history = ChatPrompt.SelectHistory(all, modelOptions.Value.HistoryTokens);
         }
         else
         {
@@ -108,17 +108,62 @@ public static class ChatEndpoints
 
         await db.SaveChangesAsync(cancellationToken);
 
-        // Search uses the last question only (decisions #55).
-        var sources = await retrieval.RetrieveAsync(question, cancellationToken);
+        var logger = loggerFactory.CreateLogger(typeof(ChatEndpoints));
+
+        // A follow-up question is searched in a form that stands on its own (decisions
+        // #69); the first question of a conversation has nothing to lean on.
+        var standalone = history.Count > 0
+            ? await RewriteAsync(chatClient, history, question, modelOptions.Value, logger, conversation.Id, cancellationToken)
+            : null;
+
+        var sources = await retrieval.RetrieveAsync(standalone ?? question, cancellationToken);
 
         var answer = new Answer(
             conversation.Id,
             sources,
-            ChatPrompt.Build(sources, history, question),
+            ChatPrompt.Build(sources, history, question, standalone),
             ModelOptions(modelOptions.Value));
 
         return TypedResults.ServerSentEvents(
-            StreamAsync(answer, db, chatClient, timeProvider, loggerFactory.CreateLogger(typeof(ChatEndpoints)), cancellationToken));
+            StreamAsync(answer, db, chatClient, timeProvider, logger, cancellationToken));
+    }
+
+    // The follow-up question rewritten to stand on its own, or null when that did not
+    // work; the user's own question is then searched, as before (decisions #69). A
+    // failure here never fails the answer.
+    private static async Task<string?> RewriteAsync(
+        IChatClient chatClient,
+        IReadOnlyList<Message> history,
+        string question,
+        ChatModelOptions settings,
+        ILogger logger,
+        Guid conversationId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var options = new ChatOptions { Temperature = 0, MaxOutputTokens = RewriteMaxTokens }
+                .AddOllamaOption(OllamaOption.NumCtx, settings.ContextTokens);
+
+            var response = await chatClient.GetResponseAsync(ChatPrompt.BuildRewrite(history, question), options, cancellationToken);
+            var rewritten = response.FinishReason == ChatFinishReason.Length ? null : ChatPrompt.CleanRewrite(response.Text);
+
+            if (rewritten is null)
+            {
+                logger.LogWarning("The follow-up question could not be rewritten in conversation {ConversationId}; it is searched as asked.", conversationId);
+            }
+            else
+            {
+                logger.LogDebug("Follow-up question in conversation {ConversationId} searched as: {Rewritten}", conversationId, rewritten);
+            }
+
+            return rewritten;
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            logger.LogWarning(exception, "Rewriting the follow-up question failed in conversation {ConversationId}; it is searched as asked.", conversationId);
+            return null;
+        }
     }
 
     // The answer stream (decisions #56): sources, then delta as the model writes, then
@@ -177,7 +222,7 @@ public static class ChatEndpoints
                         break;
                     }
 
-                    piece = updates.Current.Text;
+                    piece = ChatPrompt.NormalizeBrackets(updates.Current.Text);
                     cutOff |= updates.Current.FinishReason == ChatFinishReason.Length;
                 }
                 catch (Exception exception) when (exception is not OperationCanceledException)

@@ -117,6 +117,31 @@ Bir cevap, "belgelerde bulunamadı" sözünü içeriyor ve hiçbir kaynak numara
 
 **Yalnızca belirli sorular:** `--ids ik-023,uc-015` yalnızca bu soruları sohbete sorar; bir prompt değişikliğini birkaç soruda hızlıca denemek içindir. Arama ölçümü yine bütün seti kapsar, böylece sayıları diğer çalıştırmalarla karşılaştırılabilir kalır. Sette olmayan bir kimlik verilirse araç başlamadan durur.
 
+### Sohbetler (`--conversations`)
+
+Kullanıcı bir bilgiyi sohbetin başında verip ("5 aydır çalışıyorum") sonra ona dayanan bir soru sorabilir ("En başta söylediğim süreme göre araç kullanabilir miyim?"), ya da önceki soruya gönderme yapabilir ("Peki köylere?"). `eval/conversations.json` bu durumları sınayan kısa sohbetlerdir (`docs/decisions.md` #69):
+
+```
+dotnet run --project eval/DocAssistant.Eval -- --conversations
+```
+
+Her sohbet `POST /chat` ile, gerçek bir kullanıcı gibi tur tur aynı sohbette sorulur; yalnızca son tur ölçülür. Yerel modelle yaklaşık 2,5 dakika sürer; `--chat-provider openai` ve `--chat-delay` ile birlikte kullanılabilir.
+
+| Alan | Anlamı |
+|---|---|
+| `id` | Sohbetin değişmeyen kimliği (`c-001`). |
+| `kind` | `fact`: son soru, kullanıcının önceki bir mesajda verdiği bilgiye dayanır. `reference`: son soru önceki soruya gönderme yapar. `switch`: son soru öncekilerden bağımsızdır; değişikliklerin bunu bozmadığını gösterir. |
+| `turns` | Kullanıcının sırayla yazdığı mesajlar; sonuncusu ölçülür. |
+| `expected_answer`, `sources` | Son sorunun cevabı ve kanıtı, `questions.json`'daki gibi. |
+
+Kanıt, aracın kendi aramasıyla değil, sohbetin bildirdiği kaynaklarda aranır: takip sorusu kullanıcının sözleriyle değil, yeniden yazılmış hâliyle aranır (#69). Bir numara, o belgenin o bölümündeki bir chunk kanıtı içeriyorsa kanıtı gösterir sayılır. Kısa kanıtlar ("5 iş günü", tablo hücreleri) ilgisiz bir aramanın getirdiği chunk'larda da geçebildiği için `evidence` sütunu iyimserdir; cevaplar sonuç dosyasındaki `conversations` bölümünde okunarak değerlendirilir.
+
+Takip sorularının nasıl yeniden yazıldığını görmek için sohbet uç noktasının ayrıntılı kaydı açılır (Git Bash'te):
+
+```
+env "Logging__LogLevel__DocAssistant.Api.Modules.Chat.ChatEndpoints=Debug" dotnet run -c Release --project eval/DocAssistant.Eval -- --conversations
+```
+
 ### Başka bir sağlayıcının modeliyle (`--chat-provider openai`)
 
 Ollama'da çalıştırılamayacak kadar büyük modelleri ölçmek için araç, OpenAI'ın sohbet protokolünü konuşan bir API'ye de bağlanabilir, örneğin Groq (`docs/decisions.md` #68). Uygulamanın kendisi Ollama ile çalışmaya devam eder.

@@ -37,6 +37,12 @@ public sealed class ChatModelOptions : IValidatableObject
     [Range(64, 8192)]
     public int MaxAnswerTokens { get; init; } = 1024;
 
+    // How much of the conversation so far the model gets, in estimated tokens (decisions
+    // #69): the user's messages first, then the answers. Sized for Ollama's context above
+    // and Groq's free per-minute limit; a model with a larger context can take more.
+    [Range(0, 100000)]
+    public int HistoryTokens { get; init; } = 2000;
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (Provider == ChatProvider.OpenAICompatible && string.IsNullOrWhiteSpace(ApiKey))

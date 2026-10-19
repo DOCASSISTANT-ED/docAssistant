@@ -71,6 +71,42 @@ internal static class Report
         }
     }
 
+    // --conversations: the last turn of every conversation, by kind. "evidence among the
+    // sources" says whether the chat brought the right chunk to the model at all; the rest
+    // is what the model did with it, read as in the answer measurement.
+    public static void PrintConversations(TextWriter output, string chatModel, IReadOnlyList<ConversationResult> results)
+    {
+        output.WriteLine();
+        output.WriteLine($"== Conversations (DOCX, chat model {chatModel}): {results.Count}, last turn measured ==");
+        output.WriteLine();
+        output.WriteLine($"  {"kind",-12}{"total",7}{"failed",8}{"evidence",10}{"refused",9}{"numbered",10}{"cites ev.",11}");
+
+        foreach (var kind in results.GroupBy(result => result.Kind))
+        {
+            var ran = kind.Where(result => !result.Failed).ToList();
+            output.WriteLine($"  {kind.Key,-12}{kind.Count(),7}{kind.Count(result => result.Failed),8}"
+                + $"{ran.Count(result => result.EvidenceShown),10}{ran.Count(result => result.Refused),9}"
+                + $"{ran.Count(result => result.Score.Cited.Count > 0),10}{ran.Count(result => result.Score.CitesEvidence),11}");
+        }
+
+        output.WriteLine();
+        output.WriteLine("  evidence: the evidence was among the sources of the last answer; cites ev.: the answer cites it.");
+
+        var missed = results.Where(result => !result.Failed && !result.EvidenceShown).Select(result => result.ConversationId).ToList();
+        if (missed.Count > 0)
+        {
+            output.WriteLine($"  Evidence not among the sources: {string.Join(", ", missed)}");
+        }
+
+        var failed = results.Where(result => result.Failed).Select(result => result.ConversationId).ToList();
+        if (failed.Count > 0)
+        {
+            output.WriteLine($"  Failed: {string.Join(", ", failed)}");
+        }
+
+        output.WriteLine("  Not measured: whether an answer is correct. The details file has every turn and the expected answer.");
+    }
+
     // docs/decisions.md #62. The two phase 4 exit criteria (PLANNING.md) are the first
     // block and the "with a source number" line.
     public static void PrintAnswers(TextWriter output, AnswerRun run)
@@ -164,7 +200,8 @@ internal static class Report
         string embeddingModel,
         DateTimeOffset ranAt,
         IReadOnlyList<FormatResult> formats,
-        AnswerRun? answers)
+        AnswerRun? answers,
+        IReadOnlyList<ConversationResult>? conversations)
     {
         Directory.CreateDirectory(paths.Results);
         var path = Path.Combine(paths.Results, $"{ranAt:yyyyMMdd-HHmmss}.json");
@@ -193,6 +230,9 @@ internal static class Report
             // Present only when the run measured answers (--answers): every answer next
             // to the expected one, to be read by a person.
             Answers = answers,
+
+            // Present only with --conversations: every turn of every conversation.
+            Conversations = conversations,
         };
 
         File.WriteAllText(path, JsonSerializer.Serialize(document, Json));
