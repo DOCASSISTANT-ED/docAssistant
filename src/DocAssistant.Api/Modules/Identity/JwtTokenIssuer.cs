@@ -10,11 +10,25 @@ public sealed class JwtTokenIssuer(IOptions<JwtOptions> options, TimeProvider ti
 {
     private readonly JsonWebTokenHandler _handler = new();
 
-    public AccessToken Issue(Guid userId, string email, Guid tenantId, string role)
+    // tenantId: null for a platform admin (docs/decisions.md #70), whose token names no
+    // organization; the tenant claim is then left out altogether.
+    public AccessToken Issue(Guid userId, string email, Guid? tenantId, string role)
     {
         var jwt = options.Value;
         var now = timeProvider.GetUtcNow();
         var expiresAt = now.AddMinutes(jwt.AccessTokenMinutes);
+
+        var claims = new Dictionary<string, object>
+        {
+            [ClaimNames.UserId] = userId.ToString(),
+            [ClaimNames.Email] = email,
+            [ClaimNames.Role] = role,
+        };
+
+        if (tenantId is { } tenant)
+        {
+            claims[ClaimNames.TenantId] = tenant.ToString();
+        }
 
         var descriptor = new SecurityTokenDescriptor
         {
@@ -23,13 +37,7 @@ public sealed class JwtTokenIssuer(IOptions<JwtOptions> options, TimeProvider ti
             IssuedAt = now.UtcDateTime,
             NotBefore = now.UtcDateTime,
             Expires = expiresAt.UtcDateTime,
-            Claims = new Dictionary<string, object>
-            {
-                [ClaimNames.UserId] = userId.ToString(),
-                [ClaimNames.Email] = email,
-                [ClaimNames.TenantId] = tenantId.ToString(),
-                [ClaimNames.Role] = role,
-            },
+            Claims = claims,
             SigningCredentials = new SigningCredentials(jwt.CreateSigningKey(), SecurityAlgorithms.HmacSha256),
         };
 

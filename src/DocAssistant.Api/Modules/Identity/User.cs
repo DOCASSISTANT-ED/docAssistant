@@ -14,6 +14,10 @@ public class User
 
     public required string PasswordHash { get; set; }
 
+    // Runs the platform rather than a company (docs/decisions.md #70): signs in without an
+    // organization and may only register companies. Set from the command line only.
+    public bool IsPlatformAdmin { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; }
 
     public List<Membership> Memberships { get; set; } = [];

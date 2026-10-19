@@ -16,6 +16,14 @@ public static class MembershipCheck
     {
         var principal = context.Principal;
 
+        // decisions #70: a platform admin's token names no organization; it holds while the
+        // account is still a platform admin.
+        if (principal?.FindFirstValue(ClaimNames.Role) == PlatformAdmin.Role)
+        {
+            await CheckPlatformAdminAsync(context, principal);
+            return;
+        }
+
         if (principal is null
             || !Guid.TryParse(principal.FindFirstValue(ClaimNames.UserId), out var userId)
             || !Guid.TryParse(principal.FindFirstValue(ClaimNames.TenantId), out var tenantId)
@@ -36,6 +44,28 @@ public static class MembershipCheck
                 context.HttpContext.RequestAborted);
 
         if (!stillMember)
+        {
+            context.Fail(FailureMessage);
+        }
+    }
+
+    private static async Task CheckPlatformAdminAsync(TokenValidatedContext context, ClaimsPrincipal principal)
+    {
+        // A platform admin's token with a tenant in it was not made by us.
+        if (!Guid.TryParse(principal.FindFirstValue(ClaimNames.UserId), out var userId)
+            || principal.FindFirst(ClaimNames.TenantId) is not null)
+        {
+            context.Fail(FailureMessage);
+            return;
+        }
+
+        var db = context.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+
+        var stillPlatformAdmin = await db.Users
+            .IgnoreQueryFilters()
+            .AnyAsync(u => u.Id == userId && u.IsPlatformAdmin, context.HttpContext.RequestAborted);
+
+        if (!stillPlatformAdmin)
         {
             context.Fail(FailureMessage);
         }

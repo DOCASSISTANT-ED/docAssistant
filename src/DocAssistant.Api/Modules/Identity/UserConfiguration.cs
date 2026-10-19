@@ -29,6 +29,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.PasswordHash)
             .IsRequired();
 
+        builder.Property(u => u.IsPlatformAdmin)
+            .HasDefaultValue(false);
+
         builder.Property(u => u.CreatedAt)
             .HasDefaultValueSql("now()");
 

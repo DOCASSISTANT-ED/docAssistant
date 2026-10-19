@@ -11,6 +11,9 @@ namespace DocAssistant.Api.Modules.Identity;
 
 public static class AuthEndpoints
 {
+    // The unique index on tenants.normalized_name (TenantConfiguration, decisions #70).
+    public const string CompanyNameIndex = "ix_tenants_normalized_name";
+
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
         var auth = app.MapGroup("/auth");
@@ -81,8 +84,16 @@ public static class AuthEndpoints
             // One SaveChanges = one transaction: all three rows or none (decisions #11).
             await db.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } unique)
         {
+            // decisions #70: company names are unique too.
+            if (unique.ConstraintName == CompanyNameIndex)
+            {
+                return TypedResults.Problem(
+                    statusCode: StatusCodes.Status409Conflict,
+                    title: "A company with this name is already registered.");
+            }
+
             // Another request registered the same email between our check and the insert;
             // the unique index on normalized_email caught it.
             return EmailAlreadyRegistered();
@@ -123,6 +134,17 @@ public static class AuthEndpoints
             return InvalidCredentials();
         }
 
+        // decisions #70: a platform admin signs in without an organization, even when the
+        // account also belongs to one, so that the two kinds of rights never mix.
+        if (user.IsPlatformAdmin)
+        {
+            await RehashIfNeededAsync(user, request.Password, verification, db, passwordHasher, cancellationToken);
+
+            var platformToken = tokenIssuer.Issue(user.Id, user.Email, tenantId: null, PlatformAdmin.Role);
+            SessionCookie.Append(http, platformToken);
+            return TypedResults.Ok(platformToken);
+        }
+
         // Phase 1: every user has exactly one membership and signs in to it (decisions #13).
         var membership = await db.Memberships
             .IgnoreQueryFilters()
@@ -137,16 +159,27 @@ public static class AuthEndpoints
                 title: "This account is not a member of any organization.");
         }
 
-        // The stored hash uses an older format; upgrade it while we have the plain password.
-        if (verification == PasswordVerificationResult.SuccessRehashNeeded)
-        {
-            user.PasswordHash = passwordHasher.HashPassword(user, request.Password);
-            await db.SaveChangesAsync(cancellationToken);
-        }
+        await RehashIfNeededAsync(user, request.Password, verification, db, passwordHasher, cancellationToken);
 
         var token = tokenIssuer.Issue(user.Id, user.Email, membership.TenantId, membership.Role.ToString());
         SessionCookie.Append(http, token);
         return TypedResults.Ok(token);
+    }
+
+    // The stored hash uses an older format; upgrade it while we have the plain password.
+    private static async Task RehashIfNeededAsync(
+        User user,
+        string password,
+        PasswordVerificationResult verification,
+        AppDbContext db,
+        IPasswordHasher<User> passwordHasher,
+        CancellationToken cancellationToken)
+    {
+        if (verification == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            user.PasswordHash = passwordHasher.HashPassword(user, password);
+            await db.SaveChangesAsync(cancellationToken);
+        }
     }
 
     // Page scripts cannot delete an HttpOnly cookie, so the server does it (decisions #60).
