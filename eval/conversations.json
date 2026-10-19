@@ -1,0 +1,201 @@
+{
+  "version": 1,
+  "conversations": [
+    {
+      "id": "c-001",
+      "kind": "fact",
+      "turns": [
+        "Merhaba, şirkette 5 aydır çalışıyorum.",
+        "Hız yaptığım için trafik cezası gelirse kim öder?",
+        "En başta söylediğim çalışma süreme göre şirket aracıyla yolculuğa çıkabilir miyim?"
+      ],
+      "expected_answer": "Hayır; şirket aracını yalnızca geçerli ehliyeti olan ve şirkette en az altı aydır çalışan personel kullanabilir.",
+      "sources": [
+        {
+          "document": "arac-kullanim-talimati",
+          "section": "Bölüm 1: Araç Tahsisi",
+          "evidence": "Şirket aracını yalnızca geçerli ehliyeti olan ve şirkette en az altı aydır çalışan personel kullanabilir."
+        }
+      ]
+    },
+    {
+      "id": "c-002",
+      "kind": "fact",
+      "turns": [
+        "Şirkette tam on yıldır çalışıyorum.",
+        "Hangi çalışmalar fazla mesai sayılır?",
+        "Benim kıdemime göre yıllık iznim kaç gün?"
+      ],
+      "expected_answer": "20 gün (5–15 yıl kıdem).",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "evidence": "5–15 yıl" }
+      ]
+    },
+    {
+      "id": "c-003",
+      "kind": "fact",
+      "turns": [
+        "Depoda forklift operatörü olarak çalışıyorum.",
+        "Depo alanında hangi koruyucu donanım zorunlu?",
+        "Peki ben evden çalışmaya başvurabilir miyim?"
+      ],
+      "expected_answer": "Hayır; forklift operatörleri uzaktan çalışmaya başvuramaz.",
+      "sources": [
+        {
+          "document": "uzaktan-calisma-politikasi",
+          "section": "1. Uygunluk ve Başvuru",
+          "evidence": "Depo, sevkiyat ve bakım birimlerinde çalışanlar, forklift operatörleri ve şirket aracı kullanan sürücüler uzaktan çalışmaya başvuramaz."
+        }
+      ]
+    },
+    {
+      "id": "c-004",
+      "kind": "fact",
+      "turns": [
+        "Evden çalışıyorum ve masam için ergonomik bir sandalye almak istiyorum.",
+        "Şirket bilgisayarımı kaybedersem ne yapmalıyım?",
+        "Az önce bahsettiğim şeyin masrafını kim karşılıyor?"
+      ],
+      "expected_answer": "Şirket ve çalışan birlikte karşılar; şirket fatura tutarının yarısını, en fazla 3.000 TL'ye kadar öder; masraf formu ile talep edilir.",
+      "sources": [
+        { "document": "uzaktan-calisma-politikasi", "section": "3. Ekipman ve Bilgi Güvenliği", "evidence": "Şirket ve çalışan" }
+      ]
+    },
+    {
+      "id": "c-005",
+      "kind": "fact",
+      "turns": [
+        "Şirkette 3 yıldır çalışıyorum.",
+        "Parolam en az kaç karakter olmalı?",
+        "Vardiya çizelgesi ne zaman duyurulur?",
+        "Depo alanında hangi koruyucu donanım zorunlu?",
+        "İlk mesajımdaki çalışma süreme göre kaç gün yıllık iznim var?"
+      ],
+      "expected_answer": "14 gün (1–5 yıl kıdem).",
+      "sources": [
+        { "document": "ik-yonetmeligi", "section": "Bölüm 2: Yıllık İzin", "evidence": "1–5 yıl" }
+      ]
+    },
+    {
+      "id": "c-006",
+      "kind": "fact",
+      "turns": [
+        "Depo sorumlusuyum, sayımda 10.000 TL'lik bir fark çıktı.",
+        "Donuk ürünler ne sıklıkla sayılır?",
+        "Bahsettiğim farkı kim onaylamalı?"
+      ],
+      "expected_answer": "Depo müdürü (2.500 TL – 25.000 TL arası).",
+      "sources": [
+        {
+          "document": "depo-sevkiyat-el-kitabi",
+          "section": "Bölüm 6: Stok Sayımı ve Kayıt Doğruluğu > 6.2 Sayım Farkları",
+          "evidence": "2.500 TL – 25.000 TL"
+        }
+      ]
+    },
+    {
+      "id": "c-007",
+      "kind": "reference",
+      "turns": [
+        "Komşu illere standart teslimat kaç iş günü sürüyor?",
+        "Peki köylere?"
+      ],
+      "expected_answer": "Köy ve mobil dağıtım bölgelerinde yalnızca standart teslimat vardır: 5 iş günü.",
+      "sources": [
+        { "document": "depo-sevkiyat-el-kitabi", "section": "Bölüm 4: Sevkiyat > 4.3 Teslimat", "evidence": "5 iş günü" }
+      ]
+    },
+    {
+      "id": "c-008",
+      "kind": "reference",
+      "turns": [
+        "100.000 TL'lik bir alım için kaç teklif alınır?",
+        "Peki bunu kim onaylar?"
+      ],
+      "expected_answer": "Satın Alma Müdürü.",
+      "sources": [
+        { "document": "satin-alma-proseduru", "section": "Bölüm 2: Teklif ve Onay", "evidence": "25.000 TL – 250.000 TL" }
+      ]
+    },
+    {
+      "id": "c-009",
+      "kind": "reference",
+      "turns": [
+        "Şirket bilgisayarım çalındı, kime ne kadar sürede bildirmeliyim?",
+        "Polis tutanağını ne yapmalıyım?"
+      ],
+      "expected_answer": "Üç iş günü içinde İnsan Kaynakları'na iletilir.",
+      "sources": [
+        {
+          "document": "bilgi-guvenligi-politikasi",
+          "section": "Bölüm 2: Cihazlar > 2.1 Kayıp ve Çalıntı",
+          "evidence": "Çalıntı durumunda çalışan ayrıca polis tutanağını üç iş günü içinde İnsan Kaynakları'na iletir."
+        }
+      ]
+    },
+    {
+      "id": "c-010",
+      "kind": "reference",
+      "turns": [
+        "Sürücü kesintisiz en fazla ne kadar süre araç kullanabilir?",
+        "Bir günde toplam en fazla ne kadar?"
+      ],
+      "expected_answer": "Dokuz saat.",
+      "sources": [
+        {
+          "document": "arac-kullanim-talimati",
+          "section": "Bölüm 2: Sürüş Kuralları > 2.1 Dinlenme Süreleri",
+          "evidence": "Günlük toplam sürüş süresi dokuz saati aşamaz."
+        }
+      ]
+    },
+    {
+      "id": "c-011",
+      "kind": "reference",
+      "turns": [
+        "Donuk ürünler hangi sıcaklıkta saklanır?",
+        "Ne sıklıkla sayılıyorlar?"
+      ],
+      "expected_answer": "Ayda bir.",
+      "sources": [
+        {
+          "document": "depo-sevkiyat-el-kitabi",
+          "section": "Bölüm 2: Depolama ve Adresleme > 2.3 Özel Depolama Alanları",
+          "evidence": "Donuk ürün deposu"
+        }
+      ]
+    },
+    {
+      "id": "c-012",
+      "kind": "switch",
+      "turns": [
+        "Şirkette 5 aydır çalışıyorum.",
+        "Parolalar en az kaç karakter olmalı?"
+      ],
+      "expected_answer": "En az on iki karakter; en az bir büyük harf, bir rakam ve bir özel işaret içermelidir.",
+      "sources": [
+        {
+          "document": "bilgi-guvenligi-politikasi",
+          "section": "Bölüm 1: Parolalar",
+          "evidence": "Parolalar en az on iki karakterden oluşur; en az bir büyük harf, bir rakam ve bir özel işaret içerir."
+        }
+      ]
+    },
+    {
+      "id": "c-013",
+      "kind": "switch",
+      "turns": [
+        "Köylere hızlı teslimat yapılıyor mu?",
+        "Depo alanında hangi koruyucu donanım zorunludur?"
+      ],
+      "expected_answer": "Çelik burunlu ayakkabı ve reflektörlü yelek.",
+      "sources": [
+        {
+          "document": "depo-is-guvenligi-talimati",
+          "section": "Bölüm 1: Kişisel Koruyucu Donanım",
+          "evidence": "Depo alanında çelik burunlu ayakkabı ve reflektörlü yelek zorunludur."
+        }
+      ]
+    }
+  ]
+}

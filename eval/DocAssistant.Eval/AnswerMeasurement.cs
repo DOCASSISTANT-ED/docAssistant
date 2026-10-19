@@ -113,11 +113,16 @@ internal static partial class AnswerMeasurement
             })
             .ToList();
 
-    private static async Task<Reply> AskAsync(HttpClient client, string question, CancellationToken cancellationToken)
+    // conversationId: null opens a new conversation; the reply carries the id to continue it.
+    internal static async Task<Reply> AskAsync(
+        HttpClient client,
+        string question,
+        CancellationToken cancellationToken,
+        Guid? conversationId = null)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "/chat")
         {
-            Content = JsonContent.Create(new ChatRequest { Question = question }),
+            Content = JsonContent.Create(new ChatRequest { ConversationId = conversationId, Question = question }),
         };
 
         // Without this the client would wait for the whole body before returning.
@@ -131,7 +136,7 @@ internal static partial class AnswerMeasurement
 
         IReadOnlyList<ChatSource> sources = [];
         var text = new StringBuilder();
-        var done = false;
+        ChatDone? done = null;
 
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
@@ -148,13 +153,13 @@ internal static partial class AnswerMeasurement
                     break;
 
                 case ChatEvents.Done:
-                    done = true;
+                    done = JsonSerializer.Deserialize<ChatDone>(item.Data, Json);
                     break;
             }
         }
 
         // No done event: the stream ended with error, or broke off.
-        return new Reply(sources, text.ToString().Trim(), Failed: !done);
+        return new Reply(sources, text.ToString().Trim(), Failed: done is null, done?.ConversationId);
     }
 
     // The numbers (from 1) of the chunks that hold the evidence of any of the question's
@@ -184,12 +189,12 @@ internal static partial class AnswerMeasurement
             && pair.First.SectionPath == pair.Second.SectionPath
             && pair.First.PageNumber == pair.Second.PageNumber);
 
-    private static string Normalize(string text) => WhiteSpace().Replace(text, " ").Trim();
+    internal static string Normalize(string text) => WhiteSpace().Replace(text, " ").Trim();
 
     [GeneratedRegex(@"\s+")]
     private static partial Regex WhiteSpace();
 
-    private sealed record Reply(IReadOnlyList<ChatSource> Sources, string Text, bool Failed);
+    internal sealed record Reply(IReadOnlyList<ChatSource> Sources, string Text, bool Failed, Guid? ConversationId);
 }
 
 // EvidenceAt is empty for a question whose evidence search did not return: the model was

@@ -10,6 +10,7 @@ namespace DocAssistant.Eval;
 //   dotnet run --project eval/DocAssistant.Eval -- --answers --sample 5      5 per question type, about 3 minutes
 //   dotnet run --project eval/DocAssistant.Eval -- --answers --chat-model llama3.1:8b --chat-url http://localhost:11434
 //   dotnet run --project eval/DocAssistant.Eval -- --answers --ids ik-023,uc-015   only these questions are asked
+//   dotnet run --project eval/DocAssistant.Eval -- --conversations         eval/conversations.json, turn by turn
 //
 // An OpenAI compatible API instead of Ollama (decisions #68); the key is read from the
 // CHAT_API_KEY environment variable, and --chat-delay pauses between questions to stay
@@ -37,6 +38,7 @@ internal static class EvalRunner
         var chatUrl = Option(args, "--chat-url") ?? "http://localhost:11434";
         var chatModel = Option(args, "--chat-model") ?? "llama3.1:8b";
         var measureAnswers = args.Contains("--answers");
+        var measureConversations = args.Contains("--conversations");
         var sample = Option(args, "--sample") is { } perType ? int.Parse(perType) : (int?)null;
         var ids = Option(args, "--ids")?.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         var delay = TimeSpan.FromSeconds(Option(args, "--chat-delay") is { } seconds ? int.Parse(seconds) : 0);
@@ -80,6 +82,7 @@ internal static class EvalRunner
 
         var results = new List<FormatResult>();
         AnswerRun? answers = null;
+        IReadOnlyList<ConversationResult>? conversations = null;
 
         foreach (var format in Formats)
         {
@@ -100,6 +103,14 @@ internal static class EvalRunner
                 Console.WriteLine($"Asking {asked.Count} questions through the chat endpoint ({chatModel})...");
                 answers = await AnswerMeasurement.RunAsync(api, corpus, asked, chatModel, delay, Console.Out, stop.Token);
             }
+
+            if (measureConversations && format == AnswerFormat)
+            {
+                var set = ConversationSet.Load(paths.Conversations);
+
+                Console.WriteLine($"Asking {set.Conversations.Count} conversations through the chat endpoint ({chatModel})...");
+                conversations = await ConversationMeasurement.RunAsync(api, corpus, set, delay, Console.Out, stop.Token);
+            }
         }
 
         Report.Print(Console.Out, questions, embeddingModel, results);
@@ -109,7 +120,12 @@ internal static class EvalRunner
             Report.PrintAnswers(Console.Out, answers);
         }
 
-        var saved = Report.Save(paths, questions, embeddingModel, ranAt, results, answers);
+        if (conversations is not null)
+        {
+            Report.PrintConversations(Console.Out, chatModel, conversations);
+        }
+
+        var saved = Report.Save(paths, questions, embeddingModel, ranAt, results, answers, conversations);
         Console.WriteLine();
         Console.WriteLine($"Details: {Path.GetRelativePath(paths.Root, saved)}");
     }
