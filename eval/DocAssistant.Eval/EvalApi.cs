@@ -17,7 +17,9 @@ internal sealed class EvalApi(
     string embeddingUrl,
     string embeddingModel,
     string chatUrl,
-    string chatModel)
+    string chatModel,
+    string chatProvider,
+    string? chatApiKey)
     : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -40,6 +42,11 @@ internal sealed class EvalApi(
         // no connection, so a search-only run does not need the chat model.
         builder.UseSetting("Chat:BaseUrl", chatUrl);
         builder.UseSetting("Chat:Model", chatModel);
+
+        // decisions #68: Ollama, or an OpenAI compatible API whose key comes from the
+        // environment (EvalRunner), never from the command line.
+        builder.UseSetting("Chat:Provider", chatProvider);
+        builder.UseSetting("Chat:ApiKey", chatApiKey);
 
         // The app refuses to start without storage settings; the storage itself is replaced below.
         builder.UseSetting("Storage:ServiceUrl", "http://storage.invalid");

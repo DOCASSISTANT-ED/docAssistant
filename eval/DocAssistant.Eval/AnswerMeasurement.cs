@@ -28,6 +28,7 @@ internal static partial class AnswerMeasurement
         Corpus corpus,
         IReadOnlyList<EvalQuestion> questions,
         string chatModel,
+        TimeSpan delay,
         TextWriter progress,
         CancellationToken cancellationToken)
     {
@@ -75,9 +76,17 @@ internal static partial class AnswerMeasurement
                 score,
                 Math.Round(clock.Elapsed.TotalSeconds, 1)));
 
-            if (results.Count % 10 == 0 || results.Count == questions.Count)
+            // With a delay (--chat-delay) a run is slow enough to report every question.
+            if (results.Count % 10 == 0 || results.Count == questions.Count || delay > TimeSpan.Zero)
             {
                 progress.WriteLine($"  {results.Count} of {questions.Count}");
+            }
+
+            // An API with a per-minute token limit answers 429 when asked too fast; the
+            // pause keeps the run under it.
+            if (delay > TimeSpan.Zero && results.Count < questions.Count)
+            {
+                await Task.Delay(delay, cancellationToken);
             }
         }
 
