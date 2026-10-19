@@ -217,6 +217,16 @@ Bu iki karar, değerlendirme setini çalıştıran araç yazılmadan önce uygul
 | | Kullanıcı daveti ve üyelik yönetimi (#67): davet bağlantısı, kullanıcılar sayfası, firmadan çıkarma | |
 | **Çapraz test:** Belge yönetimi, kota, davet ve üyelik testleri | **Çapraz test:** Deploy sonrası smoke testleri | |
 
+**Firma ve yönetici kaydı (#70).** Sıra: Erva'nın 1. işi önce birleşir (Dide'nin yönetici kaydı firmaya ve koda ihtiyaç duyar); Dide e-posta doğrulamasına aynı anda başlayabilir. İki taraf da `AuthEndpoints`'in giriş kısmına dokunduğu için girişteki değişiklikler sırayla birleştirilir.
+
+| Dide | Erva | Birlikte |
+|---|---|---|
+| E-posta doğrulama: `email_verifications` tablosu, 6 haneli kod, yeniden gönderme, SMTP ile gönderim, Docker'a Mailpit | 1. Sistem yöneticisi ve firma kaydı backend'i: migration (`tenants`: normalize ad, alan adları, kayıt kodu özeti; `users.is_platform_admin`), `create-platform-admin` komutu, `/platform/companies` (oluştur, listele, kodu yenile) | Karar 70 |
+| Yönetici kaydı backend'i: kayıt kodu ve alan adı kuralıyla kayıt, `Auth:OpenRegistration` ayarı | Sistem yöneticisinin girişi (firmasız oturum) ve yetkisi | Canlıdaki SMTP servisinin seçimi |
+| Girişte doğrulanmamış hesabın reddi | Davetle katılmada alan adı kuralı ve yeni hesabın doğrulamaya yönlendirilmesi | |
+| Arayüz: yönetici kayıt ekranı (bugünkü kayıt ekranının yerine), doğrulama kodu ekranı | Arayüz: `/firmalar` sayfası (firma ekle, alan adı kuralı, kodu bir kez gösterme, kodu yenileme) | |
+| **Çapraz test:** sistem yöneticisi, firma kaydı, `/firmalar` sayfası, davette alan adı kuralı | **Çapraz test:** e-posta doğrulama, yönetici kaydı, girişteki kontroller, kayıt ve doğrulama ekranları | |
+
 **Bitiş koşulu:**
 - [ ] Uygulama canlı ortamda HTTPS üzerinden erişilebilir
 - [ ] Her tenant'ın token kullanımı kayıt altında ve kota aşılınca istek reddediliyor
