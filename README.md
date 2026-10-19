@@ -175,6 +175,7 @@ Arayüz API'ye tarayıcıdan, başka bir adresten istek gönderir. API buna yaln
 | API'yi elle dene (kayıt, giriş, `/auth/me`) | `src/DocAssistant.Api/DocAssistant.Api.http`; VS Code'da [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) eklentisiyle her isteğin üstündeki "Send Request" |
 | Bekleyen migration'ları uygula (`git pull` sonrası) | `dotnet ef database update --project src/DocAssistant.Api` |
 | Yeni migration üret | `dotnet ef migrations add <Ad> --project src/DocAssistant.Api --output-dir Data/Migrations` |
+| Sistem yöneticisi hesabı aç ya da var olan hesabı sistem yöneticisi yap (firma kaydı yalnızca onda; parolayı ekranda göstermeden sorar: [decisions.md](docs/decisions.md) #70) | `dotnet run --project src/DocAssistant.Api -- create-platform-admin <e-posta>` |
 
 ## Sık karşılaşılan sorunlar
 

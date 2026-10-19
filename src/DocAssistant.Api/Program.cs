@@ -53,6 +53,13 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy
 
 var app = builder.Build();
 
+// docs/decisions.md #70: the platform admin account is made from the command line only.
+// The command runs instead of the web server and exits.
+if (args is [PlatformAdmin.CommandName, ..])
+{
+    return await PlatformAdmin.RunCommandAsync(app.Services, args);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -79,5 +86,8 @@ app.MapMemberEndpoints();
 app.MapDocumentEndpoints();
 app.MapChatEndpoints();
 app.MapConversationEndpoints();
+app.MapPlatformCompanyEndpoints();
 
 app.Run();
+
+return 0;

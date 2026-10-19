@@ -148,3 +148,39 @@ Authorization: Bearer {{login.response.body.$.token}}
 # Their account stays; their token stops working at once.
 DELETE {{DocAssistant.Api_HostAddress}}/members/{{members.response.body.$[-1:].userId}}
 Authorization: Bearer {{login.response.body.$.token}}
+
+### Platform admin: log in (docs/decisions.md #70; the account is made from the command line:
+#   dotnet run --project src/DocAssistant.Api -- create-platform-admin platform@ornek.com)
+# The token names no organization; /auth/me answers with tenantId null and role PlatformAdmin.
+# @name platformLogin
+POST {{DocAssistant.Api_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "platform@ornek.com",
+  "password": "Gizli123!"
+}
+
+### Register a company with an email rule (platform admin only; the code is in this answer only)
+# Leave emailDomains out (or empty) for a company without an email of its own. 409 for a taken name.
+# @name company
+POST {{DocAssistant.Api_HostAddress}}/platform/companies
+Authorization: Bearer {{platformLogin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "A Firması",
+  "emailDomains": ["afirma.com"]
+}
+
+### Every company, by name (platform admin only)
+GET {{DocAssistant.Api_HostAddress}}/platform/companies
+Authorization: Bearer {{platformLogin.response.body.$.token}}
+
+### A new registration code for the company above; the old one stops working (platform admin only)
+POST {{DocAssistant.Api_HostAddress}}/platform/companies/{{company.response.body.$.company.id}}/registration-code
+Authorization: Bearer {{platformLogin.response.body.$.token}}
+
+### A company admin may not register companies: 403
+GET {{DocAssistant.Api_HostAddress}}/platform/companies
+Authorization: Bearer {{login.response.body.$.token}}
