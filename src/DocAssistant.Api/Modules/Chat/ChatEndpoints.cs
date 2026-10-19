@@ -177,7 +177,7 @@ public static class ChatEndpoints
                         break;
                     }
 
-                    piece = updates.Current.Text;
+                    piece = ChatPrompt.NormalizeBrackets(updates.Current.Text);
                     cutOff |= updates.Current.FinishReason == ChatFinishReason.Length;
                 }
                 catch (Exception exception) when (exception is not OperationCanceledException)

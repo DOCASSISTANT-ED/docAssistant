@@ -66,6 +66,15 @@ public static partial class ChatPrompt
         return messages;
     }
 
+    // Source numbers are written "[3]" (decisions #56), but some models write them with
+    // other brackets: 【3】 (gpt-oss) or the full-width ［3］ (decisions #68). The answer
+    // arrives in pieces and a number can be split between two of them ("…【" and "3】"),
+    // so each bracket is replaced on its own rather than the whole "【3】".
+    public static string NormalizeBrackets(string piece) =>
+        piece.IndexOfAny(['【', '】', '［', '］']) < 0
+            ? piece
+            : piece.Replace('【', '[').Replace('】', ']').Replace('［', '[').Replace('］', ']');
+
     // "[3]", and also "[1, 3]": the prompt asks for one number per bracket (decisions #56),
     // but models sometimes write two in one.
     [GeneratedRegex(@"\s*\[\d+(\s*,\s*\d+)*\]")]
