@@ -169,11 +169,12 @@ describe('routes', () => {
       expect(page().querySelector('app-login')).not.toBeNull();
     });
 
+    // decisions #70: /register is the admin registration with a company's code.
     it('shows the register screen', async () => {
       await visit('/register', null);
 
       expect(router.url).toBe('/register');
-      expect(page().querySelector('app-register')).not.toBeNull();
+      expect(page().querySelector('app-admin-register')).not.toBeNull();
     });
 
     it('leads from the home page to the login screen', async () => {
@@ -199,7 +200,7 @@ describe('routes', () => {
 
   it.each([
     ['/login', null, 'Giriş yap · DocAssistant'],
-    ['/register', null, 'Firma kaydı · DocAssistant'],
+    ['/register', null, 'Yönetici kaydı · DocAssistant'],
     ['/', admin, 'DocAssistant'],
   ] as const)('titles the page at %s', async (url, signedInAs, title) => {
     await visit(url, signedInAs);
