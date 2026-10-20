@@ -1,6 +1,7 @@
 using DocAssistant.Api.Data;
 using DocAssistant.Api.Modules.Chat;
 using DocAssistant.Api.Modules.Documents;
+using DocAssistant.Api.Modules.Email;
 using DocAssistant.Api.Modules.Embeddings;
 using DocAssistant.Api.Modules.Identity;
 using DocAssistant.Api.Modules.Ingestion;
@@ -29,6 +30,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
     .UseAppDatabase(connectionString)
     .AddInterceptors(services.GetRequiredService<TenantConnectionInterceptor>()));
 
+builder.Services.AddEmailModule();
 builder.Services.AddIdentityModule();
 builder.Services.AddTenantsModule();
 builder.Services.AddDocumentsModule();
@@ -81,6 +83,7 @@ app.UseAuthorization();
 
 app.MapHealthChecks("/health");
 app.MapAuthEndpoints();
+app.MapEmailVerificationEndpoints();
 app.MapInvitationEndpoints();
 app.MapMemberEndpoints();
 app.MapDocumentEndpoints();

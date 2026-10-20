@@ -44,12 +44,13 @@ Docker Desktop açık olmalı.
 docker compose up -d
 ```
 
-Bu komut iki servis başlatır:
+Bu komut üç servis başlatır:
 
 | Servis | Ne için | Adres |
 |---|---|---|
 | PostgreSQL 17 + pgvector | Veritabanı | `localhost:5432` |
 | SeaweedFS | S3 uyumlu dosya saklama; `documents` bucket'ı açılışta otomatik oluşur | S3 API: http://localhost:8333, yönetim paneli: http://localhost:23646 |
+| Mailpit | Uygulamanın gönderdiği e-postaları (doğrulama kodları, [decisions.md](docs/decisions.md) #70) kimseye göndermeden yakalar; servis yeniden başlayınca silinirler | SMTP: `localhost:1025`, e-postalar: http://localhost:8025 |
 
 Doğrulamak için:
 
@@ -58,7 +59,7 @@ docker compose ps
 docker compose exec postgres psql -U docassistant -d docassistant -c "SELECT '[1,2,3]'::vector <-> '[1,2,4]'::vector AS distance;"
 ```
 
-İlk komutta `docassistant-postgres` ve `docassistant-seaweedfs` satırlarında `healthy` görünmeli, ikincisi `1` döndürmelidir.
+İlk komutta `docassistant-postgres`, `docassistant-seaweedfs` ve `docassistant-mailpit` satırlarında `healthy` görünmeli, ikincisi `1` döndürmelidir.
 
 API dosya depolamaya `appsettings.Development.json` içindeki `Storage` ayarlarıyla bağlanır (adres, erişim anahtarı, gizli anahtar, bucket). Bu değerler `.env.example`'daki `S3_` değerleriyle aynıdır; `.env` dosyanda `S3_` değerlerini değiştirirsen `Storage` ayarlarını da aynı yap.
 
@@ -186,7 +187,7 @@ Arayüz API'ye tarayıcıdan, başka bir adresten istek gönderir. API buna yaln
 - **Arayüzde "API'ye ulaşılamıyor" yazıyor:** API çalışmıyordur (`dotnet run --project src/DocAssistant.Api`) ya da arayüz 4200 dışında bir porttan açılmıştır; API yalnızca `Cors:AllowedOrigins` listesindeki adreslere izin verir. Tarayıcı konsolunda "CORS" hatası görürsen ikinci durumdur.
 - **`npm start` "ng tanınmıyor" ya da modül bulunamadı hatası veriyor:** Paketler kurulmamıştır; `src/web` içinde `npm install` çalıştır.
 - **API açılışta `The SigningKey field is required` hatası veriyor:** Bu bilgisayarda JWT anahtarı ayarlanmamıştır; 7. adımı uygula.
-- **5432 portu kullanımda:** Bilgisayarında başka bir PostgreSQL çalışıyordur. `.env` dosyasında `POSTGRES_PORT` değerini değiştir. 8333 veya 23646 portları için aynı şekilde `S3_PORT` ve `SEAWEEDFS_ADMIN_PORT` kullanılır.
+- **5432 portu kullanımda:** Bilgisayarında başka bir PostgreSQL çalışıyordur. `.env` dosyasında `POSTGRES_PORT` değerini değiştir. 8333, 23646, 1025 veya 8025 portları için aynı şekilde `S3_PORT`, `SEAWEEDFS_ADMIN_PORT`, `MAILPIT_SMTP_PORT` ve `MAILPIT_UI_PORT` kullanılır.
 - **`.env` dosyan bu değişiklikten önce oluşturulduysa:** `.env.example`'daki `S3_` ve `SEAWEEDFS_` satırlarını kendi `.env` dosyana ekle; yoksa SeaweedFS anahtarsız açılır.
 - **Migration `role "docassistant_app" does not exist` hatası veriyor:** Veritabanın bu kullanıcı eklenmeden önce oluşturulmuştur; init betikleri yalnızca veritabanı ilk oluşurken çalışır. `.env` dosyana `.env.example`'daki `APP_DB_PASSWORD` satırını ekle, sonra veriyi silmeden kullanıcıyı oluştur:
 

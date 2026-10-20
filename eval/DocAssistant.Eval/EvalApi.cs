@@ -48,6 +48,10 @@ internal sealed class EvalApi(
         builder.UseSetting("Chat:Provider", chatProvider);
         builder.UseSetting("Chat:ApiKey", chatApiKey);
 
+        // The app refuses to start without e-mail settings (decisions #70); a run sends none.
+        builder.UseSetting("Email:Host", "smtp.invalid");
+        builder.UseSetting("Email:FromAddress", "evaluation@example.com");
+
         // The app refuses to start without storage settings; the storage itself is replaced below.
         builder.UseSetting("Storage:ServiceUrl", "http://storage.invalid");
         builder.UseSetting("Storage:AccessKey", "evaluation");

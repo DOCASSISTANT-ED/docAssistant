@@ -64,6 +64,11 @@ public static class AuthEndpoints
             Email = request.Email.Trim(),
             NormalizedEmail = normalizedEmail,
             PasswordHash = string.Empty,
+
+            // decisions #70: this open registration exists only for development, tests and
+            // the evaluation run (off in production, Auth:OpenRegistration), which have no
+            // mailbox to read a code from; its accounts count as verified.
+            EmailVerifiedAt = DateTimeOffset.UtcNow,
         };
         user.PasswordHash = passwordHasher.HashPassword(user, request.Password);
 

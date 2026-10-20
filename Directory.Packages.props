@@ -24,6 +24,14 @@
     <PackageVersion Include="AWSSDK.S3" Version="4.0.104.1" />
   </ItemGroup>
 
+  <!-- E-posta (docs/decisions.md #70) -->
+  <ItemGroup>
+    <PackageVersion Include="MailKit" Version="4.18.1" />
+    <!-- MailKit brings 10.0.0, which has known vulnerabilities (NuGet audit fails the build);
+         10.0.13 is the first fixed release. Drop once MailKit requires a fixed one. -->
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+  </ItemGroup>
+
   <!-- Belge okuma -->
   <ItemGroup>
     <PackageVersion Include="DocumentFormat.OpenXml" Version="3.5.1" />

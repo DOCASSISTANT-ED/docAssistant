@@ -18,6 +18,10 @@ public class User
     // organization and may only register companies. Set from the command line only.
     public bool IsPlatformAdmin { get; set; }
 
+    // When the person proved the address is theirs with a code (docs/decisions.md #70);
+    // empty until then, and an account that is not verified cannot sign in.
+    public DateTimeOffset? EmailVerifiedAt { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; }
 
     public List<Membership> Memberships { get; set; } = [];

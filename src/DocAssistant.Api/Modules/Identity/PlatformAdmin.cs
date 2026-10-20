@@ -43,6 +43,10 @@ public static class PlatformAdmin
         if (user is not null)
         {
             user.IsPlatformAdmin = true;
+
+            // Made on the server by whoever runs it, not over the internet: no code to
+            // confirm (decisions #70).
+            user.EmailVerifiedAt ??= DateTimeOffset.UtcNow;
             await db.SaveChangesAsync();
             Console.WriteLine($"{user.Email} is now a platform admin; the password is unchanged.");
             return 0;
@@ -68,6 +72,7 @@ public static class PlatformAdmin
             NormalizedEmail = normalizedEmail,
             PasswordHash = string.Empty,
             IsPlatformAdmin = true,
+            EmailVerifiedAt = DateTimeOffset.UtcNow,
         };
         user.PasswordHash = passwordHasher.HashPassword(user, password);
 

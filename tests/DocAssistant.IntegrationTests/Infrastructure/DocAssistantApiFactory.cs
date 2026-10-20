@@ -41,5 +41,10 @@ public sealed class DocAssistantApiFactory(string connectionString) : WebApplica
         // And for the chat model (decisions #61). Tests that ask questions replace IChatClient.
         builder.UseSetting("Chat:BaseUrl", "http://chat.invalid");
         builder.UseSetting("Chat:Model", "integration-tests");
+
+        // And for e-mail (decisions #70): no test may send a real one. Tests that send
+        // e-mail replace IEmailSender.
+        builder.UseSetting("Email:Host", "smtp.invalid");
+        builder.UseSetting("Email:FromAddress", "integration-tests@example.com");
     }
 }

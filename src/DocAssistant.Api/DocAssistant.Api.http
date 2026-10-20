@@ -41,6 +41,26 @@ Content-Type: application/json
   "password": "wrong-password"
 }
 
+### Ask for an e-mail verification code (docs/decisions.md #70). Always 204: the answer does
+# not tell whether the address has an account. The code arrives in Mailpit: http://localhost:8025
+# A new code at most every 60 seconds and 5 an hour; 503 when the e-mail could not be sent.
+POST {{DocAssistant.Api_HostAddress}}/auth/verify-email/resend
+Content-Type: application/json
+
+{
+  "email": "ayse@yildiz.com"
+}
+
+### Verify the address with the code from the e-mail (signs in and returns a token; 400 when
+# the code is wrong, expired or used, and after 5 wrong tries)
+POST {{DocAssistant.Api_HostAddress}}/auth/verify-email
+Content-Type: application/json
+
+{
+  "email": "ayse@yildiz.com",
+  "code": "123456"
+}
+
 ### Invalid input: 400 with the field errors
 POST {{DocAssistant.Api_HostAddress}}/auth/register
 Content-Type: application/json
