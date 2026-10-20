@@ -122,6 +122,7 @@ public static class AuthEndpoints
         AppDbContext db,
         IPasswordHasher<User> passwordHasher,
         JwtTokenIssuer tokenIssuer,
+        EmailVerificationService emailVerifications,
         CancellationToken cancellationToken)
     {
         var normalizedEmail = User.NormalizeEmail(request.Email);
@@ -144,6 +145,32 @@ public static class AuthEndpoints
         if (verification == PasswordVerificationResult.Failed)
         {
             return InvalidCredentials();
+        }
+
+        // decisions #70: an account whose address is not verified cannot sign in. Checked after
+        // the password, so only someone who knows it learns that the account is unverified.
+        // A new code is sent at once (within the limits of EmailVerificationService): the one
+        // from registration has likely expired, and the screen moves on to typing the code.
+        if (user.EmailVerifiedAt is null)
+        {
+            bool sent;
+            try
+            {
+                sent = await emailVerifications.SendCodeAsync(user, cancellationToken) == SendCodeResult.Sent;
+            }
+            catch (EmailNotSentException)
+            {
+                sent = false;
+            }
+
+            return TypedResults.Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "This account's email address is not verified yet.",
+                extensions: new Dictionary<string, object?>
+                {
+                    ["emailNotVerified"] = true,
+                    ["verificationSent"] = sent,
+                });
         }
 
         // decisions #70: a platform admin signs in without an organization, even when the
