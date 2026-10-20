@@ -35,8 +35,18 @@ export const routes: Routes = [
     canActivate: [signedOutOnly],
     title: 'Giriş yap · DocAssistant',
   },
+  // A company's admin registers with the company's registration code (decisions #70).
   {
     path: 'register',
+    loadComponent: () => import('./auth/admin-register/admin-register').then((m) => m.AdminRegister),
+    canActivate: [signedOutOnly],
+    title: 'Yönetici kaydı · DocAssistant',
+  },
+  // Opening a company oneself (open registration). Linked from nowhere: only the platform
+  // admin opens companies (decisions #70), and production turns this off (Auth:OpenRegistration).
+  // Kept for development, where it is the quick way to a test company.
+  {
+    path: 'firma-kaydi',
     loadComponent: () => import('./auth/register/register').then((m) => m.Register),
     canActivate: [signedOutOnly],
     title: 'Firma kaydı · DocAssistant',

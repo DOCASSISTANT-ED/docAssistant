@@ -1,0 +1,8 @@
+/* The admin registration screen's own parts; the rest comes from auth-form.css. */
+
+/* The code reads like the platform admin's screen shows it: fixed-width, spaced out. More
+   specific than Material's own rule for the input's font. */
+.form input.code.mat-mdc-input-element {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  letter-spacing: 0.08em;
+}

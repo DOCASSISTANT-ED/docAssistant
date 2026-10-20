@@ -1,0 +1,90 @@
+<app-auth-layout>
+  <h1 class="title">Yönetici olarak kaydolun</h1>
+  <p class="subtitle">Firmanızın kayıt kodunu sistem yöneticisinden alırsınız.</p>
+
+  @if (failure(); as message) {
+    <p class="failure" role="alert">{{ message }}</p>
+  }
+
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <mat-form-field appearance="outline" hideRequiredMarker>
+      <mat-label>Kayıt kodu</mat-label>
+      <input
+        #codeInput
+        matInput
+        type="text"
+        class="code"
+        formControlName="registrationCode"
+        autocomplete="off"
+        autocapitalize="characters"
+        spellcheck="false"
+        placeholder="ABCD-EFGH-JKMN"
+        (input)="formatCode(codeInput)"
+      />
+      <mat-hint>Tireler kendiliğinden eklenir.</mat-hint>
+      @if (form.controls.registrationCode.hasError('required')) {
+        <mat-error>Firmanızın kayıt kodunu girin.</mat-error>
+      } @else if (form.controls.registrationCode.hasError('unknown')) {
+        <mat-error>Bu kod hiçbir firmaya ait değil.</mat-error>
+      } @else if (form.controls.registrationCode.invalid) {
+        <mat-error>Kod 12 harf ya da rakamdan oluşur.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" hideRequiredMarker>
+      <mat-label>E-posta</mat-label>
+      <input matInput type="email" formControlName="email" autocomplete="email" inputmode="email" />
+      @if (form.controls.email.hasError('required')) {
+        <mat-error>E-posta adresinizi girin.</mat-error>
+      } @else if (form.controls.email.hasError('taken')) {
+        <mat-error>Bu adres kullanılıyor.</mat-error>
+      } @else if (form.controls.email.hasError('domain')) {
+        <mat-error>Firmanın kendi e-posta adresinizi girin.</mat-error>
+      } @else if (form.controls.email.invalid) {
+        <mat-error>Geçerli bir e-posta adresi girin.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" hideRequiredMarker>
+      <mat-label>Parola</mat-label>
+      <input
+        matInput
+        [type]="passwordVisible() ? 'text' : 'password'"
+        formControlName="password"
+        autocomplete="new-password"
+      />
+      <button
+        matSuffix
+        matButton
+        type="button"
+        class="reveal"
+        [attr.aria-pressed]="passwordVisible()"
+        (click)="passwordVisible.set(!passwordVisible())"
+      >
+        {{ passwordVisible() ? 'Gizle' : 'Göster' }}
+      </button>
+      <mat-hint>En az {{ limits.passwordMinLength }} karakter.</mat-hint>
+      @if (form.controls.password.hasError('required')) {
+        <mat-error>Bir parola belirleyin.</mat-error>
+      } @else if (form.controls.password.hasError('minlength')) {
+        <mat-error>Parola en az {{ limits.passwordMinLength }} karakter olmalı.</mat-error>
+      } @else if (form.controls.password.hasError('maxlength')) {
+        <mat-error>Parola en çok {{ limits.passwordMaxLength }} karakter olabilir.</mat-error>
+      } @else if (form.controls.password.invalid) {
+        <mat-error>Bu parola kabul edilmedi.</mat-error>
+      }
+    </mat-form-field>
+
+    <button matButton="filled" type="submit" class="submit" [disabled]="submitting()">
+      @if (submitting()) {
+        <mat-spinner diameter="20" aria-label="Kayıt oluşturuluyor" />
+      } @else {
+        Kaydol <span class="arrow" aria-hidden="true">→</span>
+      }
+    </button>
+  </form>
+
+  <p class="switch">
+    Zaten hesabınız var mı? <a routerLink="/login" queryParamsHandling="preserve">Giriş yapın</a>
+  </p>
+</app-auth-layout>
