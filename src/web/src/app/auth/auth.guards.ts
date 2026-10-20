@@ -30,6 +30,21 @@ export const signedOutOnly: CanActivateFn = () =>
 export const adminOnly: CanActivateFn = () =>
   inject(Session).isAdmin() ? true : inject(Router).createUrlTree(['/']);
 
+// For the screens of an organization (chat, documents, users). The platform admin has
+// none (decisions #70) and is sent to the companies screen instead, which is also where
+// signing in takes them: login goes to "/", and this sends them on.
+export const companyUserOnly: CanActivateFn = () =>
+  isPlatformAdmin() ? inject(Router).createUrlTree(['/firmalar']) : true;
+
+// For the companies screen: the platform admin's only one. Others go home.
+export const platformAdminOnly: CanActivateFn = () =>
+  isPlatformAdmin() ? true : inject(Router).createUrlTree(['/']);
+
+// The platform admin registers companies and belongs to no organization (decisions #70).
+function isPlatformAdmin(): boolean {
+  return inject(Session).user()?.role === 'PlatformAdmin';
+}
+
 // Where to go after signing in: the address the login screen was given, if it is one of
 // the app's own. Anything else (another site, a protocol-relative "//host") is ignored,
 // so a crafted link cannot use the login screen to send people elsewhere.

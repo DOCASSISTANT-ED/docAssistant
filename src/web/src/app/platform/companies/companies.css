@@ -1,0 +1,375 @@
+/* Laid out like the users page (members.css); the bar on top stands in for the shell's
+   side panel, which the platform admin does not have. */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--brand-paper);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--brand-forest);
+  color: var(--brand-on-forest);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 1.0625rem;
+  font-weight: 500;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+}
+
+.brand-area {
+  padding-left: 0.7rem;
+  border-left: 1px solid var(--brand-on-forest-muted);
+  color: var(--brand-on-forest-muted);
+  font-weight: 400;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.account-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--brand-on-forest-muted);
+}
+
+.topbar .link {
+  color: var(--brand-on-forest);
+}
+
+.topbar .link:hover {
+  background: color-mix(in srgb, var(--brand-on-forest) 12%, transparent);
+}
+
+.page {
+  display: grid;
+  gap: 2rem;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--mat-sys-primary);
+}
+
+.lead,
+.empty {
+  margin: 0.35rem 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.section-title {
+  margin: 0 0 0.75rem;
+  font: var(--mat-sys-title-medium);
+  color: var(--mat-sys-on-surface);
+}
+
+.card {
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+/* ---- The form ---- */
+
+.form {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.field.nested {
+  margin: 0 0 0.25rem 1.75rem;
+}
+
+.field-label {
+  font-weight: 500;
+}
+
+.input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 0.6rem;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: inherit;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--brand-amber);
+  outline-offset: 1px;
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--mat-sys-error);
+}
+
+.field-error {
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}
+
+.rule {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.rule .field-label {
+  margin-bottom: 0.2rem;
+  padding: 0;
+}
+
+.rule-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.rule-option input {
+  margin-top: 0.25rem;
+}
+
+.rule-option > span {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.option-hint {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---- A code just shown ---- */
+
+.code {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--brand-forest) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand-forest) 25%, transparent);
+}
+
+.code-title {
+  margin: 0;
+  font: var(--mat-sys-title-small);
+}
+
+.code-line {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.code-box {
+  flex: 1;
+  min-width: 12rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.6rem;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-title-medium);
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.08em;
+}
+
+.code-warning {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+/* ---- The list ---- */
+
+.list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.lines {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.details {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+  overflow-wrap: anywhere;
+}
+
+.badge {
+  padding: 0.25rem 0.65rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--brand-amber) 25%, transparent);
+  color: var(--brand-on-amber);
+  font: var(--mat-sys-label-medium);
+  white-space: nowrap;
+}
+
+.confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.confirm-text {
+  font: var(--mat-sys-body-small);
+}
+
+/* ---- Buttons and messages, as on the users page ---- */
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.primary {
+  padding: 0.6rem 1.05rem;
+  border: none;
+  border-radius: 0.8rem;
+  background: var(--brand-amber);
+  color: var(--brand-on-amber);
+  font-weight: 500;
+}
+
+.link {
+  padding: 0.3rem 0.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: none;
+  color: var(--mat-sys-primary);
+}
+
+.link:hover:not(:disabled) {
+  background: var(--mat-sys-surface-container-high);
+}
+
+.danger {
+  padding: 0.35rem 0.8rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: var(--mat-sys-error);
+  color: var(--mat-sys-on-error);
+}
+
+.secondary {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 0.7rem;
+  background: none;
+  color: var(--mat-sys-primary);
+}
+
+.message {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.message p {
+  margin: 0;
+}
+
+.failure {
+  margin: 0;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+/* Narrow screens: the badge and the button go under the name; the email in the bar goes. */
+@media (max-width: 40rem) {
+  .topbar {
+    padding: 0.6rem 1rem;
+  }
+
+  .account-email,
+  .brand-area {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .row > .badge,
+  .row > button,
+  .row > .confirm {
+    justify-self: start;
+  }
+
+  .field.nested {
+    margin-left: 0;
+  }
+}

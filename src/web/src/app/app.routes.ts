@@ -1,5 +1,11 @@
 import { Routes, UrlMatcher } from '@angular/router';
-import { adminOnly, signedInOnly, signedOutOnly } from './auth/auth.guards';
+import {
+  adminOnly,
+  companyUserOnly,
+  platformAdminOnly,
+  signedInOnly,
+  signedOutOnly,
+} from './auth/auth.guards';
 
 // The chat screen has two addresses: the plain one for a new conversation and /c/<id>
 // for one from the history (so that a conversation can be reloaded, bookmarked and
@@ -44,11 +50,21 @@ export const routes: Routes = [
     title: 'Davete katıl · DocAssistant',
   },
 
-  // Everything a signed-in user sees is shown inside the shell (side panel, account menu).
+  // The platform admin's screen (decisions #70), outside the shell: it has no chat and no
+  // organization, only the companies.
+  {
+    path: 'firmalar',
+    loadComponent: () => import('./platform/companies/companies').then((m) => m.Companies),
+    canActivate: [signedInOnly, platformAdminOnly],
+    title: 'Firmalar · DocAssistant',
+  },
+
+  // Everything a signed-in user of an organization sees is shown inside the shell (side
+  // panel, account menu).
   {
     path: '',
     loadComponent: () => import('./shell/shell').then((m) => m.Shell),
-    canActivate: [signedInOnly],
+    canActivate: [signedInOnly, companyUserOnly],
     children: [
       {
         matcher: chatAddress,
