@@ -54,6 +54,10 @@ export class Register {
   protected readonly failure = signal<string | null>(null);
   protected readonly passwordVisible = signal(false);
 
+  // Open registration is off on this server (decisions #70); the screen points to the
+  // registration with a company's code instead.
+  protected readonly closed = signal(false);
+
   protected async submit(): Promise<void> {
     if (this.submitting()) {
       return;
@@ -114,6 +118,12 @@ export class Register {
 
         return 'Bazı bilgiler kabul edilmedi. İşaretli alanları kontrol edin.';
       }
+
+      // Open registration is off here (Auth:OpenRegistration, decisions #70): the endpoint is
+      // not there at all.
+      case 404:
+        this.closed.set(true);
+        return 'Bu ortamda yeni firma açılamıyor. Firmanızın kayıt koduyla kaydolun.';
 
       case 0:
         return 'Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip yeniden deneyin.';
