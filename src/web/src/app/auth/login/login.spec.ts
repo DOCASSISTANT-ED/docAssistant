@@ -171,6 +171,87 @@ describe('Login', () => {
       expect(router.url).toBe('/login?returnUrl=%2Fbelgeler');
     });
 
+    // decisions #70: the password was right but the address is not verified. The API says
+    // so with emailNotVerified, and whether it sent a new code with verificationSent.
+    describe('for an account whose address is not verified', () => {
+      function rejectAsUnverified(problem: object): void {
+        login.mockRejectedValueOnce(
+          new HttpErrorResponse({
+            status: 403,
+            error: {
+              title: "This account's email address is not verified yet.",
+              status: 403,
+              ...problem,
+            },
+          }),
+        );
+      }
+
+      it('says that a new code was sent when one was', async () => {
+        await open();
+        rejectAsUnverified({ emailNotVerified: true, verificationSent: true });
+        fillIn();
+
+        await submit();
+
+        expect(failure()).toBe(
+          'E-posta adresiniz henüz doğrulanmadı. Adresinize yeni bir doğrulama kodu gönderdik.',
+        );
+        expect(router.url).toBe('/login');
+      });
+
+      it('says where to look when no new code was sent', async () => {
+        await open();
+        rejectAsUnverified({ emailNotVerified: true, verificationSent: false });
+        fillIn();
+
+        await submit();
+
+        expect(failure()).toBe(
+          'E-posta adresiniz henüz doğrulanmadı. Doğrulama kodunu e-postanızda bulamıyorsanız biraz sonra yeniden giriş yapmayı deneyin.',
+        );
+      });
+
+      // Only true counts: a missing or odd value is read as "not sent".
+      it.each([[undefined], ['true'], [1]])(
+        'treats verificationSent %j as not sent',
+        async (verificationSent) => {
+          await open();
+          rejectAsUnverified({ emailNotVerified: true, verificationSent });
+          fillIn();
+
+          await submit();
+
+          expect(failure()).toContain('Doğrulama kodunu e-postanızda bulamıyorsanız');
+        },
+      );
+
+      // Any other 403 is the account without an organization, as before.
+      it.each([[{}], [{ emailNotVerified: false }], [{ emailNotVerified: 'true' }]])(
+        'keeps the message for an account without an organization for %j',
+        async (problem) => {
+          await open();
+          rejectAsUnverified(problem);
+          fillIn();
+
+          await submit();
+
+          expect(failure()).toBe(
+            'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.',
+          );
+        },
+      );
+
+      it('lets the user try again', async () => {
+        await open();
+        rejectAsUnverified({ emailNotVerified: true, verificationSent: true });
+        fillIn();
+        await submit();
+
+        expect(submitButton().disabled).toBe(false);
+      });
+    });
+
     it('explains a failure that is not an answer of the API', async () => {
       await open();
       login.mockRejectedValueOnce(new Error('boom'));
