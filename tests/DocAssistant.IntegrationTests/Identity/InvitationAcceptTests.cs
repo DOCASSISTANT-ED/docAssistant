@@ -85,6 +85,7 @@ public class InvitationAcceptTests(PostgresFixture database)
         using (await Invitations.AcceptAsync(client, created.Token, email, "Kendi-Parolam-42"))
         {
         }
+        await Invitations.MarkVerifiedAsync(database, email);
 
         using var login = await TestAccounts.LoginAsync(client, email, "Kendi-Parolam-42");
 
