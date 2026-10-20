@@ -21,11 +21,16 @@ public class InvitationsTests(PostgresFixture database)
         using var preview = await Invitations.PreviewAsync(client, invitation.Token);
         var email = TestAccounts.NewEmail();
         using var accepted = await Invitations.AcceptAsync(client, invitation.Token, email);
-        var token = await TestAccounts.ReadTokenAsync(accepted);
+
+        // decisions #70: joining e-mails a code instead of signing in; the address is
+        // verified here as typing the code would, and the person signs in.
+        await Invitations.MarkVerifiedAsync(database, email);
+        using var login = await TestAccounts.LoginAsync(client, email, Invitations.Password);
+        var token = await TestAccounts.ReadTokenAsync(login);
         using var me = await TestAccounts.GetCurrentUserAsync(client, token);
 
         Assert.Equal(HttpStatusCode.OK, preview.StatusCode);
-        Assert.Equal(HttpStatusCode.OK, accepted.StatusCode);
+        Assert.Equal(HttpStatusCode.Accepted, accepted.StatusCode);
         Assert.Equal(HttpStatusCode.OK, me.StatusCode);
         var current = (await me.Content.ReadFromJsonAsync<CurrentUserResponse>())!;
         Assert.Equal(admin.TenantId, current.TenantId);
