@@ -68,6 +68,7 @@ public class MembershipCheckTests(PostgresFixture database)
         using (await Invitations.AcceptAsync(client, created.Token, email))
         {
         }
+        await Invitations.MarkVerifiedAsync(database, email);
         var user = (await Invitations.UserByEmailAsync(database, email))!;
         using (await Invitations.RemoveAsync(client, admin.Token, user.Id))
         {
@@ -126,6 +127,7 @@ public class MembershipCheckTests(PostgresFixture database)
         using (await Invitations.AcceptAsync(client, created.Token, email))
         {
         }
+        await Invitations.MarkVerifiedAsync(database, email);
         var user = (await Invitations.UserByEmailAsync(database, email))!;
         await SetRoleAsync(user.Id, admin.TenantId, MembershipRole.Member);
 

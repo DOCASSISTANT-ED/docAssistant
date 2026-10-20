@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { identityLimits } from '../../api/identity';
+import { problemOf } from '../../api/problem';
 import { safeReturnUrl } from '../auth.guards';
 import { AuthLayout } from '../auth-layout/auth-layout';
 import { Session } from '../session';
@@ -90,7 +91,10 @@ function messageFor(error: unknown): string {
       case 401:
         return 'E-posta ya da parola hatalı.';
       case 403:
-        return 'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.';
+        return (
+          unverifiedMessage(error) ??
+          'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.'
+        );
       // Status 0: no answer at all (the API is down or the network is).
       case 0:
         return 'Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip yeniden deneyin.';
@@ -98,4 +102,22 @@ function messageFor(error: unknown): string {
   }
 
   return 'Giriş yapılamadı. Biraz sonra yeniden deneyin.';
+}
+
+// The password was right, but the address is not verified yet (decisions #70); the API sends
+// a new code with this answer when it may. Null for any other 403. The screen for typing the
+// code comes later; until then the message says where the code is.
+function unverifiedMessage(error: HttpErrorResponse): string | null {
+  const problem = problemOf(error) as {
+    emailNotVerified?: unknown;
+    verificationSent?: unknown;
+  } | null;
+
+  if (problem?.emailNotVerified !== true) {
+    return null;
+  }
+
+  return problem.verificationSent === true
+    ? 'E-posta adresiniz henüz doğrulanmadı. Adresinize yeni bir doğrulama kodu gönderdik.'
+    : 'E-posta adresiniz henüz doğrulanmadı. Doğrulama kodunu e-postanızda bulamıyorsanız biraz sonra yeniden giriş yapmayı deneyin.';
 }

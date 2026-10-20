@@ -118,6 +118,20 @@ internal static class Invitations
             .SingleOrDefaultAsync(u => u.NormalizedEmail == User.NormalizeEmail(email));
     }
 
+    // Joining by invitation does not verify the address yet: the code and the verification
+    // screen come with the invitation's own change (docs/decisions.md #70). Tests that sign
+    // in again after joining verify the address here, as typing the code would.
+    public static async Task MarkVerifiedAsync(PostgresFixture database, string email)
+    {
+        await using var db = database.CreateOwnerDbContext();
+
+        var updated = await db.Users.IgnoreQueryFilters()
+            .Where(u => u.NormalizedEmail == User.NormalizeEmail(email))
+            .ExecuteUpdateAsync(set => set.SetProperty(u => u.EmailVerifiedAt, DateTimeOffset.UtcNow));
+
+        Assert.Equal(1, updated);
+    }
+
     public static Task<HttpResponseMessage> SendAsync(
         HttpClient client, HttpMethod method, string path, string? token, HttpContent? content)
     {
