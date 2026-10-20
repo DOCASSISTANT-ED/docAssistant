@@ -86,6 +86,9 @@ public static class IdentityModule
         // own tables. Default: PBKDF2 with HMAC-SHA512, 100,000 iterations, random salt.
         services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
+        // Scoped like AppDbContext, which it uses (docs/decisions.md #70).
+        services.AddScoped<EmailVerificationService>();
+
         return services;
     }
 }
