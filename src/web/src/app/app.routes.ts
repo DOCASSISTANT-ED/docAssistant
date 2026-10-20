@@ -41,6 +41,14 @@ export const routes: Routes = [
     canActivate: [signedOutOnly],
     title: 'Firma kaydı · DocAssistant',
   },
+  // Typing the code e-mailed to a new account (decisions #70). An account that is signed in
+  // is verified already.
+  {
+    path: 'dogrula',
+    loadComponent: () => import('./auth/verify-email/verify-email').then((m) => m.VerifyEmail),
+    canActivate: [signedOutOnly],
+    title: 'E-postanızı doğrulayın · DocAssistant',
+  },
   // Joining with an invitation link (decisions #67). A person belongs to one organization
   // (decisions #13), so somebody signed in has no use for it either.
   {
