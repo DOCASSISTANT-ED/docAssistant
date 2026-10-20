@@ -38,9 +38,11 @@ public static partial class PlatformCompanyEndpoints
     {
         if (!TryNormalizeDomains(request.EmailDomains, out var domains, out var invalid))
         {
+            // invalidDomain names it for the screen, which says it in Turkish.
             return TypedResults.Problem(
                 statusCode: StatusCodes.Status400BadRequest,
-                title: $"Not a domain name: {invalid}. Write it like afirma.com, without the part before @.");
+                title: $"Not a domain name: {invalid}. Write it like afirma.com, without the part before @.",
+                extensions: new Dictionary<string, object?> { ["invalidDomain"] = invalid });
         }
 
         var name = request.Name.Trim();

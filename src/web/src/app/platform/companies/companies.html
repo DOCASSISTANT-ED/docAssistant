@@ -1,0 +1,218 @@
+<header class="topbar">
+  <span class="brand">
+    <span class="brand-mark" aria-hidden="true">D</span>
+    <span class="brand-name">DocAssistant</span>
+    <span class="brand-area">Sistem yönetimi</span>
+  </span>
+  <span class="account">
+    <span class="account-email">{{ email() }}</span>
+    <button class="link" type="button" (click)="logout()">Çıkış yap</button>
+  </span>
+</header>
+
+<main class="page">
+  <header class="head">
+    <h1 class="title">Firmalar</h1>
+    <p class="lead">
+      Firmaları kaydedin ve kayıt kodlarını yönetin. Bir firmanın yöneticileri, kayıt koduyla hesap
+      açar.
+    </p>
+  </header>
+
+  @if (failure(); as message) {
+    <p class="failure" role="alert">{{ message }}</p>
+  }
+
+  <section class="card" aria-labelledby="new-title">
+    <h2 id="new-title" class="section-title">Yeni firma</h2>
+
+    <form class="form" novalidate (submit)="$event.preventDefault(); save()">
+      <label class="field">
+        <span class="field-label">Firma adı</span>
+        <input
+          class="input"
+          type="text"
+          autocomplete="organization"
+          [maxLength]="limits.nameMaxLength"
+          [value]="name()"
+          [attr.aria-invalid]="nameError() !== null"
+          aria-describedby="name-error"
+          (input)="name.set($any($event.target).value)"
+        />
+        @if (nameError(); as error) {
+          <span id="name-error" class="field-error">{{ error }}</span>
+        }
+      </label>
+
+      <fieldset class="rule">
+        <legend class="field-label">E-posta kuralı</legend>
+
+        <label class="rule-option">
+          <input
+            type="radio"
+            name="email-rule"
+            value="domains"
+            [checked]="emailRule() === 'domains'"
+            (change)="emailRule.set('domains')"
+          />
+          <span>
+            <strong>Şirket e-postası zorunlu</strong>
+            <span class="option-hint">
+              Firmanın yöneticileri ve davetle katılanlar yalnızca bu uzantılarla hesap açabilir.
+            </span>
+          </span>
+        </label>
+
+        @if (emailRule() === 'domains') {
+          <label class="field nested">
+            <span class="field-label">Alan adları</span>
+            <input
+              class="input"
+              type="text"
+              inputmode="url"
+              autocapitalize="off"
+              spellcheck="false"
+              placeholder="afirma.com, afirma.com.tr"
+              [value]="domainsText()"
+              [attr.aria-invalid]="domainsError() !== null"
+              aria-describedby="domains-hint domains-error"
+              (input)="domainsText.set($any($event.target).value)"
+            />
+            <span id="domains-hint" class="option-hint">
+              Virgülle ayırarak en çok {{ limits.maxEmailDomains }} alan adı yazın; @ işaretinden
+              sonraki kısım yeterli.
+            </span>
+            @if (domainsError(); as error) {
+              <span id="domains-error" class="field-error">{{ error }}</span>
+            }
+          </label>
+        }
+
+        <label class="rule-option">
+          <input
+            type="radio"
+            name="email-rule"
+            value="none"
+            [checked]="emailRule() === 'none'"
+            (change)="emailRule.set('none')"
+          />
+          <span>
+            <strong>Firmanın kendi e-postası yok</strong>
+            <span class="option-hint">Herhangi bir e-posta adresiyle hesap açılabilir.</span>
+          </span>
+        </label>
+      </fieldset>
+
+      <div class="actions">
+        <button class="primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Kaydediliyor…' : 'Firmayı kaydet' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  @if (shown(); as shown) {
+    <section class="code" role="status" aria-labelledby="code-title">
+      <h2 id="code-title" class="code-title">
+        {{ shown.companyName }}:
+        {{ shown.renewed ? 'kayıt kodu yenilendi' : 'kayıt kodu hazır' }}
+      </h2>
+      <div class="code-line">
+        <input
+          #codeInput
+          class="code-box"
+          type="text"
+          readonly
+          aria-label="Kayıt kodu"
+          [value]="shown.code"
+          (focus)="codeInput.select()"
+        />
+        <button class="primary" type="button" (click)="copyCode(shown.code)">
+          {{ copied() ? 'Kopyalandı' : 'Kopyala' }}
+        </button>
+        <button class="link" type="button" (click)="closeShown()">Kapat</button>
+      </div>
+      <p class="code-warning">
+        Bu kod bir daha gösterilmeyecek. Şimdi kopyalayıp firmanın yöneticilerine iletin.
+        @if (shown.renewed) {
+          Eski kod artık geçersiz.
+        }
+      </p>
+    </section>
+  }
+
+  @switch (listState()) {
+    @case ('loading') {
+      <p class="message" role="status">Firmalar yükleniyor…</p>
+    }
+
+    @case ('failed') {
+      <div class="message" role="alert">
+        <p>Firmalar yüklenemedi. Bağlantınızı kontrol edip yeniden deneyin.</p>
+        <button class="secondary" type="button" (click)="reload()">Yeniden dene</button>
+      </div>
+    }
+
+    @default {
+      <section aria-labelledby="list-title">
+        <h2 id="list-title" class="section-title">Kayıtlı firmalar</h2>
+
+        @if (companies().length === 0) {
+          <p class="empty">Henüz kayıtlı firma yok.</p>
+        } @else {
+          <ul class="list" aria-label="Kayıtlı firmalar">
+            @for (company of companies(); track company.id) {
+              <li class="row">
+                <div class="lines">
+                  <span class="name">{{ company.name }}</span>
+                  <span class="details">
+                    {{ domainsLabel(company) }} · {{ company.adminCount }} yönetici ·
+                    {{ dateLabel(company.createdAt) }} tarihinde kaydedildi
+                  </span>
+                </div>
+
+                @if (!company.hasRegistrationCode) {
+                  <span class="badge" title="Bu firmaya henüz kayıt kodu üretilmedi">Kod yok</span>
+                } @else {
+                  <span></span>
+                }
+
+                @if (confirming() === company.id) {
+                  <span
+                    class="confirm"
+                    role="group"
+                    [attr.aria-label]="company.name + ' kodu yenilensin mi?'"
+                  >
+                    <span class="confirm-text">Eski kod hemen geçersiz olur. Yenilensin mi?</span>
+                    <button class="danger" type="button" (click)="renew(company)">Yenile</button>
+                    <button class="link" type="button" (click)="cancelRenew()">Vazgeç</button>
+                  </span>
+                } @else if (company.hasRegistrationCode) {
+                  <button
+                    class="link"
+                    type="button"
+                    [disabled]="renewing() === company.id"
+                    [attr.aria-label]="company.name + ' için kayıt kodunu yenile'"
+                    (click)="askToRenew(company.id)"
+                  >
+                    {{ renewing() === company.id ? 'Yenileniyor…' : 'Kodu yenile' }}
+                  </button>
+                } @else {
+                  <button
+                    class="link"
+                    type="button"
+                    [disabled]="renewing() === company.id"
+                    [attr.aria-label]="company.name + ' için kayıt kodu üret'"
+                    (click)="renew(company)"
+                  >
+                    {{ renewing() === company.id ? 'Üretiliyor…' : 'Kod üret' }}
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  }
+</main>

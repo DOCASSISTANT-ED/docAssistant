@@ -23,12 +23,13 @@ export interface LoginRequest {
 // Server: MembershipRole. Admins upload documents; members ask questions.
 export type Role = 'Admin' | 'Member';
 
-// Server: CurrentUserResponse, for a signed-in user.
+// Server: CurrentUserResponse, for a signed-in user. The platform admin (decisions #70)
+// belongs to no organization: tenantId is null and the role is 'PlatformAdmin'.
 export interface CurrentUser {
   userId: string;
   email: string;
-  tenantId: string;
-  role: Role;
+  tenantId: string | null;
+  role: Role | 'PlatformAdmin';
 }
 
 // The limits the server validates (AuthRequests.cs), so that forms can say the same
