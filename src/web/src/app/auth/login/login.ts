@@ -11,6 +11,7 @@ import { problemOf } from '../../api/problem';
 import { safeReturnUrl } from '../auth.guards';
 import { AuthLayout } from '../auth-layout/auth-layout';
 import { Session } from '../session';
+import { PendingVerification } from '../verify-email/pending-verification';
 
 @Component({
   imports: [
@@ -30,6 +31,7 @@ export class Login {
   private readonly session = inject(Session);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly pending = inject(PendingVerification);
 
   // The same limits as the server (LoginRequest): anything longer would be rejected.
   protected readonly form = inject(NonNullableFormBuilder).group({
@@ -73,6 +75,16 @@ export class Login {
       // Back to the screen the user was sent here from, if any (auth.guards.ts).
       await this.router.navigateByUrl(safeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl')));
     } catch (error) {
+      // The password was right, but the address is not verified yet (decisions #70): on to
+      // typing the code, which the API has just sent when it could. The page asked for
+      // before signing in (returnUrl) goes along.
+      const unverified = unverifiedAccount(error);
+      if (unverified) {
+        this.pending.start(this.form.controls.email.value, unverified.codeSent);
+        await this.router.navigate(['/dogrula'], { queryParamsHandling: 'preserve' });
+        return;
+      }
+
       this.failure.set(messageFor(error));
     } finally {
       this.submitting.set(false);
@@ -91,10 +103,7 @@ function messageFor(error: unknown): string {
       case 401:
         return 'E-posta ya da parola hatalı.';
       case 403:
-        return (
-          unverifiedMessage(error) ??
-          'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.'
-        );
+        return 'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.';
       // Status 0: no answer at all (the API is down or the network is).
       case 0:
         return 'Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip yeniden deneyin.';
@@ -104,20 +113,14 @@ function messageFor(error: unknown): string {
   return 'Giriş yapılamadı. Biraz sonra yeniden deneyin.';
 }
 
-// The password was right, but the address is not verified yet (decisions #70); the API sends
-// a new code with this answer when it may. Null for any other 403. The screen for typing the
-// code comes later; until then the message says where the code is.
-function unverifiedMessage(error: HttpErrorResponse): string | null {
-  const problem = problemOf(error) as {
-    emailNotVerified?: unknown;
-    verificationSent?: unknown;
-  } | null;
-
-  if (problem?.emailNotVerified !== true) {
+// The API's 403 for an account whose address is not verified (decisions #70), with whether it
+// sent a new code; null for any other error, including the 403 of an account in no company.
+function unverifiedAccount(error: unknown): { codeSent: boolean } | null {
+  if (!(error instanceof HttpErrorResponse) || error.status !== 403) {
     return null;
   }
 
-  return problem.verificationSent === true
-    ? 'E-posta adresiniz henüz doğrulanmadı. Adresinize yeni bir doğrulama kodu gönderdik.'
-    : 'E-posta adresiniz henüz doğrulanmadı. Doğrulama kodunu e-postanızda bulamıyorsanız biraz sonra yeniden giriş yapmayı deneyin.';
+  const problem = problemOf(error) as { emailNotVerified?: unknown; verificationSent?: unknown } | null;
+
+  return problem?.emailNotVerified === true ? { codeSent: problem.verificationSent === true } : null;
 }
