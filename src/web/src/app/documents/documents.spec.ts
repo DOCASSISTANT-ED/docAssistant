@@ -680,13 +680,9 @@ describe('Documents', () => {
       expect(rowText('Belge d-new', '.status')).toBe('Hazır');
     });
 
-    // Known gap. A refresh that was already on its way when a document was deleted brings
-    // back the list as it was before the deletion, and the deleted document reappears.
-    // When nothing else is in progress there is no further refresh to correct it, so it
-    // stays until the page is opened again; deleting it then gives "not found" and takes
-    // it away. Expected: a document deleted on this page does not come back. Remove
-    // ".skip" when the page does.
-    it.skip('does not bring back a document deleted while a refresh was on its way', async () => {
+    // A refresh that was already on its way when a document was deleted brings back the
+    // list as it was before the deletion; the deleted document must not reappear with it.
+    it('does not bring back a document deleted while a refresh was on its way', async () => {
       await open();
       await answerList([info('d-1', { status: 'Done' }), info('d-2', { status: 'Pending' })]);
 
