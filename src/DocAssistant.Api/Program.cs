@@ -83,6 +83,7 @@ app.UseAuthorization();
 
 app.MapHealthChecks("/health");
 app.MapAuthEndpoints();
+app.MapEmailVerificationEndpoints();
 app.MapInvitationEndpoints();
 app.MapMemberEndpoints();
 app.MapDocumentEndpoints();
