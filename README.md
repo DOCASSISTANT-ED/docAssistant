@@ -177,6 +177,7 @@ Arayüz API'ye tarayıcıdan, başka bir adresten istek gönderir. API buna yaln
 | Bekleyen migration'ları uygula (`git pull` sonrası) | `dotnet ef database update --project src/DocAssistant.Api` |
 | Yeni migration üret | `dotnet ef migrations add <Ad> --project src/DocAssistant.Api --output-dir Data/Migrations` |
 | Sistem yöneticisi hesabı aç ya da var olan hesabı sistem yöneticisi yap (firma kaydı yalnızca onda; parolayı ekranda göstermeden sorar: [decisions.md](docs/decisions.md) #70) | `dotnet run --project src/DocAssistant.Api -- create-platform-admin <e-posta>` |
+| Herkesin firma açabildiği açık kaydı (`POST /auth/register`, bugünkü kayıt ekranı) aç ya da kapat. Geliştirmede `appsettings.Development.json` ile açık; ayar yoksa kapalı, canlıda kapalı kalır ([decisions.md](docs/decisions.md) #70) | `Auth:OpenRegistration` ayarı (`true` / `false`) |
 
 ## Sık karşılaşılan sorunlar
 

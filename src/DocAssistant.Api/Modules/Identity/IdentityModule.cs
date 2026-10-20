@@ -16,6 +16,9 @@ public static class IdentityModule
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<AuthOptions>()
+            .BindConfiguration(AuthOptions.SectionName);
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer();
 

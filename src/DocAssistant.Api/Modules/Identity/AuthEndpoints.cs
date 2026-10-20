@@ -5,6 +5,7 @@ using DocAssistant.Shared.Tenancy;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Npgsql;
 
 namespace DocAssistant.Api.Modules.Identity;
@@ -18,7 +19,13 @@ public static class AuthEndpoints
     {
         var auth = app.MapGroup("/auth");
 
-        auth.MapPost("/register", Register);
+        // decisions #70: closed, the endpoint does not exist at all (404), so production does
+        // not even show that it is there.
+        if (app.ServiceProvider.GetRequiredService<IOptions<AuthOptions>>().Value.OpenRegistration)
+        {
+            auth.MapPost("/register", Register);
+        }
+
         auth.MapPost("/login", Login);
 
         // No authorization: signing out must also work with an expired or missing token.

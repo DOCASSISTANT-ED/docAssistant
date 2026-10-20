@@ -201,6 +201,19 @@ Authorization: Bearer {{platformLogin.response.body.$.token}}
 POST {{DocAssistant.Api_HostAddress}}/platform/companies/{{company.response.body.$.company.id}}/registration-code
 Authorization: Bearer {{platformLogin.response.body.$.token}}
 
+### Register as an admin of the company above with its registration code (docs/decisions.md #70)
+# 202: the account is made but not verified yet; the code is e-mailed (Mailpit: http://localhost:8025)
+# and typed with POST /auth/verify-email. 400 for an unknown code or an address outside the
+# company's domains; 409 for a registered address.
+POST {{DocAssistant.Api_HostAddress}}/auth/register-admin
+Content-Type: application/json
+
+{
+  "registrationCode": "{{company.response.body.$.registrationCode}}",
+  "email": "yonetici@afirma.com",
+  "password": "Gizli123!"
+}
+
 ### A company admin may not register companies: 403
 GET {{DocAssistant.Api_HostAddress}}/platform/companies
 Authorization: Bearer {{login.response.body.$.token}}
