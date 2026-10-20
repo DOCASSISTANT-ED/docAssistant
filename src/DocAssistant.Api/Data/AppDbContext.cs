@@ -20,6 +20,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
 
     public DbSet<Invitation> Invitations => Set<Invitation>();
 
+    public DbSet<EmailVerification> EmailVerifications => Set<EmailVerification>();
+
     public DbSet<Document> Documents => Set<Document>();
 
     public DbSet<Chunk> Chunks => Set<Chunk>();

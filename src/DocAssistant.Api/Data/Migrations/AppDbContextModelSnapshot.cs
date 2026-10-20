@@ -201,6 +201,54 @@ namespace DocAssistant.Api.Data.Migrations
                     b.ToTable("documents", (string)null);
                 });
 
+            modelBuilder.Entity("DocAssistant.Api.Modules.Identity.EmailVerification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character(64)")
+                        .HasColumnName("code_hash")
+                        .IsFixedLength();
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<int>("FailedAttempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("failed_attempts");
+
+                    b.Property<int>("SendsInWindow")
+                        .HasColumnType("integer")
+                        .HasColumnName("sends_in_window");
+
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<DateTimeOffset>("WindowStartedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("window_started_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_email_verifications");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_email_verifications_user_id");
+
+                    b.ToTable("email_verifications", (string)null);
+                });
+
             modelBuilder.Entity("DocAssistant.Api.Modules.Identity.Invitation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -324,6 +372,10 @@ namespace DocAssistant.Api.Data.Migrations
                         .HasMaxLength(254)
                         .HasColumnType("character varying(254)")
                         .HasColumnName("email");
+
+                    b.Property<DateTimeOffset?>("EmailVerifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("email_verified_at");
 
                     b.Property<bool>("IsPlatformAdmin")
                         .ValueGeneratedOnAdd()
@@ -568,6 +620,16 @@ namespace DocAssistant.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_documents_users_uploaded_by_user_id");
+                });
+
+            modelBuilder.Entity("DocAssistant.Api.Modules.Identity.EmailVerification", b =>
+                {
+                    b.HasOne("DocAssistant.Api.Modules.Identity.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_email_verifications_users_user_id");
                 });
 
             modelBuilder.Entity("DocAssistant.Api.Modules.Identity.Invitation", b =>
