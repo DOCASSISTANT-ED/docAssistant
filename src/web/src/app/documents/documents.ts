@@ -51,6 +51,10 @@ export class Documents {
 
   private refreshTimer: ReturnType<typeof setTimeout> | null = null;
   private destroyed = false;
+
+  // Documents deleted on this page. A refresh that was already on its way when one was
+  // deleted brings back the list as it was before; these stay out of it.
+  private readonly deleted = new Set<string>();
   private nextUploadKey = 0;
 
   constructor() {
@@ -192,7 +196,7 @@ export class Documents {
         return;
       }
 
-      this.documents.set(documents);
+      this.documents.set(documents.filter((document) => !this.deleted.has(document.id)));
       this.listState.set('ready');
     } catch {
       if (this.destroyed) {
@@ -228,6 +232,7 @@ export class Documents {
   }
 
   private removeFromList(id: string): void {
+    this.deleted.add(id);
     this.documents.update((documents) => documents.filter((document) => document.id !== id));
   }
 }
@@ -288,8 +293,11 @@ function deleteFailure(document: DocumentInfo, error: unknown): string {
 
 // "512 KB", "2,4 MB": Turkish decimal comma, one decimal for megabytes.
 export function formatSize(bytes: number): string {
-  if (bytes < 1024 * 1024) {
-    return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  // Rounded first: a size just under a megabyte rounds to 1024 KB, which is written as 1 MB.
+  const kilobytes = Math.max(1, Math.round(bytes / 1024));
+
+  if (kilobytes < 1024) {
+    return `${kilobytes} KB`;
   }
 
   const megabytes = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 }).format(

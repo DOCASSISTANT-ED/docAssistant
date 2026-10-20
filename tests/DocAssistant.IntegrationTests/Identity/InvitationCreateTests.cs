@@ -93,11 +93,10 @@ public partial class InvitationCreateTests(PostgresFixture database)
         Assert.Empty(await Invitations.ListedAsync(client, admin.Token));
     }
 
-    // Known gap. The role is read with Enum.TryParse, which also takes numbers ("1" is
-    // Admin, "0" is Member) and lists that it combines ("Admin, Member" is Admin). Only
-    // admins make invitations, so nobody gains a role they could not give anyway; but the
-    // decision says "Member" or "Admin". Remove ".Skip" when such roles are refused.
-    [Theory(Skip = "Known gap: a role given as a number (\"0\", \"1\") or a list (\"Admin, Member\") is accepted. To be fixed by the invitations' author.")]
+    // Enum.TryParse alone also takes numbers ("1" is Admin, "0" is Member) and lists that it
+    // combines ("Admin, Member" is Admin). Only admins make invitations, so nobody gains a
+    // role they could not give anyway; but the decision says "Member" or "Admin".
+    [Theory]
     [InlineData("0")]
     [InlineData("1")]
     [InlineData("Admin, Member")]
