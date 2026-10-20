@@ -5,6 +5,7 @@ import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { signedInOnly } from '../auth.guards';
 import { Session } from '../session';
+import { PendingVerification } from '../verify-email/pending-verification';
 import { Login } from './login';
 
 @Component({ template: '' })
@@ -33,6 +34,7 @@ describe('Login', () => {
         provideRouter([
           { path: 'login', component: Login },
           { path: 'register', component: Blank },
+          { path: 'dogrula', component: Blank },
           { path: 'belgeler', component: Blank, canActivate: [signedInOnly] },
           { path: '', pathMatch: 'full', component: Blank, canActivate: [signedInOnly] },
         ]),
@@ -172,7 +174,8 @@ describe('Login', () => {
     });
 
     // decisions #70: the password was right but the address is not verified. The API says
-    // so with emailNotVerified, and whether it sent a new code with verificationSent.
+    // so with emailNotVerified, and whether it sent a new code with verificationSent; the
+    // screen moves on to typing the code (/dogrula) and hands the address over in memory.
     describe('for an account whose address is not verified', () => {
       function rejectAsUnverified(problem: object): void {
         login.mockRejectedValueOnce(
@@ -187,29 +190,30 @@ describe('Login', () => {
         );
       }
 
-      it('says that a new code was sent when one was', async () => {
+      const pending = () => TestBed.inject(PendingVerification);
+
+      it('goes on to the code screen with the address, saying a code was sent', async () => {
         await open();
         rejectAsUnverified({ emailNotVerified: true, verificationSent: true });
-        fillIn();
+        fillIn('ayse@example.com');
 
         await submit();
 
-        expect(failure()).toBe(
-          'E-posta adresiniz henüz doğrulanmadı. Adresinize yeni bir doğrulama kodu gönderdik.',
-        );
-        expect(router.url).toBe('/login');
+        expect(router.url).toBe('/dogrula');
+        expect(pending().email()).toBe('ayse@example.com');
+        expect(pending().codeSent()).toBe(true);
+        expect(failure()).toBeNull();
       });
 
-      it('says where to look when no new code was sent', async () => {
+      it('tells the code screen when no new code was sent', async () => {
         await open();
         rejectAsUnverified({ emailNotVerified: true, verificationSent: false });
         fillIn();
 
         await submit();
 
-        expect(failure()).toBe(
-          'E-posta adresiniz henüz doğrulanmadı. Doğrulama kodunu e-postanızda bulamıyorsanız biraz sonra yeniden giriş yapmayı deneyin.',
-        );
+        expect(router.url).toBe('/dogrula');
+        expect(pending().codeSent()).toBe(false);
       });
 
       // Only true counts: a missing or odd value is read as "not sent".
@@ -222,11 +226,23 @@ describe('Login', () => {
 
           await submit();
 
-          expect(failure()).toContain('Doğrulama kodunu e-postanızda bulamıyorsanız');
+          expect(router.url).toBe('/dogrula');
+          expect(pending().codeSent()).toBe(false);
         },
       );
 
-      // Any other 403 is the account without an organization, as before.
+      // The page asked for before signing in goes along to the code screen.
+      it('keeps the page the user was heading for', async () => {
+        await open('/login?returnUrl=%2Fbelgeler');
+        rejectAsUnverified({ emailNotVerified: true, verificationSent: true });
+        fillIn();
+
+        await submit();
+
+        expect(router.url).toBe('/dogrula?returnUrl=%2Fbelgeler');
+      });
+
+      // Any other 403 is the account without an organization, as before: no code screen.
       it.each([[{}], [{ emailNotVerified: false }], [{ emailNotVerified: 'true' }]])(
         'keeps the message for an account without an organization for %j',
         async (problem) => {
@@ -239,17 +255,10 @@ describe('Login', () => {
           expect(failure()).toBe(
             'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.',
           );
+          expect(router.url).toBe('/login');
+          expect(pending().email()).toBeNull();
         },
       );
-
-      it('lets the user try again', async () => {
-        await open();
-        rejectAsUnverified({ emailNotVerified: true, verificationSent: true });
-        fillIn();
-        await submit();
-
-        expect(submitButton().disabled).toBe(false);
-      });
     });
 
     it('explains a failure that is not an answer of the API', async () => {
