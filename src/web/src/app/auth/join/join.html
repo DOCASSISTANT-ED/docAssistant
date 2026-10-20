@@ -52,6 +52,8 @@
               <mat-error>E-posta adresinizi girin.</mat-error>
             } @else if (form.controls.email.hasError('taken')) {
               <mat-error>Bu adres kullanılıyor.</mat-error>
+            } @else if (form.controls.email.hasError('domain')) {
+              <mat-error>Firmanın kendi e-posta adresinizi girin.</mat-error>
             } @else if (form.controls.email.invalid) {
               <mat-error>Geçerli bir e-posta adresi girin.</mat-error>
             }

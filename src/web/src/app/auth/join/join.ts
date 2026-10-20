@@ -155,6 +155,16 @@ export class Join implements OnInit {
         return;
 
       case 400: {
+        // The company takes only its own addresses (decisions #70); the answer names them.
+        const domains = emailDomainsOf(error);
+        if (domains.length > 0) {
+          this.form.controls.email.setErrors({ domain: true });
+          this.failure.set(
+            `Bu firmaya yalnızca ${domains.map((domain) => '@' + domain).join(', ')} uzantılı e-posta adresleriyle katılabilirsiniz.`,
+          );
+          return;
+        }
+
         // The server names fields its own way ("Email"); ours start lower case.
         for (const field of Object.keys(problemOf(error)?.errors ?? {})) {
           const name = field.charAt(0).toLowerCase() + field.slice(1);
@@ -176,4 +186,14 @@ export class Join implements OnInit {
         this.failure.set('Katılım tamamlanamadı. Biraz sonra yeniden deneyin.');
     }
   }
+}
+
+// The domains a company with an email rule takes, from the API's answer to a join with
+// another address (decisions #70); empty for any other answer.
+function emailDomainsOf(error: HttpErrorResponse): string[] {
+  const domains = (problemOf(error) as { emailDomains?: unknown } | null)?.emailDomains;
+
+  return Array.isArray(domains)
+    ? domains.filter((domain): domain is string => typeof domain === 'string')
+    : [];
 }
