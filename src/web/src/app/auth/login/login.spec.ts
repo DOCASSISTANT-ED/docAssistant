@@ -5,6 +5,7 @@ import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { signedInOnly } from '../auth.guards';
 import { Session } from '../session';
+import { PendingVerification } from '../verify-email/pending-verification';
 import { Login } from './login';
 
 @Component({ template: '' })
@@ -33,6 +34,7 @@ describe('Login', () => {
         provideRouter([
           { path: 'login', component: Login },
           { path: 'register', component: Blank },
+          { path: 'dogrula', component: Blank },
           { path: 'belgeler', component: Blank, canActivate: [signedInOnly] },
           { path: '', pathMatch: 'full', component: Blank, canActivate: [signedInOnly] },
         ]),
@@ -169,6 +171,94 @@ describe('Login', () => {
 
       expect(failure()).toBe(message);
       expect(router.url).toBe('/login?returnUrl=%2Fbelgeler');
+    });
+
+    // decisions #70: the password was right but the address is not verified. The API says
+    // so with emailNotVerified, and whether it sent a new code with verificationSent; the
+    // screen moves on to typing the code (/dogrula) and hands the address over in memory.
+    describe('for an account whose address is not verified', () => {
+      function rejectAsUnverified(problem: object): void {
+        login.mockRejectedValueOnce(
+          new HttpErrorResponse({
+            status: 403,
+            error: {
+              title: "This account's email address is not verified yet.",
+              status: 403,
+              ...problem,
+            },
+          }),
+        );
+      }
+
+      const pending = () => TestBed.inject(PendingVerification);
+
+      it('goes on to the code screen with the address, saying a code was sent', async () => {
+        await open();
+        rejectAsUnverified({ emailNotVerified: true, verificationSent: true });
+        fillIn('ayse@example.com');
+
+        await submit();
+
+        expect(router.url).toBe('/dogrula');
+        expect(pending().email()).toBe('ayse@example.com');
+        expect(pending().codeSent()).toBe(true);
+        expect(failure()).toBeNull();
+      });
+
+      it('tells the code screen when no new code was sent', async () => {
+        await open();
+        rejectAsUnverified({ emailNotVerified: true, verificationSent: false });
+        fillIn();
+
+        await submit();
+
+        expect(router.url).toBe('/dogrula');
+        expect(pending().codeSent()).toBe(false);
+      });
+
+      // Only true counts: a missing or odd value is read as "not sent".
+      it.each([[undefined], ['true'], [1]])(
+        'treats verificationSent %j as not sent',
+        async (verificationSent) => {
+          await open();
+          rejectAsUnverified({ emailNotVerified: true, verificationSent });
+          fillIn();
+
+          await submit();
+
+          expect(router.url).toBe('/dogrula');
+          expect(pending().codeSent()).toBe(false);
+        },
+      );
+
+      // The page asked for before signing in goes along to the code screen.
+      it('keeps the page the user was heading for', async () => {
+        await open('/login?returnUrl=%2Fbelgeler');
+        rejectAsUnverified({ emailNotVerified: true, verificationSent: true });
+        fillIn();
+
+        await submit();
+
+        expect(router.url).toBe('/dogrula?returnUrl=%2Fbelgeler');
+      });
+
+      // Any other 403 is the account without an organization, as before: no code screen.
+      it.each([[{}], [{ emailNotVerified: false }], [{ emailNotVerified: 'true' }]])(
+        'keeps the message for an account without an organization for %j',
+        async (problem) => {
+          await open();
+          rejectAsUnverified(problem);
+          fillIn();
+
+          await submit();
+
+          expect(failure()).toBe(
+            'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.',
+          );
+          expect(router.url).toBe('/login');
+          expect(pending().email()).toBeNull();
+        },
+      );
     });
 
     it('explains a failure that is not an answer of the API', async () => {
