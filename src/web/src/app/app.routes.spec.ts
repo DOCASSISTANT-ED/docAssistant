@@ -103,7 +103,7 @@ describe('routes', () => {
       },
     );
 
-    it.each(['/login', '/register'])('leads home from %s', async (url) => {
+    it.each(['/login', '/register', '/dogrula'])('leads home from %s', async (url) => {
       await visit(url);
 
       expect(router.url).toBe('/');
@@ -177,6 +177,14 @@ describe('routes', () => {
       expect(page().querySelector('app-admin-register')).not.toBeNull();
     });
 
+    // decisions #70: typing the e-mailed code, before the account can sign in.
+    it('shows the verification screen', async () => {
+      await visit('/dogrula', null);
+
+      expect(router.url).toBe('/dogrula');
+      expect(page().querySelector('app-verify-email')).not.toBeNull();
+    });
+
     it('leads from the home page to the login screen', async () => {
       await visit('/', null);
 
@@ -201,6 +209,7 @@ describe('routes', () => {
   it.each([
     ['/login', null, 'Giriş yap · DocAssistant'],
     ['/register', null, 'Yönetici kaydı · DocAssistant'],
+    ['/dogrula', null, 'E-postanızı doğrulayın · DocAssistant'],
     ['/', admin, 'DocAssistant'],
   ] as const)('titles the page at %s', async (url, signedInAs, title) => {
     await visit(url, signedInAs);

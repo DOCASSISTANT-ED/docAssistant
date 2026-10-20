@@ -69,7 +69,7 @@ public class InvitationPreviewTests(PostgresFixture database)
         Assert.Null((await Invitations.ReadAsync(database, created.Id))!.AcceptedAt);
 
         using var accepted = await Invitations.AcceptAsync(client, created.Token, TestAccounts.NewEmail());
-        Assert.Equal(HttpStatusCode.OK, accepted.StatusCode);
+        Assert.Equal(HttpStatusCode.Accepted, accepted.StatusCode);
     }
 
     // ---- Links that cannot be used ----

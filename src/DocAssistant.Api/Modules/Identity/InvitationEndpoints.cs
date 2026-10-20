@@ -129,14 +129,13 @@ public static class InvitationEndpoints
     }
 
     // Joins with the link: a new user and their membership, in one transaction with the
-    // link being used up, then signed in (decisions #60).
-    private static async Task<Results<Ok<AccessToken>, NotFound, ProblemHttpResult>> Accept(
+    // link being used up; then the address is verified with an e-mailed code (#70).
+    private static async Task<Results<Accepted<JoinedResponse>, NotFound, ProblemHttpResult>> Accept(
         string token,
         AcceptInvitationRequest request,
-        HttpContext http,
         AppDbContext db,
         IPasswordHasher<User> passwordHasher,
-        JwtTokenIssuer tokenIssuer,
+        EmailVerificationService verifications,
         TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
@@ -223,10 +222,22 @@ public static class InvitationEndpoints
 
         await transaction.CommitAsync(cancellationToken);
 
-        var accessToken = tokenIssuer.Issue(user.Id, user.Email, invitation.TenantId, invitation.Role.ToString());
-        SessionCookie.Append(http, accessToken);
+        // decisions #70: a new account proves its address before it is used, as an admin's
+        // does at registration. No sign-in here: the code is e-mailed, and typing it
+        // (POST /auth/verify-email) signs the person in to this organization with this role.
+        // The account stays when the e-mail could not be sent (joining again would only
+        // answer 404, the link is used up); the person asks for a new code on that screen.
+        bool sent;
+        try
+        {
+            sent = await verifications.SendCodeAsync(user, cancellationToken) == SendCodeResult.Sent;
+        }
+        catch (EmailNotSentException)
+        {
+            sent = false;
+        }
 
-        return TypedResults.Ok(accessToken);
+        return TypedResults.Accepted((string?)null, new JoinedResponse(sent));
     }
 
     // Not used, not expired; looked up by the hash of the key, without a tenant.
@@ -283,3 +294,7 @@ public sealed record InvitationCreatedResponse(Guid Id, string Token, string Rol
 public sealed record InvitationResponse(Guid Id, string Role, DateTimeOffset CreatedAt, DateTimeOffset ExpiresAt);
 
 public sealed record InvitationPreviewResponse(string CompanyName, string Role, DateTimeOffset ExpiresAt);
+
+// The answer to joining (decisions #70): whether the verification code went out; when not,
+// the verification screen offers a new one at once. As AdminRegistrationResponse.
+public sealed record JoinedResponse(bool VerificationSent);

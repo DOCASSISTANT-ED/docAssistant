@@ -11,7 +11,7 @@ import { identityLimits } from '../../api/identity';
 import { InvitationPreview, InvitationsApi, roleLabels } from '../../api/invitations';
 import { problemOf } from '../../api/problem';
 import { AuthLayout } from '../auth-layout/auth-layout';
-import { Session } from '../session';
+import { PendingVerification } from '../verify-email/pending-verification';
 
 // What the screen shows: the link is being looked at, it can be used, it cannot be used
 // (unknown, used, revoked or expired: the API does not say which), or the API did not
@@ -24,7 +24,8 @@ type LinkState =
 
 // /davet/<key>: joining an organization with an invitation link (docs/decisions.md #67).
 // The screen first shows which organization and role the link is for, then creates the
-// account with an email and a password and signs it in.
+// account with an email and a password, and sends the person on to type the code e-mailed
+// to that address (#70); the code signs them in.
 @Component({
   imports: [
     AuthLayout,
@@ -41,7 +42,7 @@ type LinkState =
 })
 export class Join implements OnInit {
   private readonly api = inject(InvitationsApi);
-  private readonly session = inject(Session);
+  private readonly pending = inject(PendingVerification);
   private readonly router = inject(Router);
 
   // The key, from the address (the route's :token parameter).
@@ -115,18 +116,14 @@ export class Join implements OnInit {
     this.failure.set(null);
 
     try {
-      await this.session.acceptInvitation(this.token, this.form.getRawValue());
+      const request = this.form.getRawValue();
+      const joined = await firstValueFrom(this.api.accept(this.token, request));
 
-      // As at registration: the account exists, but the session cookie did not come back
-      // (decisions #60). The link is used up now, so joining again would not work.
-      if (!this.session.isSignedIn()) {
-        this.failure.set(
-          'Hesabınız oluşturuldu ama oturum açılamadı. Tarayıcınız çerezleri engelliyor olabilir; bu siteye çerez izni verip giriş yapın.',
-        );
-        return;
-      }
-
-      await this.router.navigateByUrl('/');
+      // decisions #70: the account is made and the link used up, but the address has to be
+      // proved first. The code was e-mailed; typing it on the verification screen signs the
+      // person in. The address goes along in memory (PendingVerification), as from login.
+      this.pending.start(request.email, joined.verificationSent);
+      await this.router.navigateByUrl('/dogrula');
     } catch (error) {
       this.explain(error);
     } finally {

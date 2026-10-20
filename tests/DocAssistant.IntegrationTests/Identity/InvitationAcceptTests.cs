@@ -29,7 +29,8 @@ public class InvitationAcceptTests(PostgresFixture database)
 
         using var response = await Invitations.AcceptAsync(client, created.Token, email);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        // decisions #70: joining answers 202 and e-mails a code; the code signs in.
+        Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
         var user = (await Invitations.UserByEmailAsync(database, email))!;
         var membership = (await Invitations.MembershipAsync(database, user.Id, admin.TenantId))!;
         Assert.Equal(expected, membership.Role);
@@ -47,13 +48,15 @@ public class InvitationAcceptTests(PostgresFixture database)
         using var response = await Invitations.AcceptAsync(
             client, created.Token, new { email, password = Invitations.Password, role = "Admin" });
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
         var user = (await Invitations.UserByEmailAsync(database, email))!;
         Assert.Equal(MembershipRole.Member, (await Invitations.MembershipAsync(database, user.Id, admin.TenantId))!.Role);
     }
 
     // The same as registering (#60): a token in the answer and the session cookie.
-    [Fact]
+    // Superseded by decisions #70: joining no longer signs in; the e-mailed code does. To be
+    // rewritten for that rule by the invitation tests' author.
+    [Fact(Skip = "Superseded by docs/decisions.md #70: joining e-mails a verification code instead of signing in.")]
     public async Task ThePersonWhoJoinedIsSignedIn()
     {
         using var client = database.Api.CreateClient();
@@ -210,7 +213,7 @@ public class InvitationAcceptTests(PostgresFixture database)
 
         Assert.Null((await Invitations.ReadAsync(database, created.Id))!.AcceptedAt);
         using var response = await Invitations.AcceptAsync(client, created.Token, TestAccounts.NewEmail());
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
     }
 
     // The person was removed from the organization; their account stays (#67), so the

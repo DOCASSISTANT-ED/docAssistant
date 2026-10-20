@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Role } from './identity';
 
@@ -40,6 +40,12 @@ export interface InvitationPreview {
 export interface AcceptInvitationRequest {
   email: string;
   password: string;
+}
+
+// Server: JoinedResponse. Whether the verification code went out (decisions #70); when
+// not, the verification screen offers a new one at once.
+export interface JoinedInvitation {
+  verificationSent: boolean;
 }
 
 // Server: MemberResponse.
@@ -93,12 +99,13 @@ export class InvitationsApi {
     return this.http.get<InvitationPreview>(`${this.invitationsUrl}/${encodeURIComponent(token)}`);
   }
 
-  // Joins and signs in: the server sets the session cookie. The token in the answer is
-  // dropped here, as at login (identity.ts, decisions #60). Fails with 404 as preview()
-  // and with 409 when the email is already registered.
-  accept(token: string, request: AcceptInvitationRequest): Observable<void> {
-    return this.http
-      .post<unknown>(`${this.invitationsUrl}/${encodeURIComponent(token)}/accept`, request)
-      .pipe(map(() => undefined));
+  // Joins, without signing in: the API e-mails a verification code, and typing it signs
+  // the person in (decisions #70). Fails with 404 as preview(), with 409 when the email is
+  // already registered and with 400 for an address outside the company's email rule.
+  accept(token: string, request: AcceptInvitationRequest): Observable<JoinedInvitation> {
+    return this.http.post<JoinedInvitation>(
+      `${this.invitationsUrl}/${encodeURIComponent(token)}/accept`,
+      request,
+    );
   }
 }
