@@ -197,11 +197,14 @@ export class VerifyEmail {
     const input = this.codeInput()?.nativeElement;
     if (input) {
       input.value = '';
-      input.focus();
     }
 
     this.code.set('');
     this.form.controls.code.reset('');
+
+    // Back to the boxes for the next try. The input is disabled while a code is checked, and
+    // a disabled input cannot take focus: wait until the screen has enabled it again.
+    setTimeout(() => this.codeInput()?.nativeElement.focus());
   }
 }
 
