@@ -35,6 +35,9 @@ internal sealed class EvalApi(
         builder.UseSetting("ConnectionStrings:Default", connectionString);
         builder.UseSetting("Jwt:SigningKey", "evaluation-run-signing-key-not-a-secret-0123456789");
 
+        // A run registers its company through open registration (decisions #70).
+        builder.UseSetting("Auth:OpenRegistration", "true");
+
         builder.UseSetting("Embedding:BaseUrl", embeddingUrl);
         builder.UseSetting("Embedding:Model", embeddingModel);
 

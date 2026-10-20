@@ -20,6 +20,10 @@ public sealed class DocAssistantApiFactory(string connectionString) : WebApplica
         builder.UseSetting("ConnectionStrings:Default", connectionString);
         builder.UseSetting("Jwt:SigningKey", SigningKey);
 
+        // Open registration (decisions #70) is how most tests make a company; tests of the
+        // closed setting turn it off.
+        builder.UseSetting("Auth:OpenRegistration", "true");
+
         // The app refuses to start without storage settings. These point nowhere on
         // purpose (.invalid never resolves): no test may reach a real bucket by accident.
         // Tests that upload replace IFileStorage or supply their own storage.
