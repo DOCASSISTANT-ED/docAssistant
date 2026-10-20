@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { CurrentUser, IdentityApi, LoginRequest, RegisterRequest } from '../api/identity';
+import { CurrentUser, IdentityApi, LoginRequest, RegisterRequest, VerifyEmailRequest } from '../api/identity';
 import { AcceptInvitationRequest, InvitationsApi } from '../api/invitations';
 
 // 'unknown' lasts only until the first answer from the API at startup.
@@ -50,6 +50,12 @@ export class Session {
 
   async register(request: RegisterRequest): Promise<void> {
     await firstValueFrom(this.api.register(request));
+    await this.load();
+  }
+
+  // The right code from the verification e-mail signs the user in (decisions #70).
+  async verifyEmail(request: VerifyEmailRequest): Promise<void> {
+    await firstValueFrom(this.api.verifyEmail(request));
     await this.load();
   }
 

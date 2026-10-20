@@ -20,6 +20,13 @@ export interface LoginRequest {
   password: string;
 }
 
+// Server: VerifyEmailRequest (docs/decisions.md #70). The six digits from the e-mail;
+// spaces are allowed.
+export interface VerifyEmailRequest {
+  email: string;
+  code: string;
+}
+
 // Server: MembershipRole. Admins upload documents; members ask questions.
 export type Role = 'Admin' | 'Member';
 
@@ -56,6 +63,18 @@ export class IdentityApi {
 
   login(request: LoginRequest): Observable<void> {
     return this.http.post<unknown>(`${this.baseUrl}/login`, request).pipe(map(() => undefined));
+  }
+
+  // Typing the code from the e-mail (decisions #70). The right code verifies the account and
+  // signs the user in, as login does; any other code fails with 400.
+  verifyEmail(request: VerifyEmailRequest): Observable<void> {
+    return this.http.post<unknown>(`${this.baseUrl}/verify-email`, request).pipe(map(() => undefined));
+  }
+
+  // Asks for a new code. Answers 204 whether or not the address has an account, and when
+  // it is too soon for another code; fails with 503 only when the e-mail could not be sent.
+  resendVerification(email: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/verify-email/resend`, { email });
   }
 
   // Removes the session cookie; succeeds also when nobody is signed in.
