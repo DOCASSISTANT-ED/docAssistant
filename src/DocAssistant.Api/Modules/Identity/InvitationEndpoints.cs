@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using DocAssistant.Api.Data;
+using DocAssistant.Api.Modules.Tenants;
 using DocAssistant.Shared.Tenancy;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -145,12 +146,24 @@ public static class InvitationEndpoints
         await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
 
         var invitation = await FindUsable(db, token, now)
-            .Select(i => new { i.Id, i.TenantId, i.Role })
+            .Select(i => new { i.Id, i.TenantId, i.Role, i.Tenant.EmailDomains })
             .SingleOrDefaultAsync(cancellationToken);
 
         if (invitation is null)
         {
             return TypedResults.NotFound();
+        }
+
+        // decisions #70: a company with an email rule takes only its own addresses, also by
+        // invitation. Checked before the address is looked up, so the answer says nothing
+        // about whether it is registered. The domains are in the answer: whoever holds the
+        // link may know them, and the join screen names them.
+        if (!Tenant.AcceptsEmail(invitation.EmailDomains, request.Email))
+        {
+            return TypedResults.Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "This company accepts only email addresses at its own domains.",
+                extensions: new Dictionary<string, object?> { ["emailDomains"] = invitation.EmailDomains });
         }
 
         // A person has one organization for now (decisions #13): an email that is already

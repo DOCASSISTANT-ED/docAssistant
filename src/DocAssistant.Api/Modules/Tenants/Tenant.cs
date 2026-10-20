@@ -32,6 +32,22 @@ public partial class Tenant
 
     public DateTimeOffset CreatedAt { get; set; }
 
+    // Whether an address may join a company with these EmailDomains (decisions #70): any
+    // address when there are none, otherwise one whose domain is one of them exactly
+    // ("ali@afirma.com" for afirma.com; not "ali@mail.afirma.com"). Case does not count.
+    public static bool AcceptsEmail(IReadOnlyCollection<string> emailDomains, string email)
+    {
+        if (emailDomains.Count == 0)
+        {
+            return true;
+        }
+
+        var at = email.LastIndexOf('@');
+        var domain = at < 0 ? string.Empty : email[(at + 1)..].Trim().ToLowerInvariant();
+
+        return emailDomains.Contains(domain);
+    }
+
     // The same steps as the migration that filled the column for existing companies
     // (AddCompanyRegistration): trim, one space between words, i ı İ I all as I, upper case.
     public static string NormalizeName(string name) =>
