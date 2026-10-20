@@ -66,6 +66,25 @@ services:
               count: all
               capabilities: [gpu]
 
+  # Geliştirmede e-posta (docs/decisions.md #70). Uygulamanın SMTP ile gönderdiği e-postaları
+  # kimseye göndermeden yakalar; doğrulama kodları http://localhost:8025 adresinde görünür.
+  # Canlıda bunun yerine gerçek bir SMTP servisi kullanılır. E-postalar bellekte durur,
+  # servis yeniden başlayınca silinir.
+  mailpit:
+    image: axllent/mailpit:v1.31.3
+    container_name: docassistant-mailpit
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "[::1]:${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025"
+      - "[::1]:${MAILPIT_UI_PORT:-8025}:8025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   # Reranker (docs/decisions.md #52). İsteğe bağlı, varsayılan olarak başlamaz:
   #   docker compose --profile reranker up -d
   # İlk açılışta modeli (yaklaşık 2,3 GB) indirir. Bu imaj işlemcide çalışır ve yavaştır
