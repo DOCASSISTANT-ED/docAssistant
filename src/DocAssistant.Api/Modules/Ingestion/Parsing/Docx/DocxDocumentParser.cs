@@ -35,7 +35,7 @@ public sealed partial class DocxDocumentParser : IDocumentParser
     {
         // The DOCX reader needs to jump around in the file. The caller's stream (e.g. from
         // file storage) may not allow that, so work on an in-memory copy; uploads are at
-        // most 20 MB (decisions #32).
+        // most 100 MB (decisions #72).
         using var file = new MemoryStream();
         content.CopyTo(file);
         file.Position = 0;

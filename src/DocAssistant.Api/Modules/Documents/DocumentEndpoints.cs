@@ -13,8 +13,12 @@ namespace DocAssistant.Api.Modules.Documents;
 
 public static class DocumentEndpoints
 {
-    // docs/decisions.md #32.
-    public const long MaxFileSizeBytes = 20 * 1024 * 1024;
+    // docs/decisions.md #72 (#32 had 20 MB).
+    public const long MaxFileSizeBytes = 100 * 1024 * 1024;
+
+    // The whole upload request: the file and the form around it (boundaries, headers),
+    // which take a few hundred bytes; a megabyte leaves room to spare.
+    public const long MaxUploadRequestBytes = MaxFileSizeBytes + (1024 * 1024);
 
     public static IEndpointRouteBuilder MapDocumentEndpoints(this IEndpointRouteBuilder app)
     {
@@ -30,7 +34,10 @@ public static class DocumentEndpoints
             // authenticated request that changes something must carry the X-Requested-With
             // header (SessionCookieCsrfProtection). Another site cannot add that header to
             // a form post, so it cannot make a logged-in browser call this endpoint.
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            // decisions #72: Kestrel turns away requests over about 28.6 MB before they reach
+            // the endpoint. Raised here only, so every other endpoint keeps that default.
+            .WithMetadata(new Microsoft.AspNetCore.Mvc.RequestSizeLimitAttribute(MaxUploadRequestBytes));
 
         documents.MapGet("/", List);
         documents.MapGet("/{id:guid}", GetById);
@@ -132,7 +139,7 @@ public static class DocumentEndpoints
 
         if (file.Length > MaxFileSizeBytes)
         {
-            return Problem(StatusCodes.Status413PayloadTooLarge, "The file is larger than 20 MB.");
+            return Problem(StatusCodes.Status413PayloadTooLarge, "The file is larger than 100 MB.");
         }
 
         await using var content = file.OpenReadStream();

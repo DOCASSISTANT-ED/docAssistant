@@ -317,12 +317,15 @@ describe('Documents', () => {
     it.each([
       ['rapor.doc', 1024, 'Yalnızca PDF ve DOCX dosyaları yüklenebilir.'],
       ['bos.pdf', 0, 'Dosya boş.'],
-      ['buyuk.pdf', 20 * 1024 * 1024 + 1, "Dosya 20 MB'tan büyük."],
+      ['buyuk.pdf', 100 * 1024 * 1024 + 1, "Dosya 100 MB'tan büyük."],
     ])('does not send %s and says why', async (name, size, message) => {
       await open();
       await answerList([]);
 
-      await choose(new File([new Uint8Array(size)], name));
+      // A small file that reports the size: over 100 MB of real bytes would only slow the test.
+      const chosen = new File([new Uint8Array(Math.min(size, 1024))], name);
+      Object.defineProperty(chosen, 'size', { value: size });
+      await choose(chosen);
 
       expect(uploadPosts()).toEqual([]);
       const line = uploadRows()[0];
@@ -331,7 +334,7 @@ describe('Documents', () => {
     });
 
     it.each([
-      [413, "Dosya 20 MB'tan büyük."],
+      [413, "Dosya 100 MB'tan büyük."],
       [415, 'Bu dosya PDF ya da DOCX değil.'],
       [400, 'Dosya boş ya da okunamadı.'],
       [403, 'Belge yalnızca yöneticiler tarafından yüklenebilir.'],
@@ -715,7 +718,7 @@ describe('Documents', () => {
       await answerList([]);
 
       expect(textOf('.rules')).toBe(
-        'PDF ya da DOCX, en fazla 20 MB. Yüklenen belge birkaç saniye içinde aranabilir olur.',
+        'PDF ya da DOCX, en fazla 100 MB. Yüklenen belge işlendikten sonra aranabilir olur; büyük belgelerde bu birkaç dakika sürebilir.',
       );
     });
 
