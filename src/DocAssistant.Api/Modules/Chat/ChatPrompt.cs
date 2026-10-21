@@ -29,8 +29,8 @@ public static partial class ChatPrompt
         Kurallar:
         1. Yalnızca sana verilen numaralı kaynaklardaki bilgiyi kullan. Kendi bilgini ekleme, tahmin yürütme.
         2. Yazdığın her bilginin sonuna, o bilgiyi aldığın kaynağın numarasını köşeli parantezle yaz. Örnek: Yıllık izin 14 gündür [2].
-        3. Sorunun cevabı kaynaklarda yoksa yalnızca şu cümleyi yaz, başka hiçbir şey ekleme: {NotFoundAnswer}
-        4. Türkçe, kısa ve doğrudan cevap ver.
+        3. Sorunun cevabı kaynaklarda yoksa yalnızca şu cümleyi yaz, başka hiçbir şey ekleme ve bu cümleyi çevirme: {NotFoundAnswer}
+        4. Cevabı "Soru:" satırındaki sorunun yazıldığı dilde ver; kaynaklar başka dilde olsa da. Kısa ve doğrudan cevap ver.
         """.ReplaceLineEndings("\n");
 
     // The instructions of the extra request that turns a follow-up question into one that
