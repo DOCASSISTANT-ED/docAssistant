@@ -77,7 +77,10 @@
             >
               {{ passwordVisible() ? 'Gizle' : 'Göster' }}
             </button>
-            <mat-hint>En az {{ limits.passwordMinLength }} karakter.</mat-hint>
+            <mat-hint
+              >En az {{ limits.passwordMinLength }} karakter. Bu adresle daha önce hesap açtıysanız
+              o hesabın parolasını girin.</mat-hint
+            >
             @if (form.controls.password.hasError('required')) {
               <mat-error>Bir parola belirleyin.</mat-error>
             } @else if (form.controls.password.hasError('minlength')) {
