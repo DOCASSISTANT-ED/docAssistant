@@ -18,6 +18,9 @@ interface Upload {
 // Processing takes seconds (decisions #50), so the page does not need to be faster.
 export const refreshIntervalMs = 3000;
 
+// "100 MB": the upload limit as the page says it.
+const maxSize = `${uploadLimits.maxSizeBytes / (1024 * 1024)} MB`;
+
 // The organization's documents (docs/decisions.md #66): every member sees them, so they
 // know what they can ask about; admins also upload and delete them.
 @Component({
@@ -30,6 +33,7 @@ export class Documents {
   protected readonly session = inject(Session);
 
   protected readonly accept = uploadLimits.extensions.join(',');
+  protected readonly maxSize = maxSize;
 
   protected readonly documents = signal<DocumentInfo[]>([]);
   protected readonly listState = signal<ListState>('loading');
@@ -238,7 +242,7 @@ export class Documents {
 }
 
 // Why a file is not sent, or null when it may be. The same rules as the server
-// (decisions #32), so that the user hears about them at once.
+// (decisions #32, #71), so that the user hears about them at once.
 export function checkFile(file: File): string | null {
   const name = file.name.toLocaleLowerCase('tr');
 
@@ -251,7 +255,7 @@ export function checkFile(file: File): string | null {
   }
 
   if (file.size > uploadLimits.maxSizeBytes) {
-    return "Dosya 20 MB'tan büyük.";
+    return `Dosya ${maxSize}'tan büyük.`;
   }
 
   return null;
@@ -261,7 +265,7 @@ function uploadFailure(error: unknown): string {
   if (error instanceof HttpErrorResponse) {
     switch (error.status) {
       case 413:
-        return "Dosya 20 MB'tan büyük.";
+        return `Dosya ${maxSize}'tan büyük.`;
       case 415:
         return 'Bu dosya PDF ya da DOCX değil.';
       case 400:
