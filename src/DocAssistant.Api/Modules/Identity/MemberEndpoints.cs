@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using DocAssistant.Api.Data;
+using DocAssistant.Shared.Tenancy;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,6 +43,7 @@ public static class MemberEndpoints
     private static async Task<Results<NoContent, NotFound, ProblemHttpResult>> Remove(
         Guid userId,
         ClaimsPrincipal user,
+        ITenantContext tenantContext,
         AppDbContext db,
         CancellationToken cancellationToken)
     {
@@ -49,6 +51,16 @@ public static class MemberEndpoints
         {
             return TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, title: "You cannot remove yourself.");
         }
+
+        // Two admins removing each other at the same moment would each count two admins and
+        // each remove the other, leaving the organization without one. Removals in one
+        // organization therefore take turns: the organization's row is locked until this
+        // removal is done, and the next one counts after it.
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+
+        await db.Database.ExecuteSqlInterpolatedAsync(
+            $"SELECT id FROM tenants WHERE id = {tenantContext.TenantId} FOR UPDATE",
+            cancellationToken);
 
         var membership = await db.Memberships
             .SingleOrDefaultAsync(m => m.UserId == userId, cancellationToken);
@@ -66,6 +78,7 @@ public static class MemberEndpoints
 
         db.Memberships.Remove(membership);
         await db.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
 
         return TypedResults.NoContent();
     }
