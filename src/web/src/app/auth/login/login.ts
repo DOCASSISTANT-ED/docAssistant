@@ -103,7 +103,9 @@ function messageFor(error: unknown): string {
       case 401:
         return 'E-posta ya da parola hatalı.';
       case 403:
-        return 'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.';
+        // decisions #67: the account stays when its person is removed from the organization;
+        // a new invitation link brings it back (with its own password).
+        return 'Bu hesap artık bir firmaya bağlı değil. Yeniden katılmak için firmanızın yöneticisinden yeni bir davet bağlantısı isteyin.';
       // Status 0: no answer at all (the API is down or the network is).
       case 0:
         return 'Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip yeniden deneyin.';

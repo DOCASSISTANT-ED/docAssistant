@@ -159,7 +159,10 @@ describe('Login', () => {
   describe('a rejected attempt', () => {
     it.each([
       [401, 'E-posta ya da parola hatalı.'],
-      [403, 'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.'],
+      [
+        403,
+        'Bu hesap artık bir firmaya bağlı değil. Yeniden katılmak için firmanızın yöneticisinden yeni bir davet bağlantısı isteyin.',
+      ],
       [0, 'Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip yeniden deneyin.'],
       [500, 'Giriş yapılamadı. Biraz sonra yeniden deneyin.'],
     ])('explains a %s answer and stays on the screen', async (status, message) => {
@@ -253,7 +256,7 @@ describe('Login', () => {
           await submit();
 
           expect(failure()).toBe(
-            'Bu hesap bir firmaya bağlı değil. Firmanızın yöneticisine başvurun.',
+            'Bu hesap artık bir firmaya bağlı değil. Yeniden katılmak için firmanızın yöneticisinden yeni bir davet bağlantısı isteyin.',
           );
           expect(router.url).toBe('/login');
           expect(pending().email()).toBeNull();

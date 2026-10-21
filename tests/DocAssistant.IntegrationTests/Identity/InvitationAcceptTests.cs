@@ -219,7 +219,10 @@ public class InvitationAcceptTests(PostgresFixture database)
     // The person was removed from the organization; their account stays (#67), so the
     // email is still registered and an invitation cannot bring them back. The decision
     // allows this; it is written down here so that the consequence is seen.
-    [Fact]
+    // Superseded by the note on #67 in docs/decisions.md: an account without an organization
+    // joins again with its own password. To be rewritten for that rule by the invitation
+    // tests' author.
+    [Fact(Skip = "Superseded by docs/decisions.md #67 (rejoining): an account without an organization joins again with its own password.")]
     public async Task APersonRemovedFromTheOrganizationCannotJoinAgainWithTheSameEmail()
     {
         using var client = database.Api.CreateClient();

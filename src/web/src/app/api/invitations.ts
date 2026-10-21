@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Role } from './identity';
 
@@ -42,9 +42,12 @@ export interface AcceptInvitationRequest {
   password: string;
 }
 
-// Server: JoinedResponse. Whether the verification code went out (decisions #70); when
-// not, the verification screen offers a new one at once.
+// What joining led to. A new account (202, server: JoinedResponse) is not signed in yet:
+// its address is verified with an e-mailed code first, and verificationSent says whether
+// one went out (decisions #70). An account without an organization coming back with its
+// own password (200, #67) is signed in at once: the server set the session cookie.
 export interface JoinedInvitation {
+  signedIn: boolean;
   verificationSent: boolean;
 }
 
@@ -99,13 +102,25 @@ export class InvitationsApi {
     return this.http.get<InvitationPreview>(`${this.invitationsUrl}/${encodeURIComponent(token)}`);
   }
 
-  // Joins, without signing in: the API e-mails a verification code, and typing it signs
-  // the person in (decisions #70). Fails with 404 as preview(), with 409 when the email is
-  // already registered and with 400 for an address outside the company's email rule.
+  // Joins. A new account is not signed in: the API e-mails a verification code, and typing
+  // it signs the person in (decisions #70). An account without an organization that comes
+  // back with its own password is signed in at once (#67); the token in that answer is
+  // dropped, as at login. Fails with 404 as preview(), with 409 when the email belongs to
+  // another organization's account or the password is not that account's, and with 400
+  // for an address outside the company's email rule.
   accept(token: string, request: AcceptInvitationRequest): Observable<JoinedInvitation> {
-    return this.http.post<JoinedInvitation>(
-      `${this.invitationsUrl}/${encodeURIComponent(token)}/accept`,
-      request,
-    );
+    return this.http
+      .post<{ verificationSent?: boolean }>(
+        `${this.invitationsUrl}/${encodeURIComponent(token)}/accept`,
+        request,
+        { observe: 'response' },
+      )
+      .pipe(
+        map((response) =>
+          response.status === 200
+            ? { signedIn: true, verificationSent: false }
+            : { signedIn: false, verificationSent: response.body?.verificationSent === true },
+        ),
+      );
   }
 }

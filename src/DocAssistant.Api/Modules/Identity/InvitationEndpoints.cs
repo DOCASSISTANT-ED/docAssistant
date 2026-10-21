@@ -129,13 +129,17 @@ public static class InvitationEndpoints
     }
 
     // Joins with the link: a new user and their membership, in one transaction with the
-    // link being used up; then the address is verified with an e-mailed code (#70).
-    private static async Task<Results<Accepted<JoinedResponse>, NotFound, ProblemHttpResult>> Accept(
+    // link being used up; then the address is verified with an e-mailed code (#70). An
+    // account without an organization joins with its own password instead (#67) and, its
+    // address being verified already, is signed in at once.
+    private static async Task<Results<Ok<AccessToken>, Accepted<JoinedResponse>, NotFound, ProblemHttpResult>> Accept(
         string token,
         AcceptInvitationRequest request,
+        HttpContext http,
         AppDbContext db,
         IPasswordHasher<User> passwordHasher,
         EmailVerificationService verifications,
+        JwtTokenIssuer tokenIssuer,
         TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
@@ -166,26 +170,44 @@ public static class InvitationEndpoints
         }
 
         // A person has one organization for now (decisions #13): an email that is already
-        // registered cannot join another one.
-        var emailTaken = await db.Users
+        // registered cannot join another one. An account that belongs to none (someone
+        // removed from their organization, #67) may come back with its own password.
+        var existing = await db.Users
             .IgnoreQueryFilters()
-            .AnyAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
+            .Where(u => u.NormalizedEmail == normalizedEmail)
+            .Select(u => new { User = u, HasMembership = u.Memberships.Any() })
+            .SingleOrDefaultAsync(cancellationToken);
 
-        if (emailTaken)
+        User user;
+
+        if (existing is not null)
         {
-            return EmailAlreadyRegistered();
+            // A wrong password gets the same answer as an account in another organization,
+            // so the answer says nothing about which one it is.
+            if (existing.HasMembership
+                || existing.User.IsPlatformAdmin
+                || passwordHasher.VerifyHashedPassword(existing.User, existing.User.PasswordHash, request.Password)
+                    == PasswordVerificationResult.Failed)
+            {
+                return EmailAlreadyRegistered();
+            }
+
+            user = existing.User;
+        }
+        else
+        {
+            user = new User
+            {
+                Id = Guid.CreateVersion7(),
+                Email = request.Email.Trim(),
+                NormalizedEmail = normalizedEmail,
+                PasswordHash = string.Empty,
+            };
+            user.PasswordHash = passwordHasher.HashPassword(user, request.Password);
+
+            db.Users.Add(user);
         }
 
-        var user = new User
-        {
-            Id = Guid.CreateVersion7(),
-            Email = request.Email.Trim(),
-            NormalizedEmail = normalizedEmail,
-            PasswordHash = string.Empty,
-        };
-        user.PasswordHash = passwordHasher.HashPassword(user, request.Password);
-
-        db.Users.Add(user);
         db.Memberships.Add(new Membership
         {
             Id = Guid.CreateVersion7(),
@@ -200,7 +222,8 @@ public static class InvitationEndpoints
         }
         catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
         {
-            // Someone registered the same email between the check and the insert.
+            // Someone registered the same email between the check and the insert, or the
+            // account joined an organization in the meantime.
             return EmailAlreadyRegistered();
         }
 
@@ -221,6 +244,15 @@ public static class InvitationEndpoints
         }
 
         await transaction.CommitAsync(cancellationToken);
+
+        // An account coming back has proved its address before (decisions #70) and is signed
+        // in at once, as at login (#60).
+        if (user.EmailVerifiedAt is not null)
+        {
+            var accessToken = tokenIssuer.Issue(user.Id, user.Email, invitation.TenantId, invitation.Role.ToString());
+            SessionCookie.Append(http, accessToken);
+            return TypedResults.Ok(accessToken);
+        }
 
         // decisions #70: a new account proves its address before it is used, as an admin's
         // does at registration. No sign-in here: the code is e-mailed, and typing it

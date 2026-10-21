@@ -11,6 +11,7 @@ import { identityLimits } from '../../api/identity';
 import { InvitationPreview, InvitationsApi, roleLabels } from '../../api/invitations';
 import { problemOf } from '../../api/problem';
 import { AuthLayout } from '../auth-layout/auth-layout';
+import { Session } from '../session';
 import { PendingVerification } from '../verify-email/pending-verification';
 
 // What the screen shows: the link is being looked at, it can be used, it cannot be used
@@ -43,6 +44,7 @@ type LinkState =
 export class Join implements OnInit {
   private readonly api = inject(InvitationsApi);
   private readonly pending = inject(PendingVerification);
+  private readonly session = inject(Session);
   private readonly router = inject(Router);
 
   // The key, from the address (the route's :token parameter).
@@ -119,6 +121,24 @@ export class Join implements OnInit {
       const request = this.form.getRawValue();
       const joined = await firstValueFrom(this.api.accept(this.token, request));
 
+      // An account that had no organization came back with its own password (#67) and is
+      // signed in: the app asks who that is, as after login.
+      if (joined.signedIn) {
+        await this.session.load();
+
+        // As at login: the API took the join, but the session cookie did not come back
+        // (decisions #60), most likely because the browser refused it.
+        if (!this.session.isSignedIn()) {
+          this.failure.set(
+            'Firmaya katıldınız ama oturum açılamadı. Tarayıcınız çerezleri engelliyor olabilir; bu siteye çerez izni verip giriş yapın.',
+          );
+          return;
+        }
+
+        await this.router.navigateByUrl('/');
+        return;
+      }
+
       // decisions #70: the account is made and the link used up, but the address has to be
       // proved first. The code was e-mailed; typing it on the verification screen signs the
       // person in. The address goes along in memory (PendingVerification), as from login.
@@ -147,7 +167,7 @@ export class Join implements OnInit {
       case 409:
         this.form.controls.email.setErrors({ taken: true });
         this.failure.set(
-          'Bu e-posta adresiyle zaten bir hesap var. Bir kişi yalnızca bir firmaya katılabilir.',
+          'Bu e-posta adresiyle bir hesap var. Daha önce bir firmadan çıkarıldıysanız hesabınızın parolasını girin; hesap başka bir firmaya bağlıysa bu davetle katılamazsınız.',
         );
         return;
 
