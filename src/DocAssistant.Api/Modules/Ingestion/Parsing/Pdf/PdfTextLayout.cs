@@ -21,7 +21,7 @@ internal static class PdfTextLayout
     public static List<PdfLine> ReadLines(Page page)
     {
         var words = page.GetWords()
-            .Where(word => !string.IsNullOrWhiteSpace(word.Text) && word.Letters.Count > 0)
+            .Where(word => !string.IsNullOrWhiteSpace(TextOf(word)) && word.Letters.Count > 0)
             .OrderByDescending(Baseline)
             .ToList();
 
@@ -152,7 +152,23 @@ internal static class PdfTextLayout
             pageNumber,
             Baseline(ordered[0]),
             fontSize,
-            string.Join(' ', ordered.Select(word => word.Text)));
+            string.Join(' ', ordered.Select(TextOf)));
+    }
+
+    // A word's text without control characters. A font that does not say which letter a
+    // glyph is (common for symbols, such as Greek letters in LaTeX documents) can come
+    // out as one, NUL included, which PostgreSQL cannot store in text (decisions #23).
+    // The symbol is lost either way; dropping it keeps the rest of the text.
+    private static string TextOf(Word word)
+    {
+        var text = word.Text;
+
+        if (!text.Any(char.IsControl))
+        {
+            return text;
+        }
+
+        return string.Concat(text.Where(letter => !char.IsControl(letter)));
     }
 
     private static PdfParagraph ToParagraph(List<PdfLine> lines)
