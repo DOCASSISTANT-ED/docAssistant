@@ -3,7 +3,7 @@ import { checkFile, formatSize } from './documents';
 const MB = 1024 * 1024;
 
 // checkFile reads only a file's name and size; a stand-in with those two is enough, and
-// spares the tests from building 20 MB of bytes.
+// spares the tests from building 100 MB of bytes.
 function file(name: string, size = 1024): File {
   return { name, size } as File;
 }
@@ -40,12 +40,17 @@ describe('checkFile', () => {
     expect(checkFile(file('bos.txt', 0))).toBe('Yalnızca PDF ve DOCX dosyaları yüklenebilir.');
   });
 
-  it('lets a file of exactly 20 MB through', () => {
-    expect(checkFile(file('buyuk.pdf', 20 * MB))).toBeNull();
+  // decisions #71: 100 MB (it was 20 MB under #32).
+  it('lets a file of exactly 100 MB through', () => {
+    expect(checkFile(file('buyuk.pdf', 100 * MB))).toBeNull();
   });
 
-  it('refuses a file one byte over 20 MB', () => {
-    expect(checkFile(file('buyuk.pdf', 20 * MB + 1))).toBe("Dosya 20 MB'tan büyük.");
+  it('lets a file of 50 MB through, which the old 20 MB limit refused', () => {
+    expect(checkFile(file('buyuk.pdf', 50 * MB))).toBeNull();
+  });
+
+  it('refuses a file one byte over 100 MB', () => {
+    expect(checkFile(file('buyuk.pdf', 100 * MB + 1))).toBe("Dosya 100 MB'tan büyük.");
   });
 
   it('lets a one-byte file through', () => {
