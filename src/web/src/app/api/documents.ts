@@ -30,7 +30,7 @@ export interface Passage {
   text: string;
 }
 
-// What the server accepts for upload (docs/decisions.md #32; the size is #71), so that the page can say so
+// What the server accepts for upload (docs/decisions.md #32; the size is #72), so that the page can say so
 // before sending. The server decides by the file's content, not its name; it stays the
 // one that checks.
 export const uploadLimits = {

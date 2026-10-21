@@ -242,7 +242,7 @@ export class Documents {
 }
 
 // Why a file is not sent, or null when it may be. The same rules as the server
-// (decisions #32, #71), so that the user hears about them at once.
+// (decisions #32, #72), so that the user hears about them at once.
 export function checkFile(file: File): string | null {
   const name = file.name.toLocaleLowerCase('tr');
 

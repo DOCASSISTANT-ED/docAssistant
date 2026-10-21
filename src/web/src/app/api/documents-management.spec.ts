@@ -130,7 +130,7 @@ describe('DocumentsApi: managing documents', () => {
     });
   });
 
-  // The same rules the server applies (decisions #32, #71), so that the page can say so at once.
+  // The same rules the server applies (decisions #32, #72), so that the page can say so at once.
   describe('the upload limits', () => {
     it('are 100 MB, PDF and DOCX', () => {
       expect(uploadLimits.maxSizeBytes).toBe(100 * 1024 * 1024);

@@ -40,7 +40,7 @@ describe('checkFile', () => {
     expect(checkFile(file('bos.txt', 0))).toBe('Yalnızca PDF ve DOCX dosyaları yüklenebilir.');
   });
 
-  // decisions #71: 100 MB (it was 20 MB under #32).
+  // decisions #72: 100 MB (it was 20 MB under #32).
   it('lets a file of exactly 100 MB through', () => {
     expect(checkFile(file('buyuk.pdf', 100 * MB))).toBeNull();
   });

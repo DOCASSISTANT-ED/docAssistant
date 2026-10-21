@@ -13,7 +13,7 @@ namespace DocAssistant.Api.Modules.Documents;
 
 public static class DocumentEndpoints
 {
-    // docs/decisions.md #71 (#32 had 20 MB).
+    // docs/decisions.md #72 (#32 had 20 MB).
     public const long MaxFileSizeBytes = 100 * 1024 * 1024;
 
     // The whole upload request: the file and the form around it (boundaries, headers),
@@ -35,7 +35,7 @@ public static class DocumentEndpoints
             // header (SessionCookieCsrfProtection). Another site cannot add that header to
             // a form post, so it cannot make a logged-in browser call this endpoint.
             .DisableAntiforgery()
-            // decisions #71: Kestrel turns away requests over about 28.6 MB before they reach
+            // decisions #72: Kestrel turns away requests over about 28.6 MB before they reach
             // the endpoint. Raised here only, so every other endpoint keeps that default.
             .WithMetadata(new Microsoft.AspNetCore.Mvc.RequestSizeLimitAttribute(MaxUploadRequestBytes));
 

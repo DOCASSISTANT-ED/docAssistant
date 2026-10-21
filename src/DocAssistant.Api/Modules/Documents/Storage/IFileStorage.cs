@@ -14,7 +14,7 @@ public interface IFileStorage
     Task SaveAsync(string key, Stream content, string contentType, CancellationToken cancellationToken = default);
 
     // Returns the whole file as a seekable stream positioned at the start; the parsers
-    // need to seek. It is held in memory, which the 100 MB upload limit (decisions #71)
+    // need to seek. It is held in memory, which the 100 MB upload limit (decisions #72)
     // keeps bounded. The caller disposes it.
     //
     // Throws FileNotFoundException when nothing is stored under key.
