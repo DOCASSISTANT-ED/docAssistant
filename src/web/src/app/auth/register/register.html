@@ -3,7 +3,12 @@
   <p class="subtitle">Firmanız için bir hesap açın. İlk kullanıcı yönetici olur.</p>
 
   @if (failure(); as message) {
-    <p class="failure" role="alert">{{ message }}</p>
+    <p class="failure" role="alert">
+      {{ message }}
+      @if (closed()) {
+        <a routerLink="/register">Kayıt koduyla kaydol</a>
+      }
+    </p>
   }
 
   <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>

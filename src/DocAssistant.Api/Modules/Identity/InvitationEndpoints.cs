@@ -290,7 +290,15 @@ public static class InvitationEndpoints
             return true;
         }
 
-        return Enum.TryParse(value, ignoreCase: false, out role) && Enum.IsDefined(role);
+        // Only the role's name as written (decisions #67): Enum.TryParse alone would also take
+        // a number ("1") and a list it combines ("Admin, Member").
+        if (!Enum.GetNames<MembershipRole>().Contains(value, StringComparer.Ordinal))
+        {
+            role = default;
+            return false;
+        }
+
+        return Enum.TryParse(value, ignoreCase: false, out role);
     }
 
     private static ProblemHttpResult EmailAlreadyRegistered() =>

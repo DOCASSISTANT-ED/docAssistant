@@ -79,9 +79,8 @@ describe('formatSize', () => {
     expect(formatSize(bytes)).toBe(expected);
   });
 
-  // Known gap. Sizes between 1023.5 KB and 1 MB are rounded up to 1024 kilobytes and
-  // shown as "1024 KB" instead of "1 MB". Remove ".skip" when they are shown in MB.
-  it.skip('does not write a size just under a megabyte as 1024 KB', () => {
+  // Sizes between 1023.5 KB and 1 MB round to 1024 kilobytes; they are shown as "1 MB".
+  it('does not write a size just under a megabyte as 1024 KB', () => {
     expect(formatSize(MB - 1)).toBe('1 MB');
   });
 });

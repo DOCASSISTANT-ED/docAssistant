@@ -14,6 +14,20 @@ export interface RegisterRequest {
   password: string;
 }
 
+// Server: AdminRegistrationRequest (docs/decisions.md #70). Registers as one of a company's
+// admins with the registration code the platform admin gave the company.
+export interface AdminRegistrationRequest {
+  registrationCode: string;
+  email: string;
+  password: string;
+}
+
+// Server: AdminRegistrationResponse. The account is made but not verified yet; this says
+// whether the verification code went out.
+export interface AdminRegistrationResponse {
+  verificationSent: boolean;
+}
+
 // Server: LoginRequest.
 export interface LoginRequest {
   email: string;
@@ -59,6 +73,14 @@ export class IdentityApi {
 
   register(request: RegisterRequest): Observable<void> {
     return this.http.post<unknown>(`${this.baseUrl}/register`, request).pipe(map(() => undefined));
+  }
+
+  // Does not sign in (decisions #70): the account can be used once the e-mailed code is typed
+  // (verifyEmail). Fails with 400 for an unknown code, an address outside the company's
+  // domains (the problem names them in emailDomains) or invalid fields, and 409 for a
+  // registered address.
+  registerAdmin(request: AdminRegistrationRequest): Observable<AdminRegistrationResponse> {
+    return this.http.post<AdminRegistrationResponse>(`${this.baseUrl}/register-admin`, request);
   }
 
   login(request: LoginRequest): Observable<void> {
